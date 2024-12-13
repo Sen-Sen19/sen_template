@@ -96,6 +96,7 @@ include 'plugins/sidebar/admin_bar.php';
             </div>
 
 
+            
 
           </div>
         </div>
