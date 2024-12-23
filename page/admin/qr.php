@@ -64,6 +64,7 @@ include 'plugins/sidebar/admin_bar.php';
 
 
 
+            
 
             <div id="qrModal" class="modal" tabindex="-1" role="dialog">
               <div class="modal-dialog" role="document" style="background-color: #343a40;">
