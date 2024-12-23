@@ -62,6 +62,7 @@ include 'plugins/sidebar/admin_bar.php';
               Total Records: 0
             </div>
 
+            
             <div id="qrModal" class="modal" tabindex="-1" role="dialog">
               <div class="modal-dialog" role="document" style="background-color: #343a40;">
                 <div class="modal-content">
