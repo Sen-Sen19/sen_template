@@ -57,7 +57,7 @@ body {
   color: white;
   margin-right: 40%;
   font-family: 'voor', sans-serif;
-                                                
+  
 }
 
 .form-group {
