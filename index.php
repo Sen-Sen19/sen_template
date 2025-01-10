@@ -115,7 +115,7 @@ label {
   <title>Sen Template</title>
 
   <link href="https://fonts.cdnfonts.com/css/voor" rel="stylesheet">
-  <link href="https://fonts.cdnfonts.com/css/perry-gothic" rel="stylesheet">
+
 
   <link rel="icon" href="dist/img/nature.png" type="image/x-icon" />
   <link rel="stylesheet" href="dist/css/font.min.css">
