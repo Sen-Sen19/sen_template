@@ -29,6 +29,7 @@ if (!isset($_SESSION['username'])) {
     <!-- Sweet Alert -->
   <link rel="stylesheet" href="../../plugins/sweetalert2/dist/sweetalert2.min.css">
   <style>
+    
     .loader {
       border: 16px solid #f3f3f3;
       border-radius: 50%;
