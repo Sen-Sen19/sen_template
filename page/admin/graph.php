@@ -10,9 +10,7 @@
   }
 </style>
 <script src="../../dist/js/apexChart.js"></script>
-
 <div class="content-wrapper">
-
   <div class="content-header">
     <div class="container-fluid">
       <div class="row mb-2">
@@ -69,6 +67,7 @@
                   </select>
                 </div>
               </div>
+              
               <div id="chart"></div>
             </div>
 
