@@ -1,23 +1,9 @@
 <?php include 'plugins/navbar.php'; ?>
 <?php include 'plugins/sidebar/admin_bar.php'; ?>
 
-<div class="content-wrapper">
-    <div class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-   
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="view.php">Home</a></li>
-                        <li class="breadcrumb-item active">Upload</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-    </div>
 
+<div class="content-wrapper">
+  <div class="content-header"></div>
     <section class="content">
         <div class="container-fluid">
             <div class="row">
@@ -79,7 +65,7 @@
 
                         <!-- File List Container with max-height like Viewer -->
                         <div id="fileListContainer" class="list-group"
-                             style="height: 59vh; overflow-y: auto; margin-top: 10px; border-top:1px solid gray;">
+                             style="height: 63vh; overflow-y: auto; margin-top: 10px; border-top:1px solid gray;">
                             <ul id="fileList" class="list-group list-group-flush">
                                 <!-- Files will appear here -->
                             </ul>

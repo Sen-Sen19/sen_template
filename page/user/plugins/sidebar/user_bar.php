@@ -37,7 +37,7 @@
           <a href="accounts.php" class="nav-link active">
           <?php } else { ?>
           <a href="accounts.php" class="nav-link">
-          <?php } ?>
+     0     <?php } ?>
             <i class="nav-icon fas fa-user-cog"></i>
             <p>Account Management</p>
           </a>

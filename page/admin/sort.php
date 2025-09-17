@@ -3,20 +3,9 @@ include 'plugins/navbar.php';
 include 'plugins/sidebar/admin_bar.php';
 ?>
 
+
 <div class="content-wrapper">
-  <div class="content-header">
-    <div class="container-fluid">
-      <div class="row mb-2">
-        <div class="col-sm-6"></div>
-        <div class="col-sm-6">
-          <ol class="breadcrumb float-sm-right">
-            <li class="breadcrumb-item"><a href="">Home</a></li>
-            <li class="breadcrumb-item active">Sort</li>
-          </ol>
-        </div>
-      </div>
-    </div>
-  </div>
+  <div class="content-header"></div>
 
   <section class="content">
     <div class="container-fluid">
@@ -42,7 +31,7 @@ include 'plugins/sidebar/admin_bar.php';
             </div>
 
             <div id="accounts_table_res" class="table-responsive"
-              style="height: 59vh; overflow: auto; display: inline-block; margin-top: 20px; border-top: 1px solid gray;">
+              style="height: 63vh; overflow: auto; display: inline-block; margin-top: 20px; border-top: 1px solid gray;">
               <table id="account" class="table table-sm table-head-fixed text-nowrap table-hover">
                 <thead style="text-align: center;">
                   <tr>

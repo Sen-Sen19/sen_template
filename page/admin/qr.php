@@ -64,21 +64,9 @@ include 'plugins/sidebar/admin_bar.php';
     }
 </style>
 
-<div class="content-wrapper">
-    <div class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6"></div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="">Home</a></li>
-                        <li class="breadcrumb-item active">QR Code</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-    </div>
 
+<div class="content-wrapper">
+  <div class="content-header"></div>
     <section class="content">
         <div class="container-fluid">
             <div class="card card-gray-dark card-outline">
@@ -114,14 +102,13 @@ include 'plugins/sidebar/admin_bar.php';
         </div>
     </section>
 </div>
-
 <script src="plugins/js/qrcode.min.js"></script>
-    <script src="plugins/js/jsbarcode.all.min.js"></script>
-    <script>
-   function updateCanvases() {
+<script src="plugins/js/jsbarcode.all.min.js"></script>
+<script>
+function updateCanvases() {
     const text = document.getElementById('inputText').value || 'Hello World';
 
-    // QR Code
+    // === QR CODE (normal square style) ===
     const qrCanvas = document.getElementById('qrCanvas');
     const qrCtx = qrCanvas.getContext('2d');
     qrCtx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
@@ -131,7 +118,7 @@ include 'plugins/sidebar/admin_bar.php';
     qrDiv.style.left = '-9999px';
     document.body.appendChild(qrDiv);
 
-    new QRCode(qrDiv, {
+    const qr = new QRCode(qrDiv, {
         text: text,
         width: 200,
         height: 200,
@@ -140,61 +127,41 @@ include 'plugins/sidebar/admin_bar.php';
         correctLevel: QRCode.CorrectLevel.H
     });
 
-    const qrPoll = setInterval(() => {
-        const qrCanvasInner = qrDiv.querySelector('canvas');
-        if (qrCanvasInner) {
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = qrCanvasInner.width;
-            tempCanvas.height = qrCanvasInner.height;
-            const tempCtx = tempCanvas.getContext('2d');
-            tempCtx.drawImage(qrCanvasInner, 0, 0);
-
-            const imgData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-            qrCtx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
-
-            const moduleSize = 6; // size of each hexagon
-
-            // Function to draw a hexagon
-            function drawHexagon(ctx, x, y, size, fillStyle) {
-                const angle = Math.PI / 3; // 60 degrees
-                ctx.beginPath();
-                for (let i = 0; i < 6; i++) {
-                    ctx.lineTo(x + size * Math.cos(angle * i), y + size * Math.sin(angle * i));
-                }
-                ctx.closePath();
-                ctx.fillStyle = fillStyle;
-                ctx.fill();
-            }
-
-            for (let y = 0; y < tempCanvas.height; y += moduleSize) {
-                for (let x = 0; x < tempCanvas.width; x += moduleSize) {
-                    const index = (y * tempCanvas.width + x) * 4;
-                    const r = imgData.data[index];
-                    if (r < 128) { // dark pixel
-                        drawHexagon(qrCtx, x + moduleSize / 2, y + moduleSize / 2, moduleSize / 2, '#000');
-                    }
-                }
-            }
-
-            document.body.removeChild(qrDiv);
-            clearInterval(qrPoll);
+    // Copy generated QR into your canvas
+    setTimeout(() => {
+        const qrImg = qrDiv.querySelector('img'); 
+        if (qrImg) {
+            const tempImg = new Image();
+            tempImg.src = qrImg.src;
+            tempImg.onload = () => {
+                qrCtx.drawImage(tempImg, 0, 0, qrCanvas.width, qrCanvas.height);
+                document.body.removeChild(qrDiv);
+            };
         }
-    }, 100);
+    }, 300);
+
+    // === BARCODE ===
+    const barcodeCanvas = document.getElementById('barcodeCanvas');
+    JsBarcode(barcodeCanvas, text, {
+        format: "CODE128",  // Good general barcode
+        lineColor: "#000",
+        width: 2,
+        height: 80,
+        displayValue: true
+    });
 }
 
+function downloadCanvas(canvasId, filename) {
+    const canvas = document.getElementById(canvasId);
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = canvas.toDataURL();
+    link.click();
+}
 
-
-        function downloadCanvas(canvasId, filename) {
-            const canvas = document.getElementById(canvasId);
-            const link = document.createElement('a');
-            link.download = filename;
-            link.href = canvas.toDataURL();
-            link.click();
-        }
-
-        // Initial render
-        window.onload = updateCanvases;
-    </script>
+// Initial render
+window.onload = updateCanvases;
+</script>
 
 <?php
 include 'plugins/footer.php';

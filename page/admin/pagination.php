@@ -4,47 +4,45 @@ include 'plugins/sidebar/admin_bar.php';
 ?>
 
 <style>
-  #pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    font-size: 18px;
-  }
+#pagination {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 
-  #pagination button {
-    border: none;
-    background-color: #008b02;
-    color: white;
-    padding: 8px 12px;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.3s;
-  }
+#pagination button {
+  border: none;
+  background-color: #008b02;
+  color: white;
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  min-width: 36px;
+  transition: 0.2s ease;
+}
 
-  #pagination button:hover:not([disabled]) {
-    background-color: #008b02;
-  }
+#pagination button:hover:not([disabled]) {
+  background-color: #006f02;
+}
 
-  #pagination button:disabled {
-    background-color: #b2ffb3;
-    cursor: not-allowed;
-  }
+#pagination button:disabled {
+  background-color: #b2ffb3;
+  cursor: not-allowed;
+}
+
+#totalCount {
+  margin-right: auto; /* pushes it to the left */
+}
+
+#pagination {
+  margin-left: auto; /* pushes it to the right */
+}
+
 </style>
+
 <div class="content-wrapper">
-  <div class="content-header">
-    <div class="container-fluid">
-      <div class="row mb-2">
-        <div class="col-sm-6"></div>
-        <div class="col-sm-6">
-          <ol class="breadcrumb float-sm-right">
-            <li class="breadcrumb-item"><a href="">Home</a></li>
-            <li class="breadcrumb-item active">Viewer</li>
-          </ol>
-        </div>
-      </div>
-    </div>
-  </div>
+  <div class="content-header"></div>
 
   <section class="content">
     <div class="container-fluid">
@@ -66,34 +64,33 @@ include 'plugins/sidebar/admin_bar.php';
               </div>
             </div>
 
-            <div class="card-body">
-              <div class="row mb-2"></div>
+        <div class="card-body">
+  <div class="row mb-2"></div>
+</div>
+
+<div id="accounts_table_res" class="table-responsive"
+  style="height: 55vh; overflow: auto; display: inline-block; margin-top: 20px; border-top: 1px solid gray;">
+  <table id="account" class="table table-sm table-head-fixed text-nowrap table-hover">
+    <thead style="text-align: center;">
+      <tr>
+        <th>Employee ID</th>
+        <th>User Name</th>
+        <th>Full Name</th>
+        <th>Department</th>
+        <th>Type</th>
+      </tr>
+    </thead>
+    <tbody id="admin_body" style="text-align: center; padding:10px;">
+    </tbody>
+  </table>
+</div>
+<!-- ✅ Move pagination + total count into card-footer -->
+<div class="card-footer d-flex justify-content-between align-items-center">
+  <div id="totalCount">Total Records: 0</div>
+  <div id="pagination"></div>
+</div>
 
 
-            </div>
-
-            <div id="accounts_table_res" class="table-responsive"
-              style="height: 55vh; overflow: auto; display: inline-block; margin-top: 20px; border-top: 1px solid gray;">
-              <table id="account" class="table table-sm table-head-fixed text-nowrap table-hover">
-                <thead style="text-align: center;">
-                  <tr>
-                    <th>Employee ID</th>
-
-                    <th>User Name</th>
-                    <th>Full Name</th>
-                    <th>Department</th>
-                    <th>Type</th>
-                  </tr>
-                </thead>
-                <tbody id="admin_body" style="text-align: center; padding:10px;">
-                </tbody>
-              </table>
-            </div>
-
-            <div id="totalCount" style="text-align: left; margin:10px ;"> Total Records: 0 </div>
-
-            <div id="pagination" style="text-align: center; "></div>
-          </div>
 
         </div>
       </div>

@@ -31,20 +31,9 @@ include 'plugins/sidebar/admin_bar.php';
     opacity: 1;
   }
 </style>
+
 <div class="content-wrapper">
-  <div class="content-header">
-    <div class="container-fluid">
-      <div class="row mb-2">
-        <div class="col-sm-6"></div>
-        <div class="col-sm-6">
-          <ol class="breadcrumb float-sm-right">
-            <li class="breadcrumb-item"><a href="">Home</a></li>
-            <li class="breadcrumb-item active">Admin</li>
-          </ol>
-        </div>
-      </div>
-    </div>
-  </div>
+  <div class="content-header"></div>
 
   <section class="content">
     <div class="container-fluid">
@@ -96,6 +85,7 @@ include 'plugins/sidebar/admin_bar.php';
                     <th>Department</th>
                     <th>Password</th>
                     <th>Type</th>
+                     <th>Active</th>
                     <th>Select</th>
                   </tr>
                 </thead>
@@ -167,164 +157,191 @@ include 'plugins/sidebar/admin_bar.php';
   </div>
 </div>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-    const adminBody = document.getElementById('admin_body');
-    const deleteBtn = document.getElementById('deleteBtn');
-    const addRecordModal = new bootstrap.Modal(document.getElementById('addRecordModal'));
-    const employeeIdField = document.getElementById('employeeId');
-    const fullNameField = document.getElementById('fullName');
-    const usernameField = document.getElementById('username');
-    const departmentField = document.getElementById('department');
-    const passwordField = document.getElementById('password');
-    const typeField = document.getElementById('type');
-    document.getElementById('openModalBtn').addEventListener('click', () => {
-      employeeIdField.value = '';
-      fullNameField.value = '';
-      usernameField.value = '';
-      departmentField.value = '';
-      passwordField.value = '';
-      typeField.value = 'user';
-      employeeIdField.readOnly = false;
-      fullNameField.readOnly = false;
-      addRecordModal.show();
-    });
+document.addEventListener('DOMContentLoaded', () => {
+  const adminBody = document.getElementById('admin_body');
+  const deleteBtn = document.getElementById('deleteBtn');
+  const addRecordModal = new bootstrap.Modal(document.getElementById('addRecordModal'));
+  const employeeIdField = document.getElementById('employeeId');
+  const fullNameField = document.getElementById('fullName');
+  const usernameField = document.getElementById('username');
+  const departmentField = document.getElementById('department');
+  const passwordField = document.getElementById('password');
+  const typeField = document.getElementById('type');
 
-    document.getElementById('addAccountForm').addEventListener('submit', (event) => {
-      event.preventDefault();
-      const formData = new FormData(event.target);
-      const url = employeeIdField.readOnly ? '../../process/account_update.php' : '../../process/account_add.php';
+  // ================== OPEN ADD MODAL ==================
+  document.getElementById('openModalBtn').addEventListener('click', () => {
+    employeeIdField.value = '';
+    fullNameField.value = '';
+    usernameField.value = '';
+    departmentField.value = '';
+    passwordField.value = '';
+    typeField.value = 'user';
+    employeeIdField.readOnly = false;
+    fullNameField.readOnly = false;
+    addRecordModal.show();
+  });
 
-      fetch(url, {
-        method: 'POST',
-        body: formData,
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Success',
-              text: 'Account saved successfully!',
-              timer: 1000,
-              showConfirmButton: false,
-            }).then(() => {
-              addRecordModal.hide();
-              location.reload();
-            });
-          } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'An error occurred: ' + data.error,
-              timer: 1000,
-              showConfirmButton: false,
-            });
-          }
-        })
-        .catch(error => {
+  // ================== SUBMIT ADD/UPDATE ==================
+  document.getElementById('addAccountForm').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const url = employeeIdField.readOnly ? '../../process/account_update.php' : '../../process/account_add.php';
+
+    fetch(url, {
+      method: 'POST',
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Account saved successfully!',
+            timer: 1000,
+            showConfirmButton: false,
+          }).then(() => {
+            addRecordModal.hide();
+            loadAccounts(); // refresh instead of reload()
+          });
+        } else {
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'An error occurred: ' + error,
+            text: 'An error occurred: ' + data.error,
           });
+        }
+      })
+      .catch(error => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'An error occurred: ' + error,
         });
-    });
-    fetch('../../process/account_view.php')
-  .then(response => response.json())
-  .then(data => {
-    if (data.error) {
-      console.error('Error fetching data:', data.error);
+      });
+  });
+
+  // ================== LOAD ACCOUNTS + ACTIVE STATUS ==================
+  function loadAccounts() {
+    Promise.all([
+      fetch('../../process/account_view.php').then(r => r.json()),
+      fetch('../../process/active_view.php').then(r => r.json())
+    ])
+    .then(([accounts, activeUsers]) => {
+      adminBody.innerHTML = ""; 
+      const now = new Date();
+
+      accounts.forEach(row => {
+        const tr = document.createElement('tr');
+        const maskedPassword = '•'.repeat(row.password.length);
+
+        // Check if user is active
+        let isActive = false;
+        activeUsers.forEach(active => {
+          if (active.username === row.username) {
+            const activeTime = new Date(active.date_time);
+            const diff = (now - activeTime) / 1000; 
+            if (diff <= 120) { // ✅ 2 minutes instead of 5 sec
+              isActive = true;
+            }
+          }
+        });
+
+        const circleColor = isActive ? "green" : "gray";
+
+        tr.innerHTML = `
+          <td>${row.employee_id}</td>
+          <td>${row.full_name}</td>
+          <td>${row.username}</td>
+          <td>${row.department}</td>
+          <td>${maskedPassword}</td>
+          <td>${row.role}</td>
+          <td><span class="status-circle" 
+              style="height:12px;width:12px;background:${circleColor};border-radius:50%;display:inline-block;"></span></td>
+          <td><input type="checkbox" class="select-checkbox" data-employee-id="${row.employee_id}"></td>
+        `;
+
+        // On row click → open modal with account data
+        tr.addEventListener('click', () => {
+          employeeIdField.value = row.employee_id;
+          fullNameField.value = row.full_name;
+          usernameField.value = row.username;
+          departmentField.value = row.department;
+          passwordField.value = row.password;
+          typeField.value = row.role;
+
+          employeeIdField.readOnly = true;
+          fullNameField.readOnly = true;
+          addRecordModal.show();
+        });
+
+        adminBody.appendChild(tr);
+      });
+    })
+    .catch(err => console.error("⚠️ Fetch error:", err));
+  }
+
+  // ================== DELETE SELECTED ==================
+  deleteBtn.addEventListener('click', () => {
+    const selectedCheckboxes = document.querySelectorAll('.select-checkbox:checked');
+    const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.dataset.employeeId);
+
+    if (selectedIds.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'No Account Selected',
+        text: 'Please select at least one account to delete.',
+      });
       return;
     }
-    data.forEach(row => {
-      const tr = document.createElement('tr');
-      const maskedPassword =  '•'.repeat(row.password.length);  
-      tr.innerHTML = ` 
-                <td>${row.employee_id}</td>
-                <td>${row.full_name}</td>
-                <td>${row.username}</td>
-                <td>${row.department}</td>
-                <td>${maskedPassword}</td>  <!-- Display masked password -->
-                <td>${row.role}</td>
-                <td><input type="checkbox" class="select-checkbox" data-employee-id="${row.employee_id}"></td>
-            `;
-      tr.addEventListener('click', () => {
-        employeeIdField.value = row.employee_id;
-        fullNameField.value = row.full_name;
-        usernameField.value = row.username;
-        departmentField.value = row.department;
-        passwordField.value = row.password;  
-        typeField.value = row.role;
 
-        employeeIdField.readOnly = true;
-        fullNameField.readOnly = true;
-        addRecordModal.show();
-      });
-      adminBody.appendChild(tr);
-    });
-  })
-  .catch(error => console.error('Error:', error));
-    deleteBtn.addEventListener('click', () => {
-      const selectedCheckboxes = document.querySelectorAll('.select-checkbox:checked');
-      const selectedIds = [];
-      selectedCheckboxes.forEach(checkbox => {
-        selectedIds.push(checkbox.dataset.employeeId);
-      });
-
-      if (selectedIds.length === 0) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'No Account Selected',
-          text: 'Please select at least one account to delete.',
-        });
-        return;
-      }
-      Swal.fire({
-        title: 'Are you sure?',
-        text: 'You are about to delete the selected accounts. This action cannot be undone.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, keep them',
-      }).then((result) => {
-        if (result.isConfirmed) {
-
-          fetch('../../process/account_delete.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ids: selectedIds }),
-          })
-            .then(response => response.json())
-            .then(data => {
-              if (data.success) {
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Deleted',
-                  text: 'Selected accounts have been deleted.',
-                  timer: 1000,
-                  showConfirmButton: false,
-                }).then(() => {
-                  location.reload();
-                });
-              } else {
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Error',
-                  text: 'An error occurred while deleting accounts.',
-                });
-              }
-            })
-            .catch(error => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You are about to delete the selected accounts. This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, keep them',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch('../../process/account_delete.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ids: selectedIds }),
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Deleted',
+                text: 'Selected accounts have been deleted.',
+                timer: 1000,
+                showConfirmButton: false,
+              }).then(() => loadAccounts());
+            } else {
               Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'An error occurred: ' + error,
+                text: 'An error occurred while deleting accounts.',
               });
+            }
+          })
+          .catch(error => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'An error occurred: ' + error,
             });
-        }
-      });
+          });
+      }
     });
   });
+
+  // ================== INIT ==================
+  loadAccounts();                 // First load
+  setInterval(loadAccounts, 60000); // Auto refresh every 60s
+});
 </script>
 
 

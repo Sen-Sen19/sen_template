@@ -21,7 +21,7 @@ if (isset($_POST['Login'])) {
             $_SESSION['role'] = $role;
 
             if ($role == 'user') {
-                header('location:../page/user/scan.php');
+                header('location:../page/user/index.php');
                 exit;
             } elseif ($role == 'admin') { 
                 header('location: /sen_template/page/admin/accounts.php');

@@ -1,4 +1,20 @@
+ <style>
+  #footer-background {
+    background-image: url('../../dist/img/footer1.jpg');
+    background-size: cover;
+    background-position: center; 
+    background-repeat: no-repeat; 
+    color: white; 
+    padding: 10px;
+}
 
+.main-footer {
+    position: relative;
+    z-index: 1;
+}
+
+ </style>
+ 
  <footer class="main-footer" id="footer-background">
     <strong>Copyright &copy; 2024. Developed by: Marc Neilsen Omabtang</strong>
     All rights reserved.
@@ -10,7 +26,7 @@
 <?php
 //MODALS
 include '../../modals/logout_modal.php';
-include '../../modals/add_modal.php'; 
+
 ?>
 <!-- jQuery -->
 <script src="../../plugins/jquery/dist/jquery.min.js"></script>
