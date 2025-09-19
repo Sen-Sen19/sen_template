@@ -25,7 +25,7 @@
           style="background-color: green;">
       </div>
       <div class="info">
-        <a href="http://172.25.114.229/sen/sen.php" class="d-block" style="text-transform: uppercase;">
+        <a href="" class="d-block" style="text-transform: uppercase;">
           <?= htmlspecialchars($_SESSION['username']); ?>
         </a>
       </div>
@@ -41,6 +41,17 @@
               <?php } ?>
               <i class="nav-icon fas fa-user-cog"></i>
               <p>Account Management</p>
+            </a>
+        </li>
+
+ <li class="nav-item">
+          <?php if ($_SERVER['REQUEST_URI'] == "/sen_template/page/admin/worklog.php") { ?>
+            <a href="worklog.php" class="nav-link active">
+            <?php } else { ?>
+              <a href="worklog.php" class="nav-link">
+              <?php } ?>
+              <i class="nav-icon fas fa-business-time"></i>
+              <p>Logs</p>
             </a>
         </li>
 
