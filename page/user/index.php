@@ -60,8 +60,9 @@ include 'plugins/sidebar/user_bar.php';
 include 'plugins/footer.php';
 ?>
 
-<!-- Pass PHP username into JS -->
+
 <script>
+  // ====================================Active Status====================================
 document.addEventListener("DOMContentLoaded", () => {
   const username = "<?= htmlspecialchars($_SESSION['username']); ?>";
   const dateTime = "<?= date("Y-m-d H:i:s"); ?>"; // same value shown above

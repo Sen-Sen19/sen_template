@@ -41,6 +41,8 @@ include 'plugins/sidebar/admin_bar.php';
         <div class="col-sm-12">
           <div class="card card-gray-dark card-outline">
             <div class="card-header">
+                         <?php include '../../dist/include/active_status.php'; ?>
+
               <h3 class="card-title">
                 <i class="nav-icon fas fa-user"></i> ADMIN
               </h3>
@@ -161,12 +163,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const adminBody = document.getElementById('admin_body');
   const deleteBtn = document.getElementById('deleteBtn');
   const addRecordModal = new bootstrap.Modal(document.getElementById('addRecordModal'));
-  const employeeIdField = document.getElementById('employeeId');
-  const fullNameField = document.getElementById('fullName');
-  const usernameField = document.getElementById('username');
-  const departmentField = document.getElementById('department');
-  const passwordField = document.getElementById('password');
-  const typeField = document.getElementById('type');
+ // Form fields
+const employeeIdField = document.getElementById('employeeId');
+const fullNameField   = document.getElementById('fullName');
+const usernameField   = document.getElementById('username'); // <-- modal input
+const departmentField = document.getElementById('department');
+const passwordField   = document.getElementById('password');
+const typeField       = document.getElementById('type');
+
+// Logged-in username in header
+const headerUsername  = document.getElementById('headerUsername');
+
 
   // ================== OPEN ADD MODAL ==================
   document.getElementById('openModalBtn').addEventListener('click', () => {
@@ -342,6 +349,9 @@ document.addEventListener('DOMContentLoaded', () => {
   loadAccounts();                 // First load
   setInterval(loadAccounts, 60000); // Auto refresh every 60s
 });
+
+
+  
 </script>
 
 

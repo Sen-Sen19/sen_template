@@ -62,8 +62,24 @@ include 'plugins/sidebar/admin_bar.php';
             align-items: center;
         }
     }
+    .qr-wrapper {
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: transparent;
+    }
+    .qr-text {
+        margin-top: 8px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #333;
+        word-wrap: break-word;
+        text-align: center;
+    }
 </style>
-
 
 <div class="content-wrapper">
   <div class="content-header"></div>
@@ -86,12 +102,18 @@ include 'plugins/sidebar/admin_bar.php';
                 <div class="card-body">
                     <div class="canva-row">
                         <div class="canva-block">
-                            <canvas id="qrCanvas" width="200" height="200"></canvas>
-                            <button class="download-btn" onclick="downloadCanvas('qrCanvas', 'qr_code.png')">Download QR</button>
+                            <div class="qr-wrapper" id="qrWrapper">
+                                <canvas id="qrCanvas" width="200" height="200"></canvas>
+                                <div id="qrValue" class="qr-text">Hello World</div>
+                            </div>
+                            <button class="download-btn" onclick="downloadCanvas('qrWrapper','qrCanvas',true)">Download QR</button>
                         </div>
+
                         <div class="canva-block">
-                            <canvas id="barcodeCanvas" width="300" height="200"></canvas>
-                            <button class="download-btn" onclick="downloadCanvas('barcodeCanvas', 'barcode.png')">Download Barcode</button>
+                            <div class="qr-wrapper" id="barcodeWrapper">
+                                <canvas id="barcodeCanvas" width="300" height="150"></canvas>
+                            </div>
+                            <button class="download-btn" onclick="downloadCanvas('barcodeWrapper','barcodeCanvas',false)">Download Barcode</button>
                         </div>
                     </div>
                     <div class="input-row">
@@ -102,13 +124,14 @@ include 'plugins/sidebar/admin_bar.php';
         </div>
     </section>
 </div>
+
 <script src="plugins/js/qrcode.min.js"></script>
 <script src="plugins/js/jsbarcode.all.min.js"></script>
 <script>
 function updateCanvases() {
     const text = document.getElementById('inputText').value || 'Hello World';
 
-    // === QR CODE (normal square style) ===
+    // === QR CODE ===
     const qrCanvas = document.getElementById('qrCanvas');
     const qrCtx = qrCanvas.getContext('2d');
     qrCtx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
@@ -118,7 +141,7 @@ function updateCanvases() {
     qrDiv.style.left = '-9999px';
     document.body.appendChild(qrDiv);
 
-    const qr = new QRCode(qrDiv, {
+    new QRCode(qrDiv, {
         text: text,
         width: 200,
         height: 200,
@@ -127,7 +150,8 @@ function updateCanvases() {
         correctLevel: QRCode.CorrectLevel.H
     });
 
-    // Copy generated QR into your canvas
+    document.getElementById('qrValue').innerText = text;
+
     setTimeout(() => {
         const qrImg = qrDiv.querySelector('img'); 
         if (qrImg) {
@@ -143,23 +167,54 @@ function updateCanvases() {
     // === BARCODE ===
     const barcodeCanvas = document.getElementById('barcodeCanvas');
     JsBarcode(barcodeCanvas, text, {
-        format: "CODE128",  // Good general barcode
+        format: "CODE128",
         lineColor: "#000",
         width: 2,
         height: 80,
-        displayValue: true
+        displayValue: true // show text below bars
     });
 }
 
-function downloadCanvas(canvasId, filename) {
+function downloadCanvas(wrapperId, canvasId, includeText) {
+    const inputText = document.getElementById("inputText").value || "Hello World";
+    const safeText = inputText.replace(/\s+/g, "_"); 
+    const filename = safeText + ".png";
+
+    const wrapper = document.getElementById(wrapperId);
     const canvas = document.getElementById(canvasId);
-    const link = document.createElement('a');
+    const text = includeText ? wrapper.querySelector(".qr-text")?.innerText : "";
+
+    // Create temporary canvas
+    const tempCanvas = document.createElement("canvas");
+    const ctx = tempCanvas.getContext("2d");
+
+    const width = canvas.width;
+    const height = includeText ? canvas.height + 40 : canvas.height;
+    tempCanvas.width = width;
+    tempCanvas.height = height;
+
+    // White background
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, width, height);
+
+    // Draw QR/Barcode
+    ctx.drawImage(canvas, 0, 0);
+
+    // Draw text under QR only
+    if (includeText && text) {
+        ctx.fillStyle = "#000000";
+        ctx.font = "16px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText(text, width / 2, canvas.height + 25);
+    }
+
+    // Download
+    const link = document.createElement("a");
     link.download = filename;
-    link.href = canvas.toDataURL();
+    link.href = tempCanvas.toDataURL();
     link.click();
 }
 
-// Initial render
 window.onload = updateCanvases;
 </script>
 

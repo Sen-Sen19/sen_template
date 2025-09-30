@@ -21,6 +21,7 @@
                             </div>
                         </div>
 
+                            <?php include '../../dist/include/active_status.php'; ?>
 
                         
                         <div class="card-body">
