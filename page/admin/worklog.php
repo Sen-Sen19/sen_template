@@ -4,215 +4,359 @@ include 'plugins/sidebar/admin_bar.php';
 ?>
 
 <style>
-  /* 📅 Calendar Layout */
   .calendar-wrapper {
-    background: #fff;
+    display: none;
+  }
+
+  /* Layout */
+  .card {
     border-radius: 12px;
-    padding: 15px;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
   }
 
-  .calendar-header {
-    background: #f8f9fa;
+  .time-row label {
+    font-weight: 600;
+    color: #333;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .time-row input.form-control {
+    height: 42px;
+    font-size: 15px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+
+  .time-row button {
+    height: 42px;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .time-row button:hover {
+    transform: scale(1.03);
+  }
+
+
+  /* Responsive */
+
+  .calendar-wrapper {
+    display: block;
+    margin-top: 40px;
+  }
+
+  #calendarContainer table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    background: #fff;
     border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
   }
 
-  .calendar-nav h5 {
-    margin: 0;
-    cursor: pointer;
+  #calendarContainer th {
+    background-color: #343a40;
+    color: white;
+    padding: 10px;
   }
 
-  .calendar-controls button {
-    min-width: 36px;
+  #calendarContainer td {
+    padding: 10px;
+    border: 1px solid #ddd;
   }
 
-  /* Grid for days/dates */
-  .calendar-days,
-  .calendar-dates {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
+  .status-present {
+    background-color: #28a745;
+    color: white;
+    font-weight: bold;
   }
 
-  .calendar-days div {
-    padding: 6px;
-    background: #e9ecef;
-    border-radius: 6px;
+  .status-no-timeout {
+    background-color: #ffc107;
+    color: black;
+    font-weight: bold;
   }
 
-  .calendar-dates div {
-    height: 70px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    border-radius: 10px;
+  .status-vl {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+  }
+
+  .status-sl {
+    background-color: #17a2b8;
+    color: white;
+    font-weight: bold;
+  }
+
+  .status-lwop {
+    background-color: #dc3545;
+    color: white;
+    font-weight: bold;
+  }
+
+  .status-rdot {
+    background-color: #2f00ffff;
+    color: white;
+    font-weight: bold;
+  }
+
+  .status-rd {
+    background-color: #b9b9b9ff;
+    color: white;
+    font-weight: bold;
+  }
+
+  .status-no-work {
+    background-color: #6c757d;
+    color: white;
+    font-weight: bold;
+  }
+
+  .status-holiday {
+    background-color: #00ffbfff;
+    color: white;
+    font-weight: bold;
+  }
+
+  .status-Pending {
+    background-color: #f8f9fa;
+    color: #333;
+  }
+
+
+
+  #calendarContainer td {
+    border-radius: 8px;
     transition: 0.2s;
   }
 
-  .calendar-dates div:hover {
-    background: #f1f3f5;
+  #calendarContainer td:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   }
 
-  /* Highlight Today */
-  .calendar-dates div.today {
-    background: #007bff;
-    color: #fff;
-    font-weight: bold;
-    box-shadow: 0 0 8px rgba(0, 123, 255, 0.6);
+  #monthYearModal .form-select {
+    border-radius: 8px;
   }
 
-  .month-btn.active {
-    background-color: #007bff;
-    color: white;
-    border-color: #007bff;
+  #monthYearModal .modal-content {
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   }
 
-  .calendar-dates div:not(.other-month):hover {
-    background: #f1f3f5;
+  /* ✨ Glassy fade effect */
+  .glassy-bg {
+    background: rgba(255, 255, 255, 1);
+    backdrop-filter: blur(15px);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #000000ff;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
   }
 
-  .past-day {
-    color: #bbb;
-    /* pale gray */
-    opacity: 0.5;
+  .year-control {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 8px;
   }
 
-  .today {
-    font-weight: bold;
-    color: #000;
+  #monthGrid button {
+    border-radius: 10px !important;
+
+    color: #000000ff;
+    background: rgba(255, 255, 255, 1);
+    border: 1px solid rgba(0, 0, 0, 1);
+    transition: all 0.2s ease-in-out;
   }
 
-  button.btn-success.red {
-    background-color: #dc3545 !important;
-    /* Bootstrap red */
-    border-color: #dc3545 !important;
-    color: #fff !important;
+  #monthGrid button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
   }
-</style>
+
+  #monthGrid .btn-dark {
+    background: rgba(109, 109, 109, 0.8) !important;
+    border-color: transparent !important;
+  }
+  
+.row .form-select,
+.row .form-control {
+  min-height: calc(1.5em + 1rem + 2px); /* Adjust as needed */
+  border-radius: 0.5rem;
+  font-weight: 600;
+}
+
+
+.status-dropdown {
+  transition: all 0.2s;
+}
+
+
+.status-dropdown option {
+  font-weight: 600;
+  padding: 0.5rem;
+}
+  </style>
 
 <div class="content-wrapper">
   <div class="content-header"></div>
 
   <section class="content">
     <div class="container-fluid">
-      <div class="row">
-        <div class="col-sm-12">
-          <div class="card card-gray-dark card-outline">
-            <div class="card-header">
-              <h3 class="card-title">
-                <i class="nav-icon fas fa-business-time"></i> Work Log <span id="username"
-                  style="display:none;"><?= htmlspecialchars($_SESSION['username']); ?></span>
+      <div class="card card-gray-dark card-outline">
+        <div class="card-header">
+          <h3 class="card-title">
+            <i class="nav-icon fas fa-business-time"></i> Work Log
+            <span id="username" style="display:none;"><?= htmlspecialchars($_SESSION['username']); ?></span>
+          </h3>
+          <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+            <button type="button" class="btn btn-tool" data-card-widget="maximize"><i
+                class="fas fa-expand"></i></button>
+          </div>
+        </div>
 
 
-              </h3>
-              <div class="card-tools">
-                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                  <i class="fas fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-tool" data-card-widget="maximize">
-                  <i class="fas fa-expand"></i>
-                </button>
+        <div class="card-body">
+          <!-- Time In / Time Out -->
+          <div class="row align-items-end time-row">
+            <div class="col-md-5 mb-3">
+              <label for="time_in">⏰ Time In</label>
+              <input type="time" id="time_in" class="form-control" readonly>
+            </div>
+            <div class="col-md-5 mb-3">
+              <label for="time_out">⏰ Time Out</label>
+              <input type="time" id="time_out" class="form-control" readonly>
+            </div>
+            <div class="col-md-2 mb-3">
+              <button id="timeBtn" class="btn btn-success w-100">
+                <i class="fas fa-clock"></i> Time In
+              </button>
+            </div>
+          </div>
+
+
+          <!-- Calendar Section -->
+          <div class="calendar-wrapper mt-5" id="calendar-wrapper">
+            <h5 class="mb-3"><i class="fas fa-calendar-alt"></i> Monthly Attendance</h5>
+
+
+
+          </div>
+
+          <div id="calendarContainer" class="mt-4"></div>
+          <!-- Month-Year Modal -->
+          <div class="modal fade glass-modal" id="monthYearModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-sm modal-dialog-centered">
+              <div class="modal-content glassy-bg">
+                <div class="modal-header justify-content-center border-0">
+                  <h5 class="modal-title fw-bold">Select Month & Year</h5>
+                </div>
+
+                <div class="modal-body text-center">
+                  <!-- Month Buttons -->
+                  <div id="monthGrid" class="row g-2 mb-3"></div>
+
+                  <!-- Year Controls -->
+                  <div class="year-control d-flex align-items-center justify-content-center mb-3">
+                    <button id="yearDown" class="btn year-btn">
+                      <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <input id="yearDisplay" type="text" class="form-control text-center mx-2" readonly />
+                    <button id="yearUp" class="btn year-btn">
+                      <i class="fas fa-chevron-up"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="modal-footer border-0">
+                  <button id="applyMonthYear" class="btn btn-primary w-100 fw-bold">
+                    <i class="fas fa-check"></i> Apply
+                  </button>
+                </div>
               </div>
             </div>
-
-            <div class="card-body">
-
-              <!-- 📅 Professional Calendar Layout -->
-              <div class="calendar-wrapper mb-4">
-                <!-- Calendar Header -->
-                <div class="calendar-header d-flex justify-content-between align-items-center mb-3 p-2">
-
-                  <!-- Title in the Center -->
-                  <div class="calendar-nav text-center flex-grow-1">
-                    <h5 id="calendar-title" class="mb-0 fw-bold cursor-pointer" onclick="openCalendarModal()"></h5>
-                  </div>
-
-                  <!-- Controls -->
-                  <div class="calendar-controls d-flex align-items-center gap-2">
-                    <button class="btn btn-light btn-sm rounded-circle shadow-sm" onclick="prevMonth()">
-                      <i class="fas fa-chevron-left"></i>
-                    </button>
-
-                    <button class="btn btn-primary btn-sm px-3 mx-1" onclick="goToday()">
-                      <i class="fas fa-calendar-day"></i> Today
-                    </button>
-
-                    <button class="btn btn-light btn-sm rounded-circle shadow-sm" onclick="nextMonth()">
-                      <i class="fas fa-chevron-right"></i>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Calendar Grid -->
-                <div class="calendar-grid">
-                  <div class="calendar-days d-grid text-center fw-bold">
-                    <div>Sun</div>
-                    <div>Mon</div>
-                    <div>Tue</div>
-                    <div>Wed</div>
-                    <div>Thu</div>
-                    <div>Fri</div>
-                    <div>Sat</div>
-                  </div>
-                  <div id="calendar-body" class="calendar-dates d-grid text-center"></div>
-                </div>`
-              </div>
-
-              <!-- 🕒 Time In / Time Out -->
-              <div class="row align-items-end">
-                <div class="col-md-5">
-                  <label for="time_in">⏰ Time In</label>
-                  <input type="time" id="time_in" class="form-control" value="<?php echo date('H:i'); ?>">
-                </div>
-
-                <div class="col-md-5">
-                  <label for="time_out">🚪 Time Out</label>
-                  <input type="time" id="time_out" class="form-control" value="<?php echo date('H:i'); ?>">
-                </div>
-
-                <div class="col-md-2">
-                  <button class="btn btn-success btn-block">
-                    <i class="fas fa-clock"></i> Time In
-                  </button>
-
-                </div>
-              </div>
-
-            </div><!-- card-body -->
           </div>
+
+
+
+
+
+
         </div>
       </div>
     </div>
   </section>
 </div>
-
-<!-- 📌 Modal for selecting Month & Year -->
-<div class="modal fade" id="calendarModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-sm modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Select Month & Year</h5>
-
+<div class="modal fade" id="dateRemarksModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-3">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-calendar-day"></i> Date Details
+        </h5>
+        <button type="button" class="btn btn-dark fw-bold" style="font-size: 1.2rem;" data-bs-dismiss="modal" aria-label="Close">
+          ×
+        </button>
       </div>
-      <div class="modal-body text-center">
-        <div class="row g-2 mb-3">
-          <?php
-          $months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-          foreach ($months as $i => $m) {
-            echo "<div class='col-3'><button class='btn btn-outline-primary btn-sm w-100 month-btn' data-month='$i' onclick='setMonthAndHighlight(this, $i)'>$m</button></div>";
-          }
-          ?>
+
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="fw-bold">📅 Date:</label>
+          <input type="text" id="modalDate" class="form-control" readonly>
         </div>
-        <input type="number" id="year-input" class="form-control text-center" value="<?php echo date('Y'); ?>"
-          min="1900" max="2100">
+
+        <div class="row g-2 mb-3">
+          <div class="col-md-6">
+            <label class="fw-bold">⏰ Time In:</label>
+            <input type="time" id="modalTimeIn" class="form-control">
+          </div>
+          <div class="col-md-6">
+            <label class="fw-bold">🕒 Time Out:</label>
+            <input type="time" id="modalTimeOut" class="form-control">
+          </div>
+        </div>
+
+        <!-- Two-column row for Status and Remarks with same height -->
+        <div class="row g-2 mb-3 align-items-end">
+          <div class="col-md-4 d-flex flex-column">
+            <label class="fw-bold">📌 Status:</label>
+            <select id="modalStatus" class="form-select status-dropdown flex-grow-1">
+              <option value="" selected disabled>-- Select Status --</option>
+              <option value="LWOP">LWOP</option>
+              <option value="RD">RD</option>
+              <option value="VL">VL</option>
+              <option value="SL">SL</option>
+              <option value="HOLIDAY">HOLIDAY</option>
+              <option value="NO WORK">NO WORK</option>
+              <option value="RDOT">RDOT</option>
+            </select>
+          </div>
+
+          <div class="col-md-8 d-flex flex-column">
+            <label class="fw-bold">💬 Remarks:</label>
+            <input type="text" id="modalRemarks" class="form-control flex-grow-1" placeholder="Enter notes or comments...">
+          </div>
+        </div>
       </div>
+
       <div class="modal-footer">
-        <button class="btn btn-primary w-100" onclick="applyCalendarSelection()">Apply</button>
+        <button type="button" class="btn btn-primary w-100 fw-bold" id="updateRemarksBtn">
+          <i class="fas fa-save"></i> Save Changes
+        </button>
+        
       </div>
     </div>
   </div>
 </div>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   // ===== Philippine Time =====
   function getPhilippineTime() {
@@ -221,127 +365,367 @@ include 'plugins/sidebar/admin_bar.php';
     return new Date(utc + 8 * 3600000); // UTC+8
   }
 
-  // Update time inputs every second
+  let liveTimeInterval = null;
+  let isFrozen = false;
+
+  const timeInInput = document.getElementById("time_in");
+  const timeOutInput = document.getElementById("time_out");
+  const punchBtn = document.getElementById("timeBtn");
+  const username = document.getElementById("username").textContent.trim();
+
+  function formatTime(input) {
+    if (!input) return "--:--:--";
+    const d = new Date(input);
+    if (!isNaN(d)) return `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}:${String(d.getSeconds()).padStart(2,"0")}`;
+    if (/^\d{2}:\d{2}:\d{2}$/.test(input)) return input; // fallback
+    return "--:--:--";
+  }
+
   function updateTimeInputs() {
     const phTime = getPhilippineTime();
-    let hh = String(phTime.getHours()).padStart(2, '0');
-    let mm = String(phTime.getMinutes()).padStart(2, '0');
+    const hh = String(phTime.getHours()).padStart(2, "0");
+    const mm = String(phTime.getMinutes()).padStart(2, "0");
+    const ss = String(phTime.getSeconds()).padStart(2, "0");
 
-    document.getElementById("time_in").value = `${hh}:${mm}`;
-    document.getElementById("time_out").value = `${hh}:${mm}`;
+    if (!timeOutInput.disabled) timeOutInput.value = `${hh}:${mm}:${ss}`;
+    if (!isFrozen && !timeInInput.disabled) timeInInput.value = `${hh}:${mm}:${ss}`;
   }
 
-  // Run immediately and keep updating
   updateTimeInputs();
-  setInterval(updateTimeInputs, 1000);
+  liveTimeInterval = setInterval(updateTimeInputs, 1000);
 
-  // ===== Variables =====
-  let today = getPhilippineTime();   // ✅ real Date object
-  let currentMonth = today.getMonth();
-  let currentYear = today.getFullYear();
-  let selectedDate = today;
+  // ===== Check existing log =====
+  async function checkUserLogStatus() {
+    try {
+      const res = await fetch("../../process/check_log.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username })
+      });
+      const data = await res.json();
 
-  const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
-
-  const calendarTitle = document.getElementById("calendar-title");
-  let calendarModal;
-
-  // ===== Generate Calendar =====
-  function generateCalendar(month, year) {
-    const calendarBody = document.getElementById("calendar-body");
-    calendarBody.innerHTML = "";
-
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const firstDay = new Date(year, month, 1).getDay();
-
-    // Add empty slots before 1st
-    for (let i = 0; i < firstDay; i++) {
-      const emptyDiv = document.createElement("div");
-      emptyDiv.classList.add("empty-day");
-      calendarBody.appendChild(emptyDiv);
-    }
-
-    // Fill current month
-    for (let i = 1; i <= daysInMonth; i++) {
-      const div = document.createElement("div");
-      div.textContent = i;
-
-      const thisDate = new Date(year, month, i);
-
-      if (thisDate.toDateString() === today.toDateString()) {
-        div.classList.add("today");
-      } else if (thisDate < today) {
-        div.classList.add("past-day");
+      if (data.time_in) {
+        timeInInput.value = formatTime(data.time_in);
+        isFrozen = true;
+      }
+      if (data.time_out) {
+        timeOutInput.value = formatTime(data.time_out);
+        timeInInput.disabled = true;
+        timeOutInput.disabled = true;
       }
 
-      calendarBody.appendChild(div);
+      if (data.status === "timed_in") {
+        punchBtn.classList.replace("btn-success","btn-danger");
+        punchBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> Time Out`;
+      } else if (data.status === "timed_out") {
+        punchBtn.className = "btn btn-secondary";
+        punchBtn.disabled = true;
+        punchBtn.innerHTML = `<i class="fas fa-check-circle"></i> Already Logged`;
+        clearInterval(liveTimeInterval);
+      }
+    } catch(err) {
+      console.error("Check log failed:", err);
+    }
+  }
+
+  checkUserLogStatus();
+
+  // ===== Punch Button =====
+  punchBtn.addEventListener("click", async () => {
+    const now = getPhilippineTime();
+    const date_time = now.toISOString().slice(0,19); // YYYY-MM-DDTHH:MM:SS
+    const action = punchBtn.classList.contains("btn-success") ? "time_in" : "time_out";
+
+    try {
+      const res = await fetch("../../process/save_log.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, date_time, action })
+      });
+      const data = await res.json();
+
+      if (data.status === "inserted" || data.status === "updated") {
+        if (action === "time_in") {
+          isFrozen = true;
+          timeInInput.value = formatTime(date_time);
+          punchBtn.classList.replace("btn-success","btn-danger");
+          punchBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> Time Out`;
+        } else {
+          timeOutInput.value = formatTime(date_time);
+          timeInInput.disabled = true;
+          timeOutInput.disabled = true;
+          punchBtn.className = "btn btn-secondary";
+          punchBtn.disabled = true;
+          punchBtn.innerHTML = `<i class="fas fa-check-circle"></i> Already Logged`;
+          clearInterval(liveTimeInterval);
+        }
+      }
+    } catch(err) {
+      console.error("Save log failed:", err);
+    }
+  });
+
+  // ===== Calendar =====
+  const calendarContainer = document.getElementById("calendarContainer");
+  const monthGrid = document.getElementById("monthGrid");
+  const yearDisplay = document.getElementById("yearDisplay");
+  const yearUp = document.getElementById("yearUp");
+  const yearDown = document.getElementById("yearDown");
+  let currentYear = new Date().getFullYear();
+  yearDisplay.value = currentYear;
+
+  function updateYearControls() {
+    yearUp.disabled = currentYear >= 2050;
+    yearDown.disabled = currentYear <= 2025;
+  }
+
+  yearUp.addEventListener("click", () => { currentYear++; yearDisplay.value = currentYear; updateYearControls(); });
+  yearDown.addEventListener("click", () => { currentYear--; yearDisplay.value = currentYear; updateYearControls(); });
+  updateYearControls();
+
+  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  let selectedMonth = null;
+
+  months.forEach((m,i)=>{
+    const btn = document.createElement("button");
+    btn.className = "btn btn-outline-dark col-3 mb-2";
+    btn.textContent = m.substring(0,3);
+    btn.dataset.value = i+1;
+    btn.addEventListener("click", ()=> {
+      monthGrid.querySelectorAll("button").forEach(b=>b.classList.remove("btn-dark"));
+      btn.classList.add("btn-dark");
+      selectedMonth = i+1;
+    });
+    monthGrid.appendChild(btn);
+  });
+
+  document.getElementById("applyMonthYear").addEventListener("click", ()=>{
+    if(!selectedMonth) return alert("Please select a month.");
+    const chosenMonth = `${currentYear}-${String(selectedMonth).padStart(2,"0")}`;
+    $("#monthYearModal").modal("hide");
+    loadCalendarFor(chosenMonth);
+  });
+
+ function renderCalendar(data, selectedMonthStr) {
+  const statusMap = {};
+  data.forEach(row => statusMap[row.date] = row.status || "Pending");
+  const [year, month] = selectedMonthStr.split("-").map(Number);
+  const firstDay = new Date(year, month-1,1);
+  const lastDay = new Date(year, month,0);
+  const totalDays = lastDay.getDate();
+  const startDay = firstDay.getDay();
+  const monthName = firstDay.toLocaleString("default",{month:"long"});
+
+  let html = `<table class="table table-bordered text-center">
+    <thead>
+      <tr>
+        <th colspan="7" class="bg-dark text-white calendar-header">
+          <button id="prevMonth" class="btn btn-sm btn-dark me-2">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <span id="monthYearLabel" style="cursor:pointer;">${monthName} ${year}</span>
+          <button id="nextMonth" class="btn btn-sm btn-dark ms-2">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </th>
+      </tr>
+      <tr class="bg-secondary text-white"><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr>
+    </thead>
+    <tbody>`;
+
+  let day=1;
+  for(let w=0;w<6&&day<=totalDays;w++){
+    html+="<tr>";
+    for(let d=0;d<7;d++){
+      if((w===0 && d<startDay) || day>totalDays){
+        html+=`<td class="bg-light"></td>`;
+      } else {
+        const dateStr = `${year}-${String(month).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+        const status=statusMap[dateStr]||"Pending";
+        const cssClass={
+          "PRESENT":"status-present","NO TIME OUT":"status-no-timeout",
+          "VL":"status-vl","SL":"status-sl","LWOP":"status-lwop",
+          "RDOT":"status-rdot","RD":"status-rd","NO WORK":"status-no-work",
+          "HOLIDAY":"status-holiday","PENDING":"status-pending"
+        }[status.trim().toUpperCase()]||"status-pending";
+
+        html+=`<td class="${cssClass}" style="height:80px;vertical-align:top;">
+                <div><strong>${day}</strong></div>
+                <div style="font-size:13px;">${status}</div>
+              </td>`;
+        day++;
+      }
+    }
+    html+="</tr>";
+  }
+  html+="</tbody></table>";
+   calendarContainer.innerHTML = html;
+
+  // ===== Attach prev/next/month listeners =====
+  const prevBtn = document.getElementById("prevMonth");
+  const nextBtn = document.getElementById("nextMonth");
+  const monthLabel = document.getElementById("monthYearLabel");
+
+  prevBtn.addEventListener("click", () => {
+    let [y, m] = selectedMonthStr.split("-").map(Number);
+    m--;
+    if (m < 1) { m = 12; y--; }
+    selectedMonthStr = `${y}-${String(m).padStart(2, "0")}`;
+    loadCalendarFor(selectedMonthStr);
+  });
+
+  nextBtn.addEventListener("click", () => {
+    let [y, m] = selectedMonthStr.split("-").map(Number);
+    m++;
+    if (m > 12) { m = 1; y++; }
+    selectedMonthStr = `${y}-${String(m).padStart(2, "0")}`;
+    loadCalendarFor(selectedMonthStr);
+  });
+
+  monthLabel.addEventListener("click", () => {
+    $("#monthYearModal").modal("show");
+  });
+}
+
+  
+  async function loadCalendarFor(monthYearStr){
+    try{
+      const res=await fetch("../../process/fetch_calendar_data.php",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({username, month:monthYearStr})
+      });
+      const data=await res.json();
+      if(!Array.isArray(data)) throw new Error("Invalid data");
+      renderCalendar(data, monthYearStr);
+    }catch(err){
+      console.error("Failed to load calendar:",err);
+      alert("⚠️ Failed to load calendar data.");
+    }
+  }
+
+  // auto load current month
+  (async ()=>{
+    const now=getPhilippineTime();
+    const curMonthStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+    await loadCalendarFor(curMonthStr);
+  })();
+
+calendarContainer.addEventListener("click", (e) => {
+  // Previous month
+  if (e.target.id === "prevMonth" || e.target.closest("#prevMonth")) {
+    let [year, month] = selectedMonthStr.split("-").map(Number);
+    month--;
+    if (month < 1) {
+      month = 12;
+      year--;
+    }
+    selectedMonthStr = `${year}-${String(month).padStart(2, "0")}`;
+    loadCalendarFor(selectedMonthStr);
+  }
+
+  // Next month
+  if (e.target.id === "nextMonth" || e.target.closest("#nextMonth")) {
+    let [year, month] = selectedMonthStr.split("-").map(Number);
+    month++;
+    if (month > 12) {
+      month = 1;
+      year++;
+    }
+    selectedMonthStr = `${year}-${String(month).padStart(2, "0")}`;
+    loadCalendarFor(selectedMonthStr);
+  }
+
+  // Month-Year label opens modal
+  if (e.target.id === "monthYearLabel" || e.target.closest("#monthYearLabel")) {
+    $("#monthYearModal").modal("show");
+  }
+});
+
+
+  // ===== Remarks Modal =====
+  const dateRemarksModalEl = document.getElementById("dateRemarksModal");
+  const dateRemarksModal = new bootstrap.Modal(dateRemarksModalEl,{backdrop:'static',keyboard:true});
+
+  // ===== Remarks/Status Modal =====
+  calendarContainer.addEventListener("click", async e => {
+    const td = e.target.closest("td");
+    if (!td || !td.querySelector("strong")) return;
+
+    const day = parseInt(td.querySelector("strong").textContent, 10);
+    const [monthName, year] = document.querySelector(".calendar-header").textContent.trim().split(" ");
+    const monthIndex = new Date(`${monthName} 1, ${year}`).getMonth() + 1;
+    const selectedDate = `${year}-${String(monthIndex).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+    const modalDate = document.getElementById("modalDate");
+    const modalRemarks = document.getElementById("modalRemarks");
+    const modalTimeIn = document.getElementById("modalTimeIn");
+    const modalTimeOut = document.getElementById("modalTimeOut");
+    const modalStatus = document.getElementById("modalStatus");
+
+    modalDate.value = selectedDate;
+    const jsDate = new Date(selectedDate);
+    const isSunday = jsDate.getDay() === 0;
+    modalRemarks.readOnly = isSunday;
+    modalRemarks.value = isSunday ? "RD" : "";
+
+    try {
+      const res = await fetch("../../process/get_remarks.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, date: selectedDate })
+      });
+      const data = await res.json();
+
+      modalRemarks.value = isSunday ? "RD" : (data.remarks || "");
+      modalTimeIn.value = data.time_in || "";
+      modalTimeOut.value = data.time_out || "";
+      modalStatus.value = data.status_value || (isSunday ? "RD" : "");
+    } catch(err) {
+      console.error("Failed to load status/remarks:", err);
     }
 
-    calendarTitle.textContent = `${months[month]} ${year}`;
-  }
-  generateCalendar(currentMonth, currentYear);
+    dateRemarksModal.show();
+  });
 
-  // ===== Navigation =====
-  function prevMonth() {
-    if (currentMonth === 0) {
-      currentMonth = 11; currentYear--;
-    } else currentMonth--;
-    generateCalendar(currentMonth, currentYear);
-  }
+  // ===== Save button =====
+  document.addEventListener("DOMContentLoaded", () => {
+  const updateBtn = document.getElementById("updateRemarksBtn");
+  if(updateBtn){
+    updateBtn.addEventListener("click", async () => {
+      const date = document.getElementById("modalDate").value;
+      const remarks = document.getElementById("modalRemarks").value.trim();
+      const status = document.getElementById("modalStatus").value;
 
-  function nextMonth() {
-    if (currentMonth === 11) {
-      currentMonth = 0; currentYear++;
-    } else currentMonth++;
-    generateCalendar(currentMonth, currentYear);
-  }
+      if (!status) return alert("Please select a status before saving.");
 
-  function goToday() {
-    today = getPhilippineTime();
-    currentMonth = today.getMonth();
-    currentYear = today.getFullYear();
-    generateCalendar(currentMonth, currentYear);
-  }
+      try {
+        const res = await fetch("../../process/save_remarks.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, date, remarks, status })
+        });
+        const data = await res.json();
 
-  // ===== Modal Functions =====
-  function openCalendarModal() {
-    if (!calendarModal) {
-      calendarModal = new bootstrap.Modal(document.getElementById("calendarModal"));
-    }
-    document.getElementById("year-input").value = currentYear;
-    document.querySelectorAll(".month-btn").forEach(btn => {
-      btn.classList.remove("active");
-      if (parseInt(btn.dataset.month) === currentMonth) {
-        btn.classList.add("active");
+        if (data.status === "updated" || data.status === "inserted") {
+          alert("✅ Saved successfully!");
+          dateRemarksModal.hide();
+          const monthToLoad = selectedMonth
+            ? `${currentYear}-${String(selectedMonth).padStart(2, "0")}`
+            : `${getPhilippineTime().getFullYear()}-${String(getPhilippineTime().getMonth() + 1).padStart(2, "0")}`;
+          loadCalendarFor(monthToLoad);
+        } else {
+          alert("⚠️ Failed to save data.");
+        }
+      } catch (err) {
+        console.error("Error saving data:", err);
+        alert("⚠️ Error occurred while saving.");
       }
     });
-    calendarModal.show();
   }
+});
 
-  function setMonthAndHighlight(button, m) {
-    currentMonth = m;
-    document.querySelectorAll(".month-btn").forEach(btn => btn.classList.remove("active"));
-    button.classList.add("active");
-  }
-
-  function applyCalendarSelection() {
-    const year = parseInt(document.getElementById("year-input").value);
-    if (!isNaN(year)) {
-      currentYear = year;
-      generateCalendar(currentMonth, currentYear);
-    }
-    calendarModal.hide();
-  }
-
-  document.getElementById("year-input").addEventListener("keydown", function (e) {
-    if (e.key === "Enter") applyCalendarSelection();
-  });
 </script>
 
 
-<?php
-include 'plugins/footer.php';
-?>
+<?php include 'plugins/footer.php'; ?>
