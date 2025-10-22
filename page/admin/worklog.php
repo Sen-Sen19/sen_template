@@ -181,25 +181,26 @@ include 'plugins/sidebar/admin_bar.php';
     background: rgba(109, 109, 109, 0.8) !important;
     border-color: transparent !important;
   }
-  
-.row .form-select,
-.row .form-control {
-  min-height: calc(1.5em + 1rem + 2px); /* Adjust as needed */
-  border-radius: 0.5rem;
-  font-weight: 600;
-}
+
+  .row .form-select,
+  .row .form-control {
+    min-height: calc(1.5em + 1rem + 2px);
+    /* Adjust as needed */
+    border-radius: 0.5rem;
+    font-weight: 600;
+  }
 
 
-.status-dropdown {
-  transition: all 0.2s;
-}
+  .status-dropdown {
+    transition: all 0.2s;
+  }
 
 
-.status-dropdown option {
-  font-weight: 600;
-  padding: 0.5rem;
-}
-  </style>
+  .status-dropdown option {
+    font-weight: 600;
+    padding: 0.5rem;
+  }
+</style>
 
 <div class="content-wrapper">
   <div class="content-header"></div>
@@ -286,11 +287,25 @@ include 'plugins/sidebar/admin_bar.php';
 
 
 
+          <div id="calendarContainer" class="mt-4"></div>
         </div>
       </div>
     </div>
   </section>
+
+
+  
 </div>
+
+
+
+
+
+
+
+
+
+
 <div class="modal fade" id="dateRemarksModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow-lg rounded-3">
@@ -298,7 +313,8 @@ include 'plugins/sidebar/admin_bar.php';
         <h5 class="modal-title">
           <i class="fas fa-calendar-day"></i> Date Details
         </h5>
-        <button type="button" class="btn btn-dark fw-bold" style="font-size: 1.2rem;" data-bs-dismiss="modal" aria-label="Close">
+        <button type="button" class="btn btn-dark fw-bold" style="font-size: 1.2rem;" data-bs-dismiss="modal"
+          aria-label="Close">
           ×
         </button>
       </div>
@@ -326,6 +342,7 @@ include 'plugins/sidebar/admin_bar.php';
             <label class="fw-bold">📌 Status:</label>
             <select id="modalStatus" class="form-select status-dropdown flex-grow-1">
               <option value="" selected disabled>-- Select Status --</option>
+              <option value="PRESENT">PRESENT</option>
               <option value="LWOP">LWOP</option>
               <option value="RD">RD</option>
               <option value="VL">VL</option>
@@ -338,7 +355,8 @@ include 'plugins/sidebar/admin_bar.php';
 
           <div class="col-md-8 d-flex flex-column">
             <label class="fw-bold">💬 Remarks:</label>
-            <input type="text" id="modalRemarks" class="form-control flex-grow-1" placeholder="Enter notes or comments...">
+            <input type="text" id="modalRemarks" class="form-control flex-grow-1"
+              placeholder="Enter notes or comments...">
           </div>
         </div>
       </div>
@@ -347,7 +365,7 @@ include 'plugins/sidebar/admin_bar.php';
         <button type="button" class="btn btn-primary w-100 fw-bold" id="updateRemarksBtn">
           <i class="fas fa-save"></i> Save Changes
         </button>
-        
+
       </div>
     </div>
   </div>
@@ -376,7 +394,7 @@ include 'plugins/sidebar/admin_bar.php';
   function formatTime(input) {
     if (!input) return "--:--:--";
     const d = new Date(input);
-    if (!isNaN(d)) return `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}:${String(d.getSeconds()).padStart(2,"0")}`;
+    if (!isNaN(d)) return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(d.getSeconds()).padStart(2, "0")}`;
     if (/^\d{2}:\d{2}:\d{2}$/.test(input)) return input; // fallback
     return "--:--:--";
   }
@@ -415,7 +433,7 @@ include 'plugins/sidebar/admin_bar.php';
       }
 
       if (data.status === "timed_in") {
-        punchBtn.classList.replace("btn-success","btn-danger");
+        punchBtn.classList.replace("btn-success", "btn-danger");
         punchBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> Time Out`;
       } else if (data.status === "timed_out") {
         punchBtn.className = "btn btn-secondary";
@@ -423,7 +441,7 @@ include 'plugins/sidebar/admin_bar.php';
         punchBtn.innerHTML = `<i class="fas fa-check-circle"></i> Already Logged`;
         clearInterval(liveTimeInterval);
       }
-    } catch(err) {
+    } catch (err) {
       console.error("Check log failed:", err);
     }
   }
@@ -433,7 +451,16 @@ include 'plugins/sidebar/admin_bar.php';
   // ===== Punch Button =====
   punchBtn.addEventListener("click", async () => {
     const now = getPhilippineTime();
-    const date_time = now.toISOString().slice(0,19); // YYYY-MM-DDTHH:MM:SS
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const dd = String(now.getDate()).padStart(2, "0");
+    const hh = String(now.getHours()).padStart(2, "0");
+    const min = String(now.getMinutes()).padStart(2, "0");
+    const ss = String(now.getSeconds()).padStart(2, "0");
+
+    const date_time = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`; // Manila-local
+
+    // ✅ Define action based on button class BEFORE fetch
     const action = punchBtn.classList.contains("btn-success") ? "time_in" : "time_out";
 
     try {
@@ -448,7 +475,7 @@ include 'plugins/sidebar/admin_bar.php';
         if (action === "time_in") {
           isFrozen = true;
           timeInInput.value = formatTime(date_time);
-          punchBtn.classList.replace("btn-success","btn-danger");
+          punchBtn.classList.replace("btn-success", "btn-danger");
           punchBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> Time Out`;
         } else {
           timeOutInput.value = formatTime(date_time);
@@ -460,63 +487,78 @@ include 'plugins/sidebar/admin_bar.php';
           clearInterval(liveTimeInterval);
         }
       }
-    } catch(err) {
+    } catch (err) {
       console.error("Save log failed:", err);
     }
   });
 
-  // ===== Calendar =====
+
+  /// ===== Calendar Setup =====
   const calendarContainer = document.getElementById("calendarContainer");
   const monthGrid = document.getElementById("monthGrid");
   const yearDisplay = document.getElementById("yearDisplay");
   const yearUp = document.getElementById("yearUp");
   const yearDown = document.getElementById("yearDown");
+
   let currentYear = new Date().getFullYear();
   yearDisplay.value = currentYear;
+  let selectedMonth = new Date().getMonth() + 1; // 1-12
+  let selectedMonthStr = `${currentYear}-${String(selectedMonth).padStart(2, "0")}`;
 
+  // ===== Year Control =====
   function updateYearControls() {
     yearUp.disabled = currentYear >= 2050;
     yearDown.disabled = currentYear <= 2025;
   }
 
-  yearUp.addEventListener("click", () => { currentYear++; yearDisplay.value = currentYear; updateYearControls(); });
-  yearDown.addEventListener("click", () => { currentYear--; yearDisplay.value = currentYear; updateYearControls(); });
+  yearUp.addEventListener("click", () => {
+    currentYear++;
+    yearDisplay.value = currentYear;
+    updateYearControls();
+  });
+  yearDown.addEventListener("click", () => {
+    currentYear--;
+    yearDisplay.value = currentYear;
+    updateYearControls();
+  });
   updateYearControls();
 
-  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  let selectedMonth = null;
-
-  months.forEach((m,i)=>{
+  // ===== Month Grid Buttons =====
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  months.forEach((m, i) => {
     const btn = document.createElement("button");
     btn.className = "btn btn-outline-dark col-3 mb-2";
-    btn.textContent = m.substring(0,3);
-    btn.dataset.value = i+1;
-    btn.addEventListener("click", ()=> {
-      monthGrid.querySelectorAll("button").forEach(b=>b.classList.remove("btn-dark"));
+    btn.textContent = m.substring(0, 3);
+    btn.dataset.value = i + 1;
+    btn.addEventListener("click", () => {
+      monthGrid.querySelectorAll("button").forEach(b => b.classList.remove("btn-dark"));
       btn.classList.add("btn-dark");
-      selectedMonth = i+1;
+      selectedMonth = i + 1;
     });
     monthGrid.appendChild(btn);
   });
 
-  document.getElementById("applyMonthYear").addEventListener("click", ()=>{
-    if(!selectedMonth) return alert("Please select a month.");
-    const chosenMonth = `${currentYear}-${String(selectedMonth).padStart(2,"0")}`;
+  // ===== Apply Month-Year =====
+  document.getElementById("applyMonthYear").addEventListener("click", () => {
+    if (!selectedMonth) return alert("Please select a month.");
+    selectedMonthStr = `${currentYear}-${String(selectedMonth).padStart(2, "0")}`;
     $("#monthYearModal").modal("hide");
-    loadCalendarFor(chosenMonth);
+    loadCalendarFor(selectedMonthStr);
   });
 
- function renderCalendar(data, selectedMonthStr) {
-  const statusMap = {};
-  data.forEach(row => statusMap[row.date] = row.status || "Pending");
-  const [year, month] = selectedMonthStr.split("-").map(Number);
-  const firstDay = new Date(year, month-1,1);
-  const lastDay = new Date(year, month,0);
-  const totalDays = lastDay.getDate();
-  const startDay = firstDay.getDay();
-  const monthName = firstDay.toLocaleString("default",{month:"long"});
+  // ===== Render Calendar =====
+  function renderCalendar(data, monthYearStr) {
+    const statusMap = {};
+    data.forEach(row => statusMap[row.date] = row.status || "Pending");
 
-  let html = `<table class="table table-bordered text-center">
+    const [year, month] = monthYearStr.split("-").map(Number);
+    const firstDay = new Date(year, month - 1, 1);
+    const lastDay = new Date(year, month, 0);
+    const totalDays = lastDay.getDate();
+    const startDay = firstDay.getDay();
+    const monthName = firstDay.toLocaleString("default", { month: "long" });
+
+    let html = `<table class="table table-bordered text-center">
     <thead>
       <tr>
         <th colspan="7" class="bg-dark text-white calendar-header">
@@ -533,119 +575,83 @@ include 'plugins/sidebar/admin_bar.php';
     </thead>
     <tbody>`;
 
-  let day=1;
-  for(let w=0;w<6&&day<=totalDays;w++){
-    html+="<tr>";
-    for(let d=0;d<7;d++){
-      if((w===0 && d<startDay) || day>totalDays){
-        html+=`<td class="bg-light"></td>`;
-      } else {
-        const dateStr = `${year}-${String(month).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
-        const status=statusMap[dateStr]||"Pending";
-        const cssClass={
-          "PRESENT":"status-present","NO TIME OUT":"status-no-timeout",
-          "VL":"status-vl","SL":"status-sl","LWOP":"status-lwop",
-          "RDOT":"status-rdot","RD":"status-rd","NO WORK":"status-no-work",
-          "HOLIDAY":"status-holiday","PENDING":"status-pending"
-        }[status.trim().toUpperCase()]||"status-pending";
+    let day = 1;
+    for (let w = 0; w < 6 && day <= totalDays; w++) {
+      html += "<tr>";
+      for (let d = 0; d < 7; d++) {
+        if ((w === 0 && d < startDay) || day > totalDays) {
+          html += `<td class="bg-light"></td>`;
+        } else {
+          const dateStr = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+          const status = statusMap[dateStr] || "Pending";
+          const cssClass = {
+            "PRESENT": "status-present", "NO TIME OUT": "status-no-timeout",
+            "VL": "status-vl", "SL": "status-sl", "LWOP": "status-lwop",
+            "RDOT": "status-rdot", "RD": "status-rd", "NO WORK": "status-no-work",
+            "HOLIDAY": "status-holiday", "PENDING": "status-Pending"
+          }[status.trim().toUpperCase()] || "status-Pending";
 
-        html+=`<td class="${cssClass}" style="height:80px;vertical-align:top;">
-                <div><strong>${day}</strong></div>
-                <div style="font-size:13px;">${status}</div>
-              </td>`;
-        day++;
+          html += `<td class="${cssClass}" style="height:80px;vertical-align:top;">
+                  <div><strong>${day}</strong></div>
+                  <div style="font-size:13px;">${status}</div>
+                </td>`;
+          day++;
+        }
       }
+      html += "</tr>";
     }
-    html+="</tr>";
+    html += "</tbody></table>";
+    calendarContainer.innerHTML = html;
   }
-  html+="</tbody></table>";
-   calendarContainer.innerHTML = html;
 
-  // ===== Attach prev/next/month listeners =====
-  const prevBtn = document.getElementById("prevMonth");
-  const nextBtn = document.getElementById("nextMonth");
-  const monthLabel = document.getElementById("monthYearLabel");
-
-  prevBtn.addEventListener("click", () => {
-    let [y, m] = selectedMonthStr.split("-").map(Number);
-    m--;
-    if (m < 1) { m = 12; y--; }
-    selectedMonthStr = `${y}-${String(m).padStart(2, "0")}`;
-    loadCalendarFor(selectedMonthStr);
-  });
-
-  nextBtn.addEventListener("click", () => {
-    let [y, m] = selectedMonthStr.split("-").map(Number);
-    m++;
-    if (m > 12) { m = 1; y++; }
-    selectedMonthStr = `${y}-${String(m).padStart(2, "0")}`;
-    loadCalendarFor(selectedMonthStr);
-  });
-
-  monthLabel.addEventListener("click", () => {
-    $("#monthYearModal").modal("show");
-  });
-}
-
-  
-  async function loadCalendarFor(monthYearStr){
-    try{
-      const res=await fetch("../../process/fetch_calendar_data.php",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({username, month:monthYearStr})
+  // ===== Load Calendar =====
+  async function loadCalendarFor(monthYearStr) {
+    selectedMonthStr = monthYearStr; // sync
+    try {
+      const res = await fetch("../../process/fetch_calendar_data.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, month: monthYearStr })
       });
-      const data=await res.json();
-      if(!Array.isArray(data)) throw new Error("Invalid data");
+      const data = await res.json();
+      if (!Array.isArray(data)) throw new Error("Invalid data");
       renderCalendar(data, monthYearStr);
-    }catch(err){
-      console.error("Failed to load calendar:",err);
+    } catch (err) {
+      console.error("Failed to load calendar:", err);
       alert("⚠️ Failed to load calendar data.");
     }
   }
 
-  // auto load current month
-  (async ()=>{
-    const now=getPhilippineTime();
-    const curMonthStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+  // ===== Prev/Next Month Clicks =====
+  calendarContainer.addEventListener("click", (e) => {
+    if (e.target.id === "prevMonth" || e.target.closest("#prevMonth")) {
+      let [y, m] = selectedMonthStr.split("-").map(Number);
+      m--; if (m < 1) { m = 12; y--; }
+      selectedMonthStr = `${y}-${String(m).padStart(2, "0")}`;
+      loadCalendarFor(selectedMonthStr);
+    }
+    if (e.target.id === "nextMonth" || e.target.closest("#nextMonth")) {
+      let [y, m] = selectedMonthStr.split("-").map(Number);
+      m++; if (m > 12) { m = 1; y++; }
+      selectedMonthStr = `${y}-${String(m).padStart(2, "0")}`;
+      loadCalendarFor(selectedMonthStr);
+    }
+    if (e.target.id === "monthYearLabel" || e.target.closest("#monthYearLabel")) {
+      $("#monthYearModal").modal("show");
+    }
+  });
+
+  // ===== Auto-load Current Month =====
+  (async () => {
+    const now = getPhilippineTime();
+    const curMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
     await loadCalendarFor(curMonthStr);
   })();
-
-calendarContainer.addEventListener("click", (e) => {
-  // Previous month
-  if (e.target.id === "prevMonth" || e.target.closest("#prevMonth")) {
-    let [year, month] = selectedMonthStr.split("-").map(Number);
-    month--;
-    if (month < 1) {
-      month = 12;
-      year--;
-    }
-    selectedMonthStr = `${year}-${String(month).padStart(2, "0")}`;
-    loadCalendarFor(selectedMonthStr);
-  }
-
-  // Next month
-  if (e.target.id === "nextMonth" || e.target.closest("#nextMonth")) {
-    let [year, month] = selectedMonthStr.split("-").map(Number);
-    month++;
-    if (month > 12) {
-      month = 1;
-      year++;
-    }
-    selectedMonthStr = `${year}-${String(month).padStart(2, "0")}`;
-    loadCalendarFor(selectedMonthStr);
-  }
-
-  // Month-Year label opens modal
-  if (e.target.id === "monthYearLabel" || e.target.closest("#monthYearLabel")) {
-    $("#monthYearModal").modal("show");
-  }
-});
 
 
   // ===== Remarks Modal =====
   const dateRemarksModalEl = document.getElementById("dateRemarksModal");
-  const dateRemarksModal = new bootstrap.Modal(dateRemarksModalEl,{backdrop:'static',keyboard:true});
+  const dateRemarksModal = new bootstrap.Modal(dateRemarksModalEl, { backdrop: 'static', keyboard: true });
 
   // ===== Remarks/Status Modal =====
   calendarContainer.addEventListener("click", async e => {
@@ -681,7 +687,7 @@ calendarContainer.addEventListener("click", (e) => {
       modalTimeIn.value = data.time_in || "";
       modalTimeOut.value = data.time_out || "";
       modalStatus.value = data.status_value || (isSunday ? "RD" : "");
-    } catch(err) {
+    } catch (err) {
       console.error("Failed to load status/remarks:", err);
     }
 
@@ -690,40 +696,68 @@ calendarContainer.addEventListener("click", (e) => {
 
   // ===== Save button =====
   document.addEventListener("DOMContentLoaded", () => {
-  const updateBtn = document.getElementById("updateRemarksBtn");
-  if(updateBtn){
-    updateBtn.addEventListener("click", async () => {
-      const date = document.getElementById("modalDate").value;
-      const remarks = document.getElementById("modalRemarks").value.trim();
-      const status = document.getElementById("modalStatus").value;
+    const updateBtn = document.getElementById("updateRemarksBtn");
+    if (updateBtn) {
+      updateBtn.addEventListener("click", async () => {
+        const date = document.getElementById("modalDate").value;
+        const remarks = document.getElementById("modalRemarks").value.trim();
+        const status = document.getElementById("modalStatus").value;
 
-      if (!status) return alert("Please select a status before saving.");
-
-      try {
-        const res = await fetch("../../process/save_remarks.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, date, remarks, status })
+        if (!status) return Swal.fire({
+          icon: 'warning',
+          title: 'Please select a status before saving.',
+          timer: 1500,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end'
         });
-        const data = await res.json();
 
-        if (data.status === "updated" || data.status === "inserted") {
-          alert("✅ Saved successfully!");
-          dateRemarksModal.hide();
-          const monthToLoad = selectedMonth
-            ? `${currentYear}-${String(selectedMonth).padStart(2, "0")}`
-            : `${getPhilippineTime().getFullYear()}-${String(getPhilippineTime().getMonth() + 1).padStart(2, "0")}`;
-          loadCalendarFor(monthToLoad);
-        } else {
-          alert("⚠️ Failed to save data.");
+        try {
+          const res = await fetch("../../process/save_remarks.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, date, remarks, status })
+          });
+          const data = await res.json();
+
+          if (data.status === "updated" || data.status === "inserted") {
+            Swal.fire({
+              icon: 'success',
+              title: 'Saved successfully!',
+              timer: 1500,
+              showConfirmButton: false,
+              toast: true,
+              position: 'top-end'
+            });
+            dateRemarksModal.hide();
+            const monthToLoad = selectedMonth
+              ? `${currentYear}-${String(selectedMonth).padStart(2, "0")}`
+              : `${getPhilippineTime().getFullYear()}-${String(getPhilippineTime().getMonth() + 1).padStart(2, "0")}`;
+            loadCalendarFor(monthToLoad);
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Failed to save data.',
+              timer: 1500,
+              showConfirmButton: false,
+              toast: true,
+              position: 'top-end'
+            });
+          }
+        } catch (err) {
+          console.error("Error saving data:", err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error occurred while saving.',
+            timer: 1500,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+          });
         }
-      } catch (err) {
-        console.error("Error saving data:", err);
-        alert("⚠️ Error occurred while saving.");
-      }
-    });
-  }
-});
+      });
+    }
+  });
 
 </script>
 
