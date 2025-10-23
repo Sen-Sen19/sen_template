@@ -238,7 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 let isActive = false;
 
-// Force-match username & normalize the boolean
 activeUsers.forEach(active => {
   const activeFlag = active.is_active === true || active.is_active === "true" || active.is_active == 1;
 
