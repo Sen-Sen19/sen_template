@@ -163,17 +163,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const adminBody = document.getElementById('admin_body');
   const deleteBtn = document.getElementById('deleteBtn');
   const addRecordModal = new bootstrap.Modal(document.getElementById('addRecordModal'));
- // Form fields
-const employeeIdField = document.getElementById('employeeId');
-const fullNameField   = document.getElementById('fullName');
-const usernameField   = document.getElementById('username'); // <-- modal input
-const departmentField = document.getElementById('department');
-const passwordField   = document.getElementById('password');
-const typeField       = document.getElementById('type');
 
-// Logged-in username in header
-const headerUsername  = document.getElementById('headerUsername');
-
+  // Form fields
+  const employeeIdField = document.getElementById('employeeId');
+  const fullNameField   = document.getElementById('fullName');
+  const usernameField   = document.getElementById('username');
+  const departmentField = document.getElementById('department');
+  const passwordField   = document.getElementById('password');
+  const typeField       = document.getElementById('type');
 
   // ================== OPEN ADD MODAL ==================
   document.getElementById('openModalBtn').addEventListener('click', () => {
@@ -192,12 +189,11 @@ const headerUsername  = document.getElementById('headerUsername');
   document.getElementById('addAccountForm').addEventListener('submit', (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
-    const url = employeeIdField.readOnly ? '../../process/account_update.php' : '../../process/account_add.php';
+    const url = employeeIdField.readOnly
+      ? '../../process/account_update.php'
+      : '../../process/account_add.php';
 
-    fetch(url, {
-      method: 'POST',
-      body: formData,
-    })
+    fetch(url, { method: 'POST', body: formData })
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -209,7 +205,7 @@ const headerUsername  = document.getElementById('headerUsername');
             showConfirmButton: false,
           }).then(() => {
             addRecordModal.hide();
-            loadAccounts(); // refresh instead of reload()
+            loadAccounts();
           });
         } else {
           Swal.fire({
@@ -230,63 +226,69 @@ const headerUsername  = document.getElementById('headerUsername');
 
   // ================== LOAD ACCOUNTS + ACTIVE STATUS ==================
   function loadAccounts() {
-    Promise.all([
-      fetch('../../process/account_view.php').then(r => r.json()),
-      fetch('../../process/active_view.php').then(r => r.json())
-    ])
-    .then(([accounts, activeUsers]) => {
-      adminBody.innerHTML = ""; 
-      const now = new Date();
+  Promise.all([
+    fetch('../../process/account_view.php').then(r => r.json()),
+    fetch('../../process/active_view.php').then(r => r.json())
+  ])
+  .then(([accounts, activeUsers]) => {
+    adminBody.innerHTML = ""; 
+    accounts.forEach(row => {
+      const tr = document.createElement('tr');
+      const maskedPassword = '•'.repeat(row.password.length);
 
-      accounts.forEach(row => {
-        const tr = document.createElement('tr');
-        const maskedPassword = '•'.repeat(row.password.length);
+let isActive = false;
 
-        // Check if user is active
-        let isActive = false;
-        activeUsers.forEach(active => {
-          if (active.username === row.username) {
-            const activeTime = new Date(active.date_time);
-            const diff = (now - activeTime) / 1000; 
-            if (diff <= 120) { // ✅ 2 minutes instead of 5 sec
-              isActive = true;
-            }
-          }
-        });
+// Force-match username & normalize the boolean
+activeUsers.forEach(active => {
+  const activeFlag = active.is_active === true || active.is_active === "true" || active.is_active == 1;
 
-        const circleColor = isActive ? "green" : "gray";
-
-        tr.innerHTML = `
-          <td>${row.employee_id}</td>
-          <td>${row.full_name}</td>
-          <td>${row.username}</td>
-          <td>${row.department}</td>
-          <td>${maskedPassword}</td>
-          <td>${row.role}</td>
-          <td><span class="status-circle" 
-              style="height:12px;width:12px;background:${circleColor};border-radius:50%;display:inline-block;"></span></td>
-          <td><input type="checkbox" class="select-checkbox" data-employee-id="${row.employee_id}"></td>
-        `;
-
-        // On row click → open modal with account data
-        tr.addEventListener('click', () => {
-          employeeIdField.value = row.employee_id;
-          fullNameField.value = row.full_name;
-          usernameField.value = row.username;
-          departmentField.value = row.department;
-          passwordField.value = row.password;
-          typeField.value = row.role;
-
-          employeeIdField.readOnly = true;
-          fullNameField.readOnly = true;
-          addRecordModal.show();
-        });
-
-        adminBody.appendChild(tr);
-      });
-    })
-    .catch(err => console.error("⚠️ Fetch error:", err));
+  if (active.username.trim().toLowerCase() === row.username.trim().toLowerCase() && activeFlag) {
+    isActive = true;
   }
+});
+
+
+      const circleColor = isActive ? "green" : "gray";
+
+      tr.innerHTML = `
+        <td>${row.employee_id}</td>
+        <td>${row.full_name}</td>
+        <td>${row.username}</td>
+        <td>${row.department}</td>
+        <td>${maskedPassword}</td>
+        <td>${row.role}</td>
+        <td>
+          <span class="status-circle"
+            style="height:12px;width:12px;background:${circleColor};
+            border-radius:50%;display:inline-block;">
+          </span>
+        </td>
+        <td>
+          <input type="checkbox" class="select-checkbox"
+            data-employee-id="${row.employee_id}">
+        </td>
+      `;
+
+      // Row click to edit
+      tr.addEventListener('click', () => {
+        employeeIdField.value = row.employee_id;
+        fullNameField.value = row.full_name;
+        usernameField.value = row.username;
+        departmentField.value = row.department;
+        passwordField.value = row.password;
+        typeField.value = row.role;
+
+        employeeIdField.readOnly = true;
+        fullNameField.readOnly = true;
+        addRecordModal.show();
+      });
+
+      adminBody.appendChild(tr);
+    });
+  })
+  .catch(err => console.error("⚠️ Fetch error:", err));
+}
+
 
   // ================== DELETE SELECTED ==================
   deleteBtn.addEventListener('click', () => {
@@ -346,12 +348,9 @@ const headerUsername  = document.getElementById('headerUsername');
   });
 
   // ================== INIT ==================
-  loadAccounts();                 // First load
-  setInterval(loadAccounts, 60000); // Auto refresh every 60s
+  loadAccounts();                 
+  setInterval(loadAccounts, 60000); // refresh every 60s
 });
-
-
-  
 </script>
 
 
