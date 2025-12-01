@@ -62,6 +62,7 @@
 }
 
 
+
 .chat-input { 
   display:flex; 
   border-top:1px solid #ddd; 
@@ -170,11 +171,14 @@
 }
 
 
-.chat-message.other { /* Messages from others */
+.chat-message.other {
   background-color: #f1f1f1;
   color: black;
   margin-right: auto;
   text-align: left;
+  display: inline-block;       /* make bubble shrink to content */
+  max-width: 200px;            /* limit width */
+  word-wrap: break-word;
 }
 
 /* Container for other users to display name above bubble */
@@ -202,6 +206,44 @@
 .reply-icon:hover {
   color: #000;
 }
+.chat-input textarea { 
+  flex:1; 
+  padding:10px; 
+  border:none; 
+  outline:none; 
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  overflow-y: auto;
+}
+.reply-preview {
+  font-size: 12px;
+  color: #555;
+  background: rgba(0,0,0,0.05);
+  padding: 4px 8px;
+  border-left: 3px solid #ccc;
+  border-radius: 6px;
+  max-width: 220px;
+  word-wrap: break-word;
+  margin-bottom: 2px;
+}
+
+.user-message-wrapper,
+.other-message-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.user-message-wrapper {
+  align-items: flex-end; /* right align user messages and reply previews */
+}
+
+.other-message-wrapper {
+  align-items: flex-start; /* left align others */
+}
+
+
 
 </style>
 
@@ -279,137 +321,166 @@
     <div id="loginError">Invalid Employee ID</div>
   </div>
 
-  <div class="chat-messages" id="chatMessages"></div>
-  <div class="chat-input">
-    <input type="text" id="chatInput" placeholder="Type a message...">
-    <button id="chatSend">Send</button>
-  </div>
+<!-- Replying message bar -->
+
+<!-- Chat messages container -->
+<div class="chat-messages" id="chatMessages"></div>
+
+<!-- Input -->
+<div id="replyingTo" style="
+    display:none;
+    position: relative;       /* make container relative */
+    padding:6px 10px;
+    background:#f1f1f1;
+    border-left:3px solid #000;
+    font-size:12px;
+    margin:6px;
+    border-radius:6px;
+    box-shadow:0 2px 5px rgba(0,0,0,0.1);
+">
+  Replying to: <span id="replyingToText"></span>
+  <button onclick="cancelReply()" style="
+      position: absolute;  /* fix position */
+      right: 6px;          /* distance from right */
+      top: 50%;            /* vertically center */
+      transform: translateY(-50%);
+      border:none;
+      background:none;
+      cursor:pointer;
+      font-size:12px;
+  ">✖</button>
+</div>
+
+<div class="chat-input">
+  <textarea id="chatInput" placeholder="Type a message..." rows="1" style="resize:none;"></textarea>
+  <button id="chatSend">Send</button>
 </div>
 
 
+</div>
 
+
+<script src="/sen_template/js/drag.js"></script>
 <script src="/sen_template/js/login.js"></script>
 <script src="/sen_template/js/activeUsers.js"></script>
 <script src="/sen_template/js/dateTime.js"></script>
+<script src="/sen_template/js/heartbeat.js"></script>
 <script>
 const ROOT_PATH = "/sen_template"; 
-
-// ====================== DOM ELEMENTS ======================
-const bubble = document.getElementById("chatToggle");
-const box = document.getElementById("chatBox");
 const chatMessages = document.getElementById("chatMessages");
 const chatInput = document.getElementById("chatInput");
 const chatSend = document.getElementById("chatSend");
-const headerDots = document.querySelector(".chat-header .header-dots");
-const menuDropdown = document.getElementById("menuDropdown");
+let user = null; // logged-in user { employee_id, full_name }
+let replyToId = null;
 
-let dragging = false, offsetX = 0, offsetY = 0, lastX = 0, lastY = 0, side = "right";
-let user = null; // logged-in user object { employee_id, full_name }
-
-// ====================== DRAGGING ======================
-bubble.style.bottom="25px";
-bubble.style.right="25px";
-lastX = bubble.getBoundingClientRect().left;
-lastY = bubble.getBoundingClientRect().top;
-
-bubble.addEventListener("mousedown", e => {
-  dragging=true;
-  offsetX = e.clientX - bubble.getBoundingClientRect().left;
-  offsetY = e.clientY - bubble.getBoundingClientRect().top;
-  bubble.style.transition = "none";
-  box.style.transition = "none";
-});
-document.addEventListener("mousemove", e => {
-  if(!dragging) return;
-  lastX = Math.max(0, Math.min(e.clientX-offsetX, window.innerWidth-bubble.offsetWidth));
-  lastY = Math.max(0, Math.min(e.clientY-offsetY, window.innerHeight-bubble.offsetHeight));
-  bubble.style.left = lastX+"px";
-  bubble.style.top = lastY+"px";
-  updateChatPosition();
-});
-document.addEventListener("mouseup", () => {
-  if(!dragging) return;
-  dragging=false;
-  const bubbleCenterX = lastX + bubble.offsetWidth/2;
-  side = bubbleCenterX < window.innerWidth/2 ? "left":"right";
-  bubble.style.left = side==="left"?"12px":"auto";
-  bubble.style.right = side==="right"?"12px":"auto";
-  updateChatPosition();
-});
-bubble.onclick = () => {
-  const isOpen = box.style.display === "flex";
-  box.style.display = isOpen ? "none" : "flex";
-  updateChatPosition();
-
-  if (!isOpen) {
-    // Load messages immediately when chat opens
-    loadMessages();
-  }
-};
-
-function updateChatPosition(){
-  const r = bubble.getBoundingClientRect();
-  box.style.left = side==="left"? r.left+"px":"auto";
-  box.style.right = side==="right"? (window.innerWidth-r.right)+"px":"auto";
-  box.style.top = r.top + r.height/2 < window.innerHeight/2 ? (r.bottom+10)+"px":"auto";
-  box.style.bottom = r.top + r.height/2 >= window.innerHeight/2 ? (window.innerHeight-r.top+10)+"px":"auto";
+// Set reply
+function replyToMessage(messageId, fullName, messageText) {
+  replyToId = messageId;
+  document.getElementById("replyingToText").textContent = `${fullName}: ${messageText}`;
+  document.getElementById("replyingTo").style.display = "block";
+  chatInput.focus();
 }
 
-// ====================== LOAD MESSAGES ======================
+// Cancel reply
+function cancelReply() {
+  replyToId = null;
+  document.getElementById("replyingTo").style.display = "none";
+  chatInput.placeholder = "Type a message...";
+}
+
+// Load messages
 async function loadMessages() {
   if (!user) return;
 
   try {
-    const resp = await fetch(`${ROOT_PATH}/process/chat/fetch_messages.php`, { credentials: "same-origin" });
+    const resp = await fetch("/sen_template/process/chat/fetch_messages.php", { credentials: "same-origin" });
     const data = await resp.json();
-
-    if (!Array.isArray(data)) {
-      console.error("Messages not array:", data);
-      return;
-    }
+    if (!Array.isArray(data)) return;
 
     chatMessages.innerHTML = "";
-data.forEach(msg => {
-  const isSelf = msg.full_name === document.getElementById("secondaryUserName").textContent;
 
-  const timestamp = new Date(msg.datetime).toLocaleString('en-US', {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-    timeZone: "Asia/Manila"
-  });
+    data.forEach(msg => {
+      const isSelf = msg.full_name === user.full_name;
+      const timestamp = new Date(msg.datetime).toLocaleString("en-US", {
+        year: "numeric", month: "short", day: "numeric",
+        hour: "2-digit", minute: "2-digit", second: "2-digit",
+        hour12: true, timeZone: "Asia/Manila"
+      });
 
-  const replyHTML = `<i class="fa-solid fa-reply reply-icon" onclick="replyToMessage('${msg.id || ''}', '${msg.full_name.replace(/'/g,"\\'")}')"></i>`;
+      // Message wrapper
+      const msgWrapper = document.createElement("div");
+      msgWrapper.className = isSelf ? "user-message-wrapper" : "other-message-wrapper";
+      msgWrapper.style.marginBottom = "8px";
 
-  if (isSelf) {
-    chatMessages.innerHTML += `
-      <div class="chat-message user">
-        ${msg.message}
-        <div style="font-size:10px; color:#ccc; margin-top:2px;">
-          ${timestamp} ${replyHTML}
-        </div>
-      </div>
-    `;
-  } else {
-    chatMessages.innerHTML += `
-      <div class="other-message-container">
-        <div class="other-name">${msg.full_name || "Unknown"}</div>
-        <div class="chat-message other">
-          ${msg.message}
-          <div style="font-size:10px; color:#555; margin-top:2px;">
-            ${timestamp} ${replyHTML}
-          </div>
-        </div>
-      </div>
-    `;
-  }
-});
+      // Message bubble
+      const msgBubble = document.createElement("div");
+      msgBubble.className = isSelf ? "chat-message user" : "chat-message other";
+      msgBubble.innerHTML = `${msg.message}<div style="font-size:10px;color:${isSelf ? "#ccc" : "#555"};margin-top:2px;">${timestamp}</div>`;
+      
+      // Assign a unique ID to each message bubble
+      const msgId = msg.id || `msg-${Math.random()}`;
+      msgBubble.id = "msg-" + msgId;
 
-    // Scroll to bottom automatically
+      // Reply preview outside bubble
+      if (msg.reply_to_id && msg.reply_message) {
+        const replyDiv = document.createElement("div");
+        replyDiv.className = "reply-preview";
+        replyDiv.innerHTML = `<strong>${msg.reply_full_name || "Unknown"}:</strong> ${msg.reply_message}`;
+        replyDiv.style.textAlign = isSelf ? "right" : "left";
+        replyDiv.style.opacity = "0.7";
+        replyDiv.style.marginLeft = isSelf ? "auto" : "0";
+        replyDiv.style.marginRight = isSelf ? "0" : "auto";
+        replyDiv.style.maxWidth = "220px";
+        replyDiv.style.wordWrap = "break-word";
+        replyDiv.style.padding = "4px 8px";
+        replyDiv.style.borderLeft = "3px solid #ccc";
+        replyDiv.style.borderRadius = "6px";
+        replyDiv.style.marginBottom = "2px";
+        replyDiv.style.cursor = "pointer";
+
+        // Scroll and blink original message when clicking the reply preview
+        replyDiv.addEventListener("click", () => {
+          const targetMsg = document.getElementById("msg-" + msg.reply_to_id);
+          if (!targetMsg) return;
+          targetMsg.scrollIntoView({ behavior: "smooth", block: "center" });
+
+          // Blink blue 2 times
+          let blinkCount = 0;
+          const originalBg = targetMsg.style.backgroundColor;
+          const blinkInterval = setInterval(() => {
+            targetMsg.style.backgroundColor = blinkCount % 2 === 0 ? "#cce5ff" : originalBg;
+            blinkCount++;
+            if (blinkCount > 3) clearInterval(blinkInterval);
+          }, 300);
+        });
+
+        msgWrapper.appendChild(replyDiv);
+      }
+
+      msgWrapper.appendChild(msgBubble);
+
+      // Reply icon
+      const replyIcon = document.createElement("i");
+      replyIcon.className = "fa-solid fa-reply reply-icon";
+      replyIcon.title = "Reply";
+      replyIcon.style.cursor = "pointer";
+      replyIcon.style.marginLeft = "6px";
+      replyIcon.addEventListener("click", () => {
+        replyToMessage(msg.id || "", msg.full_name, msg.message);
+      });
+      msgBubble.appendChild(replyIcon);
+
+      // If other user, show name above bubble
+      if (!isSelf) {
+        const nameDiv = document.createElement("div");
+        nameDiv.className = "other-name";
+        nameDiv.textContent = msg.full_name;
+        msgWrapper.insertBefore(nameDiv, msgWrapper.firstChild);
+      }
+
+      chatMessages.appendChild(msgWrapper);
+    });
+
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
   } catch (err) {
@@ -417,28 +488,23 @@ data.forEach(msg => {
   }
 }
 
-// ====================== REFRESH MESSAGES ======================
-setInterval(loadMessages, 30000);
-window.addEventListener("DOMContentLoaded", loadMessages);
-
-// ====================== SEND MESSAGE ======================
+// Send message
 chatSend.onclick = async () => {
   const message = chatInput.value.trim();
   if (!message) return;
 
   try {
-    const response = await fetch(`${ROOT_PATH}/process/chat/send_messages.php`, {
+    const resp = await fetch("/sen_template/process/chat/send_messages.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({ message, reply_to_id: replyToId }),
       credentials: "same-origin"
     });
-
-    const data = await response.json();
-
+    const data = await resp.json();
     if (data.status === "success") {
       chatInput.value = "";
-      loadMessages(); // reload messages immediately
+      cancelReply();
+      loadMessages();
     } else {
       alert("Send failed: " + (data.message || "Unknown error"));
     }
@@ -448,43 +514,24 @@ chatSend.onclick = async () => {
   }
 };
 
-
-// Allow Enter key to send message
-chatInput.addEventListener("keydown", (e) => {
+// Enter key to send
+chatInput.addEventListener("keydown", e => {
   if (e.key === "Enter") {
-    e.preventDefault(); // prevent new line if input is multiline
-    chatSend.click();   // trigger the send button click
+    if (e.shiftKey) {
+      const start = chatInput.selectionStart;
+      const end = chatInput.selectionEnd;
+      chatInput.value = chatInput.value.substring(0, start) + "\n" + chatInput.value.substring(end);
+      chatInput.selectionStart = chatInput.selectionEnd = start + 1;
+      e.preventDefault();
+    } else {
+      e.preventDefault();
+      chatSend.click();
+    }
   }
 });
 
-// ====================== HEARTBEAT ======================
-async function sendHeartbeat() {
-  if (!user) return;
-  const now = new Date();
-  const optionsDate = { year:"numeric", month:"long", day:"numeric", timeZone:"Asia/Manila" };
-  const optionsTime = { hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:true, timeZone:"Asia/Manila" };
-
-  try {
-    await fetch(`${ROOT_PATH}/process/chat/heartbeat.php`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        employee_id: user.employee_id,
-        date_today: now.toLocaleDateString("en-US", optionsDate),
-        time_now: now.toLocaleTimeString("en-US", optionsTime)
-      })
-    });
-  } catch(err) {
-    console.log("Heartbeat failed", err);
-  }
-}
-setInterval(sendHeartbeat, 30000);
-window.addEventListener("DOMContentLoaded", () => { setTimeout(sendHeartbeat, 500); });
-
-// ====================== MENU CLOSE ======================
-document.addEventListener("click", (e) => {
-  const isClickInside = menuDropdown.contains(e.target) || headerDots.contains(e.target);
-  if (!isClickInside) menuDropdown.style.display = "none";
-});
+// Auto refresh every 30s
+setInterval(loadMessages, 30000);
+window.addEventListener("DOMContentLoaded", loadMessages);
 </script>
 
