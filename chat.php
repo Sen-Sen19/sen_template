@@ -189,6 +189,20 @@
   color: #333;
   padding-left: 4px;
 }
+
+.reply-icon {
+  display: inline-block;
+  margin-left: 8px;
+  cursor: pointer;
+  color: #888;
+  font-size: 12px;
+  transition: 0.2s;
+}
+
+.reply-icon:hover {
+  color: #000;
+}
+
 </style>
 
 <!-- ====================== CHAT HTML ====================== -->
@@ -355,9 +369,7 @@ async function loadMessages() {
     }
 
     chatMessages.innerHTML = "";
-
 data.forEach(msg => {
-  // Compare full name to the secondary user display name
   const isSelf = msg.full_name === document.getElementById("secondaryUserName").textContent;
 
   const timestamp = new Date(msg.datetime).toLocaleString('en-US', {
@@ -371,11 +383,15 @@ data.forEach(msg => {
     timeZone: "Asia/Manila"
   });
 
+  const replyHTML = `<i class="fa-solid fa-reply reply-icon" onclick="replyToMessage('${msg.id || ''}', '${msg.full_name.replace(/'/g,"\\'")}')"></i>`;
+
   if (isSelf) {
     chatMessages.innerHTML += `
       <div class="chat-message user">
         ${msg.message}
-        <div style="font-size:10px; color:#ccc; margin-top:2px;">${timestamp}</div>
+        <div style="font-size:10px; color:#ccc; margin-top:2px;">
+          ${timestamp} ${replyHTML}
+        </div>
       </div>
     `;
   } else {
@@ -384,7 +400,9 @@ data.forEach(msg => {
         <div class="other-name">${msg.full_name || "Unknown"}</div>
         <div class="chat-message other">
           ${msg.message}
-          <div style="font-size:10px; color:#555; margin-top:2px;">${timestamp}</div>
+          <div style="font-size:10px; color:#555; margin-top:2px;">
+            ${timestamp} ${replyHTML}
+          </div>
         </div>
       </div>
     `;
