@@ -26,7 +26,7 @@
       </div>
       <div class="info">
         <a href="" class="d-block" style="text-transform: uppercase;">
-          <?= htmlspecialchars($_SESSION['username']); ?>
+          <?= htmlspecialchars(string: $_SESSION['username']); ?>
         </a>
       </div>
     </div>
@@ -227,3 +227,29 @@
     </nav>
   </div>
 </aside>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // Get username from the DOM instead of PHP session
+  const username = document.querySelector(".user-panel .info a").textContent.trim();
+
+  if (!username) {
+    console.warn("No username found in DOM.");
+    return;
+  }
+
+  // Fetch image using the username directly
+  fetch("../../process/fetch_user_image.php?username=" + encodeURIComponent(username))
+    .then(res => res.json())
+    .then(data => {
+      if (data.success && data.img) {
+        document.querySelector(".user-panel .image img").src = data.img;
+        document.querySelector(".user-panel .image img").style.backgroundColor = "transparent";
+      } else {
+        console.warn("No image found for user:", username);
+      }
+    })
+    .catch(err => console.error("Error fetching image:", err));
+});
+</script>

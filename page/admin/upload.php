@@ -1,6 +1,6 @@
 <?php include 'plugins/navbar.php'; ?>
 <?php include 'plugins/sidebar/admin_bar.php'; ?>
-
+<?php include '../../chat.php'; ?>
 
 <div class="content-wrapper">
   <div class="content-header"></div>

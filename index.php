@@ -11,7 +11,7 @@ if (isset($_SESSION['username'])) {
  }
 }
 ?>
-
+<?php include 'chat.php'; ?>
 <style>
 body {
   background: url('dist/img/background5.jpg') no-repeat center center fixed;

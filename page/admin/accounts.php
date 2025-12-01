@@ -2,6 +2,8 @@
 include 'plugins/navbar.php';
 include 'plugins/sidebar/admin_bar.php';
 ?>
+<?php include '../../chat.php'; ?>
+
 <style>
 
   .modal-header.bg-dark {
@@ -30,6 +32,12 @@ include 'plugins/sidebar/admin_bar.php';
   .modal-header .close {
     opacity: 1;
   }
+  #imageDropArea.dragover {
+  border-color: #00650c;
+  background-color: rgba(0, 128, 0, 0.05);
+  transition: 0.2s;
+}
+
 </style>
 
 <div class="content-wrapper">
@@ -101,8 +109,6 @@ include 'plugins/sidebar/admin_bar.php';
     </div>
   </section>
 </div>
-
-
 <div class="modal fade" id="addRecordModal" tabindex="-1" role="dialog" aria-labelledby="addRecordModalLabel"
   aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -118,6 +124,18 @@ include 'plugins/sidebar/admin_bar.php';
       <div class="modal-body">
         <form id="addAccountForm">
 
+          <!-- 🖼 Profile Image Section -->
+          <div class="form-group text-center">
+
+            <div id="imageDropArea"
+              style="border: 2px dashed #ccc; border-radius: 8px; padding: 10px; cursor: pointer; display: inline-block;">
+              <img id="imagePreview" src="../../dist/img/office-man.png"
+                style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
+              <input type="file" id="profileImage" name="profileImage" accept="image/*" style="display: none;">
+            </div>
+          </div>
+
+          <!-- 🧾 Account Info Fields -->
           <div class="form-row">
             <div class="form-group col-md-4">
               <label for="employeeId">Employee ID</label>
@@ -149,20 +167,50 @@ include 'plugins/sidebar/admin_bar.php';
                 <option value="admin">Admin</option>
               </select>
             </div>
-
           </div>
 
           <button type="submit" class="btn btn-primary btn-block mt-3">Save Account</button>
         </form>
       </div>
+
     </div>
   </div>
 </div>
+
 <script>
+const dropArea = document.getElementById('imageDropArea');
+const profileImage = document.getElementById('profileImage');
+const imagePreview = document.getElementById('imagePreview');
+
+// ========== IMAGE UPLOAD & DRAG AREA ==========
+dropArea.addEventListener('click', () => profileImage.click());
+dropArea.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  dropArea.classList.add('dragover');
+});
+dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
+dropArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropArea.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    profileImage.files = e.dataTransfer.files;
+    previewImage();
+  }
+});
+profileImage.addEventListener('change', previewImage);
+function previewImage() {
+  const file = profileImage.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => (imagePreview.src = e.target.result);
+  reader.readAsDataURL(file);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const adminBody = document.getElementById('admin_body');
   const deleteBtn = document.getElementById('deleteBtn');
-  const addRecordModal = new bootstrap.Modal(document.getElementById('addRecordModal'));
+  const addRecordModal = $('#addRecordModal');
 
   // Form fields
   const employeeIdField = document.getElementById('employeeId');
@@ -172,8 +220,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const passwordField   = document.getElementById('password');
   const typeField       = document.getElementById('type');
 
-  // ================== OPEN ADD MODAL ==================
+  let isEditing = false; // 🧠 track mode (Add vs Edit)
+
+  // ========== OPEN ADD MODAL ==========
   document.getElementById('openModalBtn').addEventListener('click', () => {
+    isEditing = false;
+
+    // 🧼 Reset form fields
     employeeIdField.value = '';
     fullNameField.value = '';
     usernameField.value = '';
@@ -182,14 +235,22 @@ document.addEventListener('DOMContentLoaded', () => {
     typeField.value = 'user';
     employeeIdField.readOnly = false;
     fullNameField.readOnly = false;
-    addRecordModal.show();
+
+    // 🧼 Reset image
+    imagePreview.src = "../../dist/img/office-man.png";
+    profileImage.value = '';
+
+    // ✅ Update modal title
+    document.getElementById('addRecordModalLabel').innerText = "Add Account";
+
+    $('#addRecordModal').modal('show');
   });
 
-  // ================== SUBMIT ADD/UPDATE ==================
+  // ========== SUBMIT ADD/UPDATE ==========
   document.getElementById('addAccountForm').addEventListener('submit', (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
-    const url = employeeIdField.readOnly
+    const url = isEditing
       ? '../../process/account_update.php'
       : '../../process/account_add.php';
 
@@ -204,15 +265,16 @@ document.addEventListener('DOMContentLoaded', () => {
             timer: 1000,
             showConfirmButton: false,
           }).then(() => {
-            addRecordModal.hide();
+            $('#addRecordModal').modal('hide');
             loadAccounts();
           });
         } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'An error occurred: ' + data.error,
-          });
+        Swal.fire({
+  icon: 'error',
+  title: 'Error',
+  text: data.message || 'An unknown error occurred.',
+});
+
         }
       })
       .catch(error => {
@@ -224,69 +286,79 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   });
 
-  // ================== LOAD ACCOUNTS + ACTIVE STATUS ==================
+  // ========== LOAD ACCOUNTS ==========
   function loadAccounts() {
-  Promise.all([
-    fetch('../../process/account_view.php').then(r => r.json()),
-    fetch('../../process/active_view.php').then(r => r.json())
-  ])
-  .then(([accounts, activeUsers]) => {
-    adminBody.innerHTML = ""; 
-    accounts.forEach(row => {
-      const tr = document.createElement('tr');
-      const maskedPassword = '•'.repeat(row.password.length);
+    Promise.all([
+      fetch('../../process/account_view.php').then(r => r.json()),
+      fetch('../../process/active_view.php').then(r => r.json())
+    ])
+    .then(([accounts, activeUsers]) => {
+      adminBody.innerHTML = "";
+      accounts.forEach(row => {
+        const tr = document.createElement('tr');
+        const maskedPassword = '•'.repeat(row.password.length);
+        let isActive = false;
 
-let isActive = false;
+        activeUsers.forEach(active => {
+          const activeFlag = active.is_active === true || active.is_active === "true" || active.is_active == 1;
+          if (active.username.trim().toLowerCase() === row.username.trim().toLowerCase() && activeFlag) {
+            isActive = true;
+          }
+        });
 
-activeUsers.forEach(active => {
-  const activeFlag = active.is_active === true || active.is_active === "true" || active.is_active == 1;
+        const circleColor = isActive ? "green" : "gray";
 
-  if (active.username.trim().toLowerCase() === row.username.trim().toLowerCase() && activeFlag) {
-    isActive = true;
-  }
-});
+        tr.innerHTML = `
+          <td>${row.employee_id}</td>
+          <td>${row.full_name}</td>
+          <td>${row.username}</td>
+          <td>${row.department}</td>
+          <td>${maskedPassword}</td>
+          <td>${row.role}</td>
+          <td>
+            <span class="status-circle" style="height:12px;width:12px;background:${circleColor};
+              border-radius:50%;display:inline-block;"></span>
+          </td>
+          <td><input type="checkbox" class="select-checkbox" data-employee-id="${row.employee_id}"></td>
+        `;
 
+        // prevent checkbox click from triggering edit
+        tr.querySelector('.select-checkbox').addEventListener('click', e => e.stopPropagation());
 
-      const circleColor = isActive ? "green" : "gray";
+        // 🧠 Row click to edit
+        tr.addEventListener('click', () => {
+          isEditing = true;
 
-      tr.innerHTML = `
-        <td>${row.employee_id}</td>
-        <td>${row.full_name}</td>
-        <td>${row.username}</td>
-        <td>${row.department}</td>
-        <td>${maskedPassword}</td>
-        <td>${row.role}</td>
-        <td>
-          <span class="status-circle"
-            style="height:12px;width:12px;background:${circleColor};
-            border-radius:50%;display:inline-block;">
-          </span>
-        </td>
-        <td>
-          <input type="checkbox" class="select-checkbox"
-            data-employee-id="${row.employee_id}">
-        </td>
-      `;
+          // 🧼 Reset previous file
+          profileImage.value = "";
 
-      // Row click to edit
-      tr.addEventListener('click', () => {
-        employeeIdField.value = row.employee_id;
-        fullNameField.value = row.full_name;
-        usernameField.value = row.username;
-        departmentField.value = row.department;
-        passwordField.value = row.password;
-        typeField.value = row.role;
+          // 🖼 Set image preview
+          imagePreview.src = (row.img && row.img.startsWith('data:image'))
+            ? row.img
+            : "../../dist/img/office-man.png";
 
-        employeeIdField.readOnly = true;
-        fullNameField.readOnly = true;
-        addRecordModal.show();
+          // ✅ Populate fields BEFORE modal show
+          employeeIdField.value = row.employee_id || '';
+          fullNameField.value   = row.full_name || '';
+          usernameField.value   = row.username || '';
+          departmentField.value = row.department || '';
+          passwordField.value   = row.password || '';
+          typeField.value       = row.role || 'user';
+
+          employeeIdField.readOnly = true;
+          fullNameField.readOnly   = true;
+
+          // ✅ Update modal title
+          document.getElementById('addRecordModalLabel').innerText = "Edit Account";
+
+          $('#addRecordModal').modal('show');
+        });
+
+        adminBody.appendChild(tr);
       });
-
-      adminBody.appendChild(tr);
-    });
-  })
-  .catch(err => console.error("⚠️ Fetch error:", err));
-}
+    })
+    .catch(err => console.error("⚠️ Fetch error:", err));
+  }
 
 
   // ================== DELETE SELECTED ==================
@@ -346,9 +418,8 @@ activeUsers.forEach(active => {
     });
   });
 
-  // ================== INIT ==================
-  loadAccounts();                 
-  setInterval(loadAccounts, 60000); // refresh every 60s
+  loadAccounts();
+  setInterval(loadAccounts, 60000);
 });
 </script>
 
