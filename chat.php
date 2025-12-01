@@ -63,10 +63,6 @@
 
 
 
-.chat-input { 
-  display:flex; 
-  border-top:1px solid #ddd; 
-}
 
 .chat-input input { 
   flex:1; 
@@ -75,13 +71,7 @@
   outline:none; 
 }
 
-.chat-input button { 
-  background:#000; 
-  border:none; 
-  padding:0 18px; 
-  color:white; 
-  cursor:pointer; 
-}
+
 
 .datetime-box { 
   background:#f1f1f1; 
@@ -168,6 +158,7 @@
   color: white;
   margin-left: auto;
   text-align: right;
+  
 }
 
 
@@ -206,20 +197,11 @@
 .reply-icon:hover {
   color: #000;
 }
-.chat-input textarea { 
-  flex:1; 
-  padding:10px; 
-  border:none; 
-  outline:none; 
-  font-family: inherit;
-  font-size: 14px;
-  line-height: 1.4;
-  overflow-y: auto;
-}
+
 .reply-preview {
   font-size: 12px;
   color: #555;
-  background: rgba(0,0,0,0.05);
+  background: rgba(255, 221, 109, 0.29);
   padding: 4px 8px;
   border-left: 3px solid #ccc;
   border-radius: 6px;
@@ -244,7 +226,35 @@
 }
 
 
+.chat-input {
+    display:flex;
+    border-top:1px solid #ddd;
+    padding:4px;
+    gap:4px;
+}
 
+.chat-input button {
+    border:none;
+    background:none;
+    cursor:pointer;
+    padding:6px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.chat-input textarea {
+    flex:1;
+    padding:10px;
+    border:none;
+    outline:none;
+    font-family: inherit;
+    font-size:14px;
+    line-height:1.4;
+    overflow-y:auto;
+    border-radius:6px;
+    background:#f5f5f5;
+}
 </style>
 
 <!-- ====================== CHAT HTML ====================== -->
@@ -350,10 +360,17 @@
       font-size:12px;
   ">✖</button>
 </div>
-
 <div class="chat-input">
-  <textarea id="chatInput" placeholder="Type a message..." rows="1" style="resize:none;"></textarea>
-  <button id="chatSend">Send</button>
+    <button id="attachBtn" title="Attachment">
+        <i class="fa-solid fa-paperclip"></i>
+    </button>
+    <textarea id="chatInput" placeholder="Type a message..." rows="1" style="resize:none;"></textarea>
+    <button id="emojiBtn" title="Emoji">
+        <i class="fa-regular fa-face-smile"></i>
+    </button>
+    <button id="chatSend" title="Send">
+        <i class="fa-solid fa-paper-plane"></i>
+    </button>
 </div>
 
 
