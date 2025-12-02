@@ -21,7 +21,7 @@
 
 .chat-box {
   position: fixed;
-  width: 320px;
+  width: 500px;
   height: 500px;
   background:white;
   border-radius:14px;
@@ -255,6 +255,131 @@
     border-radius:6px;
     background:#f5f5f5;
 }
+.message-actions {
+  display: none;
+  margin-bottom: 2px; /* space above bubble */
+  gap: 6px;
+  font-size: 14px;
+}
+
+.user-message-wrapper:hover .message-actions,
+.other-message-wrapper:hover .message-actions {
+  display: flex;
+}
+
+.message-actions i {
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+/* Icon color based on bubble type */
+.chat-message.user + .message-actions i {
+  color: #fff; /* light icons for dark bubble */
+}
+
+.chat-message.other + .message-actions i {
+  color: #555; /* dark icons for light bubble */
+}
+
+.message-actions i:hover {
+  color: #ffd93d; /* highlight on hover */
+}
+/* ====================== RESPONSIVE DESIGN ====================== */
+
+/* Phones & small tablets */
+@media (max-width: 600px) {
+
+  .chat-box {
+    width: 95vw !important;
+    height: 85vh !important;
+    bottom: 80px !important;
+    right: 2.5vw !important;
+    border-radius: 12px;
+  }
+
+  .chat-toggle {
+    width: 55px;
+    height: 55px;
+    font-size: 22px;
+    bottom: 15px !important;
+    right: 15px !important;
+  }
+
+  .chat-header {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .chat-messages {
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .chat-message {
+    max-width: 85% !important;
+    font-size: 13px;
+  }
+
+  .chat-message.other {
+    max-width: 75% !important;
+  }
+
+  #replyingTo {
+    font-size: 11px;
+  }
+
+  .chat-input textarea {
+    font-size: 13px;
+    padding: 8px;
+    max-height: 100px; /* prevent overflow */
+  }
+
+  .chat-input button i {
+    font-size: 18px;
+  }
+
+  #activeUsersModal {
+    width: 80vw !important;
+    max-height: 60vh !important;
+  }
+}
+
+/* Very small devices */
+@media (max-width: 400px) {
+
+  .chat-box {
+    height: 90vh !important;
+  }
+
+  .chat-header {
+    font-size: 13px;
+  }
+
+  .chat-toggle {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+
+  .chat-message {
+    font-size: 12px;
+  }
+
+  .chat-input textarea {
+    font-size: 12px;
+    padding: 6px;
+  }
+}
+
+/* Large screens (nice and centered) */
+@media (min-width: 1200px) {
+  .chat-box {
+    width: 420px !important;
+    height: 520px !important;
+  }
+}
+
+
 </style>
 
 <!-- ====================== CHAT HTML ====================== -->
@@ -432,13 +557,13 @@ async function loadMessages() {
       // Message bubble
       const msgBubble = document.createElement("div");
       msgBubble.className = isSelf ? "chat-message user" : "chat-message other";
+      msgBubble.style.position = "relative"; // for hover actions
       msgBubble.innerHTML = `${msg.message}<div style="font-size:10px;color:${isSelf ? "#ccc" : "#555"};margin-top:2px;">${timestamp}</div>`;
-      
-      // Assign a unique ID to each message bubble
+
       const msgId = msg.id || `msg-${Math.random()}`;
       msgBubble.id = "msg-" + msgId;
 
-      // Reply preview outside bubble
+      // Reply preview
       if (msg.reply_to_id && msg.reply_message) {
         const replyDiv = document.createElement("div");
         replyDiv.className = "reply-preview";
@@ -455,13 +580,10 @@ async function loadMessages() {
         replyDiv.style.marginBottom = "2px";
         replyDiv.style.cursor = "pointer";
 
-        // Scroll and blink original message when clicking the reply preview
         replyDiv.addEventListener("click", () => {
           const targetMsg = document.getElementById("msg-" + msg.reply_to_id);
           if (!targetMsg) return;
           targetMsg.scrollIntoView({ behavior: "smooth", block: "center" });
-
-          // Blink blue 2 times
           let blinkCount = 0;
           const originalBg = targetMsg.style.backgroundColor;
           const blinkInterval = setInterval(() => {
@@ -474,20 +596,92 @@ async function loadMessages() {
         msgWrapper.appendChild(replyDiv);
       }
 
-      msgWrapper.appendChild(msgBubble);
+ // Hover actions container (Reply + React picker)
+const actionsDiv = document.createElement("div");
+actionsDiv.className = "message-actions";
+actionsDiv.style.position = "absolute";
+actionsDiv.style.top = "-28px"; // above bubble
+actionsDiv.style.left = "4px"; // left side
+actionsDiv.style.display = "flex";
+actionsDiv.style.gap = "6px";
+actionsDiv.style.opacity = "0";
+actionsDiv.style.transition = "0.2s";
 
-      // Reply icon
-      const replyIcon = document.createElement("i");
-      replyIcon.className = "fa-solid fa-reply reply-icon";
-      replyIcon.title = "Reply";
-      replyIcon.style.cursor = "pointer";
-      replyIcon.style.marginLeft = "6px";
-      replyIcon.addEventListener("click", () => {
-        replyToMessage(msg.id || "", msg.full_name, msg.message);
-      });
-      msgBubble.appendChild(replyIcon);
+msgBubble.addEventListener("mouseenter", () => actionsDiv.style.opacity = "1");
+msgBubble.addEventListener("mouseleave", () => actionsDiv.style.opacity = "0");
 
-      // If other user, show name above bubble
+// Reply icon
+const replyIcon = document.createElement("i");
+replyIcon.className = "fa-solid fa-reply";
+replyIcon.title = "Reply";
+replyIcon.style.cursor = "pointer";
+replyIcon.addEventListener("click", () => {
+    replyToMessage(msg.id || "", msg.full_name, msg.message);
+});
+actionsDiv.appendChild(replyIcon);
+
+// React icon (to open emoji picker)
+const reactIcon = document.createElement("i");
+reactIcon.className = "fa-regular fa-face-smile";
+reactIcon.title = "React";
+reactIcon.style.cursor = "pointer";
+
+// Emoji picker
+const emojiPicker = document.createElement("div");
+emojiPicker.style.position = "absolute";
+emojiPicker.style.top = "-40px"; // above actions
+emojiPicker.style.left = "0"; // left side
+emojiPicker.style.display = "flex";
+emojiPicker.style.background = "#fff";
+emojiPicker.style.border = "1px solid #ccc";
+emojiPicker.style.borderRadius = "8px";
+emojiPicker.style.padding = "2px 4px";
+emojiPicker.style.boxShadow = "0 4px 10px rgba(0,0,0,0.2)";
+emojiPicker.style.gap = "4px";
+emojiPicker.style.zIndex = "9999";
+emojiPicker.style.display = "none";
+
+const emojis = ["😄","😢","😡"];
+emojis.forEach(e => {
+    const btn = document.createElement("button");
+    btn.textContent = e;
+    btn.style.border = "none";
+    btn.style.background = "transparent";
+    btn.style.cursor = "pointer";
+    btn.style.fontSize = "16px";
+    btn.addEventListener("click", () => {
+        // Reactions container at bottom-right (above timestamp)
+        let reactionsDiv = msgBubble.querySelector(".reactions");
+        if (!reactionsDiv) {
+            reactionsDiv = document.createElement("div");
+            reactionsDiv.className = "reactions";
+            reactionsDiv.style.position = "absolute";
+            reactionsDiv.style.bottom = "2px"; // just above timestamp
+            reactionsDiv.style.right = "6px";  // bottom-right
+            reactionsDiv.style.fontSize = "14px";
+            reactionsDiv.style.display = "flex";
+            reactionsDiv.style.gap = "2px";
+            msgBubble.appendChild(reactionsDiv);
+        }
+        // add emoji if not already present
+        if (![...reactionsDiv.textContent].includes(e)) reactionsDiv.textContent += e + " ";
+        emojiPicker.style.display = "none";
+    });
+    emojiPicker.appendChild(btn);
+});
+
+reactIcon.addEventListener("click", (event) => {
+    event.stopPropagation();
+    emojiPicker.style.display = emojiPicker.style.display === "flex" ? "none" : "flex";
+});
+
+actionsDiv.appendChild(reactIcon);
+msgBubble.appendChild(actionsDiv);
+msgBubble.appendChild(emojiPicker);
+
+
+
+      // Other user name above
       if (!isSelf) {
         const nameDiv = document.createElement("div");
         nameDiv.className = "other-name";
@@ -495,6 +689,7 @@ async function loadMessages() {
         msgWrapper.insertBefore(nameDiv, msgWrapper.firstChild);
       }
 
+      msgWrapper.appendChild(msgBubble);
       chatMessages.appendChild(msgWrapper);
     });
 
