@@ -256,21 +256,16 @@
     background:#f5f5f5;
 }
 .message-actions {
-  display: none;
-  margin-bottom: 2px; /* space above bubble */
+  display: flex;
   gap: 6px;
   font-size: 14px;
+  opacity: 1 !important; /* make always visible */
 }
-
 .user-message-wrapper:hover .message-actions,
 .other-message-wrapper:hover .message-actions {
-  display: flex;
+  opacity: 1; /* optional, no effect now */
 }
 
-.message-actions i {
-  cursor: pointer;
-  transition: 0.2s;
-}
 
 /* Icon color based on bubble type */
 .chat-message.user + .message-actions i {
@@ -378,6 +373,50 @@
     height: 520px !important;
   }
 }
+/* Wrap reply preview + reactions + actions in one line */
+.message-top-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap; /* allows wrapping if too long */
+}
+
+/* Reactions (picked emojis) */
+.reactions {
+  display: none; /* hide when no reactions */
+  gap: 4px;
+  font-size: 14px;
+}
+
+
+/* Reply preview style */
+.reply-preview {
+  font-size: 12px;
+  color: #555;
+  background: rgba(255, 221, 109, 0.29);
+  padding: 4px 8px;
+  border-left: 3px solid #ccc;
+  border-radius: 6px;
+  max-width: 220px;
+  word-wrap: break-word;
+}
+
+/* Emoji picker stays absolute above icons */
+.emoji-picker {
+  position: absolute;
+  bottom: 24px;
+  left: 0;
+  display: flex;
+  gap: 4px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 2px 4px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  flex-wrap: wrap;
+  z-index: 9999;
+}
+
 
 
 </style>
@@ -507,6 +546,7 @@
 <script src="/sen_template/js/activeUsers.js"></script>
 <script src="/sen_template/js/dateTime.js"></script>
 <script src="/sen_template/js/heartbeat.js"></script>
+<script src="/sen_template/js/react_reply.js"></script>
 <script>
 const ROOT_PATH = "/sen_template"; 
 const chatMessages = document.getElementById("chatMessages");
@@ -529,39 +569,158 @@ function cancelReply() {
   document.getElementById("replyingTo").style.display = "none";
   chatInput.placeholder = "Type a message...";
 }
+// Create a single global tooltip once
+let reactionsTooltip = document.getElementById("reactionsTooltip");
+if (!reactionsTooltip) {
+  reactionsTooltip = document.createElement("div");
+  reactionsTooltip.id = "reactionsTooltip";
+  Object.assign(reactionsTooltip.style, {
+    position: "fixed",
+    background: "#fff",
+    color: "#000",
+    border: "1px solid #ccc",
+    borderRadius: "8px",
+    padding: "6px 10px",
+    boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
+    fontSize: "12px",
+    minWidth: "140px",
+    maxWidth: "300px",
+    maxHeight: "150px",
+    overflowY: "auto",
+    display: "none",
+    zIndex: "99999",
+    whiteSpace: "normal",
+    wordWrap: "break-word",
+    textAlign: "left"
+  });
+  document.body.appendChild(reactionsTooltip);
+}
+function updateReactionsDiv(container, reactions) {
+  container.innerHTML = "";
+  if (!Array.isArray(reactions) || reactions.length === 0) {
+    container.style.display = "none";
+    return;
+  }
+  container.style.display = "flex";
+  container.style.gap = "4px";
+
+  // Create one tooltip per message container if it doesn't exist
+  let tooltip = container.querySelector(".reactionsTooltip");
+  if (!tooltip) {
+    tooltip = document.createElement("div");
+    tooltip.className = "reactionsTooltip";
+    Object.assign(tooltip.style, {
+      position: "fixed", // relative to viewport
+      background: "#fff",
+      color: "#000",
+      border: "1px solid #ccc",
+      borderRadius: "8px",
+      padding: "6px 10px",
+      boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
+      fontSize: "12px",
+      minWidth: "140px",
+      maxWidth: "300px",
+      maxHeight: "150px",
+      overflowY: "auto",
+      display: "none",
+      zIndex: "99999",
+      whiteSpace: "normal",
+      wordWrap: "break-word",
+      textAlign: "left"
+    });
+    document.body.appendChild(tooltip);
+  }
+
+  reactions.forEach(r => {
+    if (!Array.isArray(r.users) || r.users.length === 0) return;
+
+    const span = document.createElement("span");
+    span.textContent = `${r.emoji} ${r.users.length}`;
+    span.style.cursor = "pointer";
+    span.style.padding = "2px 6px";
+    span.style.borderRadius = "4px";
+
+    // Hover: show tooltip with all reactions
+    span.addEventListener("mouseenter", (e) => {
+      tooltip.innerHTML = ""; // clear previous
+      reactions.forEach(rx => {
+        rx.users.forEach(u => {
+          const line = document.createElement("div");
+          line.textContent = `${rx.emoji} - ${u}`;
+          line.style.marginBottom = "2px";
+          tooltip.appendChild(line);
+        });
+      });
+
+      tooltip.style.display = "block";
+
+      const rect = container.getBoundingClientRect(); // position relative to message container
+
+      // Horizontal positioning
+      let left = rect.left;
+      if (left + tooltip.offsetWidth > window.innerWidth) left = window.innerWidth - tooltip.offsetWidth - 8;
+      if (left < 4) left = 4;
+      tooltip.style.left = left + "px";
+
+      // Vertical positioning
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      let top;
+      if (spaceBelow < tooltip.offsetHeight && spaceAbove > tooltip.offsetHeight) {
+        top = rect.top - tooltip.offsetHeight - 4; // above
+      } else {
+        top = rect.bottom + 4; // below
+      }
+      tooltip.style.top = top + "px";
+    });
+
+    span.addEventListener("mouseleave", () => {
+      tooltip.style.display = "none";
+    });
+
+    container.appendChild(span);
+  });
+
+  // Hide tooltip on click outside
+  document.addEventListener("click", (event) => {
+    if (!tooltip.contains(event.target)) tooltip.style.display = "none";
+  });
+}
 
 // Load messages
 async function loadMessages() {
   if (!user) return;
-
   try {
     const resp = await fetch("/sen_template/process/chat/fetch_messages.php", { credentials: "same-origin" });
     const data = await resp.json();
     if (!Array.isArray(data)) return;
-
     chatMessages.innerHTML = "";
 
     data.forEach(msg => {
       const isSelf = msg.full_name === user.full_name;
-      const timestamp = new Date(msg.datetime).toLocaleString("en-US", {
-        year: "numeric", month: "short", day: "numeric",
-        hour: "2-digit", minute: "2-digit", second: "2-digit",
-        hour12: true, timeZone: "Asia/Manila"
-      });
 
-      // Message wrapper
       const msgWrapper = document.createElement("div");
       msgWrapper.className = isSelf ? "user-message-wrapper" : "other-message-wrapper";
       msgWrapper.style.marginBottom = "8px";
 
-      // Message bubble
       const msgBubble = document.createElement("div");
       msgBubble.className = isSelf ? "chat-message user" : "chat-message other";
-      msgBubble.style.position = "relative"; // for hover actions
-      msgBubble.innerHTML = `${msg.message}<div style="font-size:10px;color:${isSelf ? "#ccc" : "#555"};margin-top:2px;">${timestamp}</div>`;
+      msgBubble.style.position = "relative";
 
-      const msgId = msg.id || `msg-${Math.random()}`;
-      msgBubble.id = "msg-" + msgId;
+      const [datePart, timePart] = msg.datetime.split(' ');
+      let [hour, minute, second] = timePart.split(':').map(Number);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      hour = hour % 12 || 12;
+      const timestamp = `${datePart} ${hour}:${minute.toString().padStart(2,'0')}:${second.toString().padStart(2,'0')} ${ampm}`;
+
+      msgBubble.innerHTML = `
+        ${msg.message}
+        <div style="font-size:10px;color:${isSelf ? "#ccc" : "#555"};margin-top:2px;">
+          ${timestamp}
+        </div>
+      `;
+
+      msgBubble.id = "msg-" + (msg.id || `msg-${Math.random()}`);
 
       // Reply preview
       if (msg.reply_to_id && msg.reply_message) {
@@ -570,14 +729,12 @@ async function loadMessages() {
         replyDiv.innerHTML = `<strong>${msg.reply_full_name || "Unknown"}:</strong> ${msg.reply_message}`;
         replyDiv.style.textAlign = isSelf ? "right" : "left";
         replyDiv.style.opacity = "0.7";
-        replyDiv.style.marginLeft = isSelf ? "auto" : "0";
-        replyDiv.style.marginRight = isSelf ? "0" : "auto";
+        replyDiv.style.margin = "2px 0";
         replyDiv.style.maxWidth = "220px";
         replyDiv.style.wordWrap = "break-word";
         replyDiv.style.padding = "4px 8px";
         replyDiv.style.borderLeft = "3px solid #ccc";
         replyDiv.style.borderRadius = "6px";
-        replyDiv.style.marginBottom = "2px";
         replyDiv.style.cursor = "pointer";
 
         replyDiv.addEventListener("click", () => {
@@ -592,96 +749,108 @@ async function loadMessages() {
             if (blinkCount > 3) clearInterval(blinkInterval);
           }, 300);
         });
-
         msgWrapper.appendChild(replyDiv);
       }
 
- // Hover actions container (Reply + React picker)
-const actionsDiv = document.createElement("div");
-actionsDiv.className = "message-actions";
-actionsDiv.style.position = "absolute";
-actionsDiv.style.top = "-28px"; // above bubble
-actionsDiv.style.left = "4px"; // left side
-actionsDiv.style.display = "flex";
-actionsDiv.style.gap = "6px";
-actionsDiv.style.opacity = "0";
-actionsDiv.style.transition = "0.2s";
+      // Reactions container
+      const reactionsDiv = document.createElement("div");
+      reactionsDiv.className = "reactions";
+      reactionsDiv.style.display = "flex";
+      reactionsDiv.style.gap = "4px";
+      reactionsDiv.style.margin = "2px 0";
+      reactionsDiv.style.flexWrap = "wrap";
+      reactionsDiv.style.justifyContent = isSelf ? "flex-end" : "flex-start";
 
-msgBubble.addEventListener("mouseenter", () => actionsDiv.style.opacity = "1");
-msgBubble.addEventListener("mouseleave", () => actionsDiv.style.opacity = "0");
+      // Actions (reply + react)
+      const actionsDiv = document.createElement("div");
+      actionsDiv.className = "message-actions";
+      actionsDiv.style.display = "flex";
+      actionsDiv.style.gap = "6px";
+      actionsDiv.style.marginTop = "2px";
+      actionsDiv.style.opacity = "0";
+      actionsDiv.style.transition = "0.2s";
+      actionsDiv.style.alignItems = "center";
 
-// Reply icon
-const replyIcon = document.createElement("i");
-replyIcon.className = "fa-solid fa-reply";
-replyIcon.title = "Reply";
-replyIcon.style.cursor = "pointer";
-replyIcon.addEventListener("click", () => {
-    replyToMessage(msg.id || "", msg.full_name, msg.message);
-});
-actionsDiv.appendChild(replyIcon);
+      msgBubble.addEventListener("mouseenter", () => actionsDiv.style.opacity = "1");
+      msgBubble.addEventListener("mouseleave", () => actionsDiv.style.opacity = "0");
 
-// React icon (to open emoji picker)
-const reactIcon = document.createElement("i");
-reactIcon.className = "fa-regular fa-face-smile";
-reactIcon.title = "React";
-reactIcon.style.cursor = "pointer";
+      // Reply icon
+      const replyIcon = document.createElement("i");
+      replyIcon.className = "fa-solid fa-reply";
+      replyIcon.title = "Reply";
+      replyIcon.style.cursor = "pointer";
+      replyIcon.addEventListener("click", () => replyToMessage(msg.id || "", msg.full_name, msg.message));
+      actionsDiv.appendChild(replyIcon);
 
-// Emoji picker
-const emojiPicker = document.createElement("div");
-emojiPicker.style.position = "absolute";
-emojiPicker.style.top = "-40px"; // above actions
-emojiPicker.style.left = "0"; // left side
-emojiPicker.style.display = "flex";
-emojiPicker.style.background = "#fff";
-emojiPicker.style.border = "1px solid #ccc";
-emojiPicker.style.borderRadius = "8px";
-emojiPicker.style.padding = "2px 4px";
-emojiPicker.style.boxShadow = "0 4px 10px rgba(0,0,0,0.2)";
-emojiPicker.style.gap = "4px";
-emojiPicker.style.zIndex = "9999";
-emojiPicker.style.display = "none";
+      // React icon
+      const reactIcon = document.createElement("i");
+      reactIcon.className = "fa-regular fa-face-smile";
+      reactIcon.title = "React";
+      reactIcon.style.cursor = "pointer";
 
-const emojis = ["😄","😢","😡"];
-emojis.forEach(e => {
-    const btn = document.createElement("button");
-    btn.textContent = e;
-    btn.style.border = "none";
-    btn.style.background = "transparent";
-    btn.style.cursor = "pointer";
-    btn.style.fontSize = "16px";
-    btn.addEventListener("click", () => {
-        // Reactions container at bottom-right (above timestamp)
-        let reactionsDiv = msgBubble.querySelector(".reactions");
-        if (!reactionsDiv) {
-            reactionsDiv = document.createElement("div");
-            reactionsDiv.className = "reactions";
-            reactionsDiv.style.position = "absolute";
-            reactionsDiv.style.bottom = "2px"; // just above timestamp
-            reactionsDiv.style.right = "6px";  // bottom-right
-            reactionsDiv.style.fontSize = "14px";
-            reactionsDiv.style.display = "flex";
-            reactionsDiv.style.gap = "2px";
-            msgBubble.appendChild(reactionsDiv);
-        }
-        // add emoji if not already present
-        if (![...reactionsDiv.textContent].includes(e)) reactionsDiv.textContent += e + " ";
-        emojiPicker.style.display = "none";
+      // Emoji picker
+      const emojiPicker = document.createElement("div");
+      emojiPicker.classList.add("emoji-picker");
+      emojiPicker.style.display = "none";
+      emojiPicker.style.position = "absolute";
+      emojiPicker.style.bottom = "24px";
+      emojiPicker.style.left = "0";
+      emojiPicker.style.background = "#fff";
+      emojiPicker.style.border = "1px solid #ccc";
+      emojiPicker.style.borderRadius = "8px";
+      emojiPicker.style.padding = "2px 4px";
+      emojiPicker.style.boxShadow = "0 4px 10px rgba(0,0,0,0.2)";
+      emojiPicker.style.gap = "4px";
+      emojiPicker.style.flexWrap = "wrap";
+      emojiPicker.style.zIndex = "9999";
+
+      const emojis = ["😄", "😢", "😡", "❤️", "👍"];
+
+      emojis.forEach(e => {
+        const btn = document.createElement("button");
+        btn.textContent = e;
+        btn.style.border = "none";
+        btn.style.background = "transparent";
+        btn.style.cursor = "pointer";
+        btn.style.fontSize = "16px";
+        btn.style.padding = "2px";
+      btn.addEventListener("click", async () => {
+  try {
+    const resp = await fetch("/sen_template/process/chat/react_message.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message_id: msg.id, emoji: e }),
+      credentials: "same-origin"
     });
-    emojiPicker.appendChild(btn);
+    const data = await resp.json();
+
+    if (data.status === "success") {
+      // The backend should return updated reactions array after toggling
+      updateReactionsDiv(reactionsDiv, data.reactions);
+    }
+  } catch(err) {
+    console.error("Failed to react:", err);
+  }
 });
+        emojiPicker.appendChild(btn);
+      }); 
 
-reactIcon.addEventListener("click", (event) => {
-    event.stopPropagation();
-    emojiPicker.style.display = emojiPicker.style.display === "flex" ? "none" : "flex";
-});
+      reactIcon.addEventListener("click", (event) => {
+        event.stopPropagation();
+        emojiPicker.style.display = emojiPicker.style.display === "flex" ? "none" : "flex";
+      });
 
-actionsDiv.appendChild(reactIcon);
-msgBubble.appendChild(actionsDiv);
-msgBubble.appendChild(emojiPicker);
+      document.addEventListener("click", (event) => {
+        if (!emojiPicker.contains(event.target) && event.target !== reactIcon) emojiPicker.style.display = "none";
+      });
 
+      actionsDiv.appendChild(reactIcon);
+      actionsDiv.appendChild(reactionsDiv);
+      msgBubble.appendChild(actionsDiv);
+      msgBubble.appendChild(emojiPicker);
 
+      if (msg.reactions && msg.reactions.length > 0) updateReactionsDiv(reactionsDiv, msg.reactions);
 
-      // Other user name above
       if (!isSelf) {
         const nameDiv = document.createElement("div");
         nameDiv.className = "other-name";
@@ -746,4 +915,3 @@ chatInput.addEventListener("keydown", e => {
 setInterval(loadMessages, 30000);
 window.addEventListener("DOMContentLoaded", loadMessages);
 </script>
-

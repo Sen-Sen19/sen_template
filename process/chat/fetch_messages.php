@@ -9,7 +9,7 @@ if (!isset($_SESSION['chat_user'])) {
     exit;
 }
 
-// Get last 1000 messages with reply info
+// Fetch messages
 $sql = "
     SELECT TOP (1000)
         m.message_id,
@@ -18,6 +18,7 @@ $sql = "
         m.message,
         m.datetime,
         m.reply_to_id,
+        m.react,           -- JSON column with reactions
         r.full_name AS reply_full_name,
         r.message AS reply_message
     FROM [sen_template_db].[dbo].[messages] m
@@ -25,7 +26,6 @@ $sql = "
         ON m.reply_to_id = r.message_id
     ORDER BY m.datetime ASC
 ";
-
 $stmt = sqlsrv_query($conn, $sql);
 if ($stmt === false) {
     echo json_encode(["status" => "error","message"=>"Query failed"]);
@@ -33,19 +33,36 @@ if ($stmt === false) {
 }
 
 $messages = [];
+
 while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
-    $dt = $row['datetime'] instanceof DateTime ? $row['datetime'] : new DateTime();
-    $dt->setTimezone(new DateTimeZone('Asia/Manila'));
+    $datetimeStr = $row['datetime'] instanceof DateTime 
+        ? $row['datetime']->format('Y-m-d H:i:s')
+        : date('Y-m-d H:i:s');
+
+    // Decode react JSON
+    $reactions = [];
+    if (!empty($row['react'])) {
+        $decoded = json_decode($row['react'], true);
+        if (is_array($decoded)) {
+            foreach ($decoded as $r) {
+                $reactions[] = [
+                    "emoji" => $r['emoji'] ?? "",
+                    "users" => $r['users'] ?? []
+                ];
+            }
+        }
+    }
 
     $messages[] = [
         "id"               => $row['message_id'],
         "employee_id"      => $row['employee_id'],
         "full_name"        => $row['full_name'],
         "message"          => $row['message'],
-        "datetime"         => $dt->format('Y-m-d H:i:s'),
+        "datetime"         => $datetimeStr,
         "reply_to_id"      => $row['reply_to_id'],
         "reply_full_name"  => $row['reply_full_name'] ?? null,
-        "reply_message"    => $row['reply_message'] ?? null
+        "reply_message"    => $row['reply_message'] ?? null,
+        "reactions"        => $reactions
     ];
 }
 
