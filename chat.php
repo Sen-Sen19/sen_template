@@ -1,46 +1,71 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+<link rel="stylesheet" href="/sen_template/css/all.min.css">
 <style>
+/* ============================================================
+   UNIVERSAL IMPROVED RESPONSIVE + MOBILE KEYBOARD SAFE CSS
+   ============================================================ */
+
 /* ====================== CHAT BUBBLE ====================== */
 .chat-toggle {
   position: fixed;
+  bottom: 20px;
+  right: 20px;
   width: 60px;
   height: 60px;
-  background:#111;
-  color:white;
-  border-radius:50%;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  cursor:pointer;
-  font-size:26px;
-  box-shadow:0 6px 18px rgba(0,0,0,0.3);
-  transition:.25s;
-  z-index:9999;
+  background: #111;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 26px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+  transition: .25s;
+  z-index: 9999;
 }
-.chat-toggle:hover { transform:scale(1.08); }
 
+.chat-toggle:hover {
+  transform: scale(1.08);
+}
+
+/* ========= CHAT BOX (keyboard safe) ========= */
 .chat-box {
   position: fixed;
-  width: 500px;
-  height: 500px;
-  background:white;
-  border-radius:14px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.2);
-  display:none;
-  flex-direction:column;
-  overflow:hidden;
-  z-index:9999;
+  bottom: 80px;
+  right: 20px;
+  width: 420px;
+  height: 520px;
+
+  max-width: 95vw;
+  max-height: calc(100vh - 90px) !important;
+
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 9999;
+
+  overscroll-behavior: contain;
   transition: all 0.3s ease;
 }
 
+@supports (height: 100dvh) {
+  .chat-box {
+    max-height: calc(100dvh - 90px) !important;
+  }
+}
+
 .chat-header {
-  background:#000; 
-  padding:12px; 
-  color:white; 
-  font-weight:600; 
-  font-size:16px; 
+  background: #000;
+  padding: 12px;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
   position: relative;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .chat-header .header-dots {
@@ -56,34 +81,42 @@
   padding: 12px;
   overflow-y: auto;
   font-size: 14px;
-  
-  display: flex;        /* add this */
-  flex-direction: column; /* stack messages vertically */
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* FIX SCROLL BUG */
 }
 
-
-
-
-.chat-input input { 
-  flex:1; 
-  padding:10px; 
-  border:none; 
-  outline:none; 
+/* INPUT AREA ALWAYS FIXED */
+.chat-input {
+  display: flex;
+  border-top: 1px solid #ddd;
+  padding: 4px;
+  gap: 4px;
+  background: #fff;
+  flex-shrink: 0;
 }
 
-
-
-.datetime-box { 
-  background:#f1f1f1; 
-  text-align:center; 
-  padding:6px; 
-  font-size:12px; 
-  border-bottom:1px solid #ddd;
-  display:flex;
-  justify-content:center;
-  gap:5px;
+.chat-input button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 6px;
 }
 
+.chat-input textarea {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  resize: none;
+  border-radius: 6px;
+  background: #f5f5f5;
+  overflow-y: auto;
+  max-height: 120px;
+}
+
+/* ====================== LOGIN FORM ====================== */
 .login-form {
   display: flex;
   flex-direction: column;
@@ -115,7 +148,7 @@
   display: none;
 }
 
-/* Blur effect only for chat input/button */
+
 .blur-chat {
   filter: blur(5px);
   pointer-events: none;
@@ -153,143 +186,67 @@
   word-wrap: break-word;
 }
 
-.chat-message.user {  
-  background-color: #111;
+.chat-message.user {
+  background: #111;
   color: white;
   margin-left: auto;
   text-align: right;
-  
 }
 
-
 .chat-message.other {
-  background-color: #f1f1f1;
+  background: #f1f1f1;
   color: black;
   margin-right: auto;
   text-align: left;
-  display: inline-block;       /* make bubble shrink to content */
-  max-width: 200px;            /* limit width */
-  word-wrap: break-word;
-}
-
-/* Container for other users to display name above bubble */
-.other-message-container {
-  margin-bottom: 8px;
-}
-
-.other-name {
-  font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 2px;
-  color: #333;
-  padding-left: 4px;
-}
-
-.reply-icon {
   display: inline-block;
-  margin-left: 8px;
-  cursor: pointer;
-  color: #888;
-  font-size: 12px;
-  transition: 0.2s;
+  max-width: 200px;
 }
 
-.reply-icon:hover {
-  color: #000;
+/* USER NAME ABOVE BUBBLE */
+.other-message-wrapper,
+.user-message-wrapper {
+  display: flex;
+  flex-direction: column;
 }
 
+.other-message-wrapper {
+  align-items: flex-start;
+}
+
+.user-message-wrapper {
+  align-items: flex-end;
+}
+
+/* REPLY PREVIEW */
 .reply-preview {
-  font-size: 12px;
-  color: #555;
-  background: rgba(255, 221, 109, 0.29);
+  background: rgba(255,221,109,0.29);
   padding: 4px 8px;
   border-left: 3px solid #ccc;
   border-radius: 6px;
+  font-size: 12px;
   max-width: 220px;
   word-wrap: break-word;
   margin-bottom: 2px;
 }
 
-.user-message-wrapper,
-.other-message-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.user-message-wrapper {
-  align-items: flex-end; /* right align user messages and reply previews */
-}
-
-.other-message-wrapper {
-  align-items: flex-start; /* left align others */
-}
-
-
-.chat-input {
-    display:flex;
-    border-top:1px solid #ddd;
-    padding:4px;
-    gap:4px;
-}
-
-.chat-input button {
-    border:none;
-    background:none;
-    cursor:pointer;
-    padding:6px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-
-.chat-input textarea {
-    flex:1;
-    padding:10px;
-    border:none;
-    outline:none;
-    font-family: inherit;
-    font-size:14px;
-    line-height:1.4;
-    overflow-y:auto;
-    border-radius:6px;
-    background:#f5f5f5;
-}
-.message-actions {
-  display: flex;
-  gap: 6px;
-  font-size: 14px;
-  opacity: 1 !important; /* make always visible */
-}
-.user-message-wrapper:hover .message-actions,
-.other-message-wrapper:hover .message-actions {
-  opacity: 1; /* optional, no effect now */
-}
-
-
-/* Icon color based on bubble type */
-.chat-message.user + .message-actions i {
-  color: #fff; /* light icons for dark bubble */
-}
-
-.chat-message.other + .message-actions i {
-  color: #555; /* dark icons for light bubble */
-}
-
-.message-actions i:hover {
-  color: #ffd93d; /* highlight on hover */
-}
 /* ====================== RESPONSIVE DESIGN ====================== */
-
-/* Phones & small tablets */
+/* ===== Small Phones → Centered Fullscreen Chat ===== */
 @media (max-width: 600px) {
 
   .chat-box {
-    width: 95vw !important;
-    height: 85vh !important;
-    bottom: 80px !important;
-    right: 2.5vw !important;
-    border-radius: 12px;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);  /* CENTER IT */
+    width: 100vw !important;
+    height: 100vh !important;
+
+    max-width: 100vw !important;
+    max-height: 100dvh !important;
+
+    border-radius: 0;
+    bottom: auto !important;
+    right: auto !important;
   }
 
   .chat-toggle {
@@ -301,154 +258,104 @@
   }
 
   .chat-header {
-    font-size: 14px;
-    padding: 10px;
+    font-size: 17px;
+    padding: 14px;
   }
 
   .chat-messages {
-    padding: 10px;
-    font-size: 13px;
-  }
-
-  .chat-message {
-    max-width: 85% !important;
-    font-size: 13px;
-  }
-
-  .chat-message.other {
-    max-width: 75% !important;
-  }
-
-  #replyingTo {
-    font-size: 11px;
+    padding: 12px;
+    font-size: 14px;
   }
 
   .chat-input textarea {
-    font-size: 13px;
-    padding: 8px;
-    max-height: 100px; /* prevent overflow */
-  }
-
-  .chat-input button i {
-    font-size: 18px;
+    font-size: 14px;
+    max-height: 120px;
   }
 
   #activeUsersModal {
-    width: 80vw !important;
-    max-height: 60vh !important;
+    width: 90vw !important;
+    max-height: 70vh !important;
   }
 }
 
-/* Very small devices */
+/* VERY SMALL DEVICES */
 @media (max-width: 400px) {
-
-  .chat-box {
-    height: 90vh !important;
-  }
-
-  .chat-header {
-    font-size: 13px;
-  }
-
-  .chat-toggle {
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
-  }
-
-  .chat-message {
-    font-size: 12px;
-  }
-
-  .chat-input textarea {
-    font-size: 12px;
-    padding: 6px;
-  }
+  .chat-header { font-size: 13px; }
+  .chat-toggle { width: 50px; height: 50px; font-size: 20px; }
+  .chat-message { font-size: 12px; }
+  .chat-input textarea { font-size: 12px; }
 }
 
-/* Large screens (nice and centered) */
+/* DESKTOP */
 @media (min-width: 1200px) {
   .chat-box {
     width: 420px !important;
     height: 520px !important;
   }
 }
-/* Wrap reply preview + reactions + actions in one line */
-.message-top-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap; /* allows wrapping if too long */
-}
 
-/* Reactions (picked emojis) */
-.reactions {
-  display: none; /* hide when no reactions */
-  gap: 4px;
-  font-size: 14px;
-}
-
-
-/* Reply preview style */
-.reply-preview {
-  font-size: 12px;
-  color: #555;
-  background: rgba(255, 221, 109, 0.29);
-  padding: 4px 8px;
-  border-left: 3px solid #ccc;
-  border-radius: 6px;
-  max-width: 220px;
-  word-wrap: break-word;
-}
-
-/* Emoji picker stays absolute above icons */
-.emoji-picker {
+/* ====================== EMOJI PICKER ====================== */
+emoji-picker {
   position: absolute;
-  bottom: 24px;
-  left: 0;
-  display: flex;
-  gap: 4px;
-  background: #fff;
-  border: 1px solid #ccc;
+  bottom: 50px;
+  left: 10px;
+  display: none;
+  max-height: 400px;
+  overflow-y: auto;
   border-radius: 8px;
-  padding: 2px 4px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  flex-wrap: wrap;
-  z-index: 9999;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  z-index: 999;
 }
 
-
+/* ============================================================
+   END OF FULL RESPONSIVE CSS
+   ============================================================ */
 
 </style>
 
 <!-- ====================== CHAT HTML ====================== -->
 <div class="chat-toggle" id="chatToggle"><i class="fa-solid fa-comments"></i></div>
 <div class="chat-box" id="chatBox">
-  <div class="chat-header">
+<div class="chat-header">
     <span class="header-title">Sen Template</span>
-    <i class="fa-solid fa-ellipsis-vertical header-dots"></i>
-  </div>
-<div class="menu-dropdown" id="menuDropdown">
-  <div id="activeUsersBtn">Active (<span id="activeCount">0</span>)</div>
-  <div id="logoutBtn">Logout</div>
+
+    <div style="
+        position:absolute; 
+        right:12px; 
+        top:50%; 
+        transform:translateY(-50%); 
+        display:flex; 
+        gap:14px;        /* <-- increased gap here */
+        align-items:center;
+    ">
+<i class="fa-solid fa-ellipsis-vertical header-dots" style="margin-right:20px;"></i>
+        <i class="fa-solid fa-xmark" id="closeChatHeader" style="cursor:pointer;"></i>
+    </div>
 </div>
 
-<!-- ACTIVE USERS PANEL (INSIDE CHAT UI) -->
-<div id="activeUsersOverlay" 
-  style="display:none; position:absolute; inset:0; background:rgba(0,0,0,.45); backdrop-filter:blur(4px);
-  z-index:99999; justify-content:center; align-items:center;">
-  
-  <div id="activeUsersModal" 
-    style="background:#fff; width:260px; max-height:350px; border-radius:10px; overflow:hidden;
-    box-shadow:0 6px 25px rgba(0,0,0,.35); animation:fadeIn .2s;">
-    
-    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; 
-      background:#111; color:white; font-weight:600;">
-      Active Users
-      <button id="closeActiveModal" style="background:none; border:none; color:white; font-size:18px; cursor:pointer;">✖</button>
-    </div>
 
-<ul id="activeUsersList" style="
+  <div class="menu-dropdown" id="menuDropdown">
+
+    <div id="activeUsersBtn">Active (<span id="activeCount">0</span>)</div>
+    <div id="logoutBtn">Logout</div>
+  </div>
+
+
+  <!-- ACTIVE USERS PANEL (INSIDE CHAT UI) -->
+  <div id="activeUsersOverlay" style="display:none; position:absolute; inset:0; background:rgba(0,0,0,.45); backdrop-filter:blur(4px);
+  z-index:99999; justify-content:center; align-items:center;">
+
+    <div id="activeUsersModal" style="background:#fff; width:260px; max-height:350px; border-radius:10px; overflow:hidden;
+    box-shadow:0 6px 25px rgba(0,0,0,.35); animation:fadeIn .2s;">
+
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; 
+      background:#111; color:white; font-weight:600;">
+        Active Users
+        <button id="closeActiveModal"
+          style="background:none; border:none; color:white; font-size:18px; cursor:pointer;">✖</button>
+      </div>
+
+      <ul id="activeUsersList" style="
     list-style:none; 
     margin:0; 
     padding:10px; 
@@ -456,13 +363,13 @@
     overflow-y:auto;    /* <-- enable vertical scroll */
 "></ul>
 
+    </div>
   </div>
-</div>
 
 
 
   <!-- ===== User Info (image + full name) ===== -->
-<div id="secondaryUser" style="
+  <div id="secondaryUser" style="
     display:none; 
     align-items:center; 
     gap:8px; 
@@ -470,23 +377,24 @@
     padding-bottom:8px; 
     border-bottom:1px solid #ddd;
 ">
-  <img id="secondaryUserImg" src="" alt="User Icon" style="width:30px; height:30px; border-radius:50%; object-fit:cover;" />
-  <span id="secondaryUserName" style="font-size:14px; font-weight:500;"></span>
-  <span id="secondaryUserDot" style="
+    <img id="secondaryUserImg" src="" alt="User Icon"
+      style="width:30px; height:30px; border-radius:50%; object-fit:cover;" />
+    <span id="secondaryUserName" style="font-size:14px; font-weight:500;"></span>
+    <span id="secondaryUserDot" style="
       width:10px; height:10px; 
       border-radius:50%; 
       background:green; 
       display:inline-block;
   "></span>
-</div>
+  </div>
 
   <!-- Secondary user container below Sen Template -->
-<!-- Secondary user container below Sen Template -->
+  <!-- Secondary user container below Sen Template -->
 
-<div class="datetime-box" style="display:none;">
-  <div id="dateToday"></div>
-  <div id="timeNow"></div>
-</div>
+  <div class="datetime-box" style="display:none;">
+    <div id="dateToday"></div>
+    <div id="timeNow"></div>
+  </div>
 
   <div class="login-form" id="loginForm">
     <h3>Login</h3>
@@ -495,13 +403,13 @@
     <div id="loginError">Invalid Employee ID</div>
   </div>
 
-<!-- Replying message bar -->
+  <!-- Replying message bar -->
 
-<!-- Chat messages container -->
-<div class="chat-messages" id="chatMessages"></div>
+  <!-- Chat messages container -->
+  <div class="chat-messages" id="chatMessages"></div>
 
-<!-- Input -->
-<div id="replyingTo" style="
+  <!-- Input -->
+  <div id="replyingTo" style="
     display:none;
     position: relative;       /* make container relative */
     padding:6px 10px;
@@ -512,8 +420,8 @@
     border-radius:6px;
     box-shadow:0 2px 5px rgba(0,0,0,0.1);
 ">
-  Replying to: <span id="replyingToText"></span>
-  <button onclick="cancelReply()" style="
+   <span id="replyingToText"></span>
+    <button onclick="cancelReply()" style="
       position: absolute;  /* fix position */
       right: 6px;          /* distance from right */
       top: 50%;            /* vertically center */
@@ -523,395 +431,605 @@
       cursor:pointer;
       font-size:12px;
   ">✖</button>
-</div>
-<div class="chat-input">
+  </div>
+  <div class="chat-input">
     <button id="attachBtn" title="Attachment">
-        <i class="fa-solid fa-paperclip"></i>
+      <i class="fa-solid fa-paperclip"></i>
     </button>
+    <input type="file" id="fileInput" multiple style="display:none;" />
+
     <textarea id="chatInput" placeholder="Type a message..." rows="1" style="resize:none;"></textarea>
-    <button id="emojiBtn" title="Emoji">
+    <div style="position: relative; display: inline-block;">
+      <button id="emojiBtn" title="Emoji">
         <i class="fa-regular fa-face-smile"></i>
-    </button>
+      </button>
+      <emoji-picker id="emojiPicker"
+        style="display: none; position: absolute; bottom: 100%; left: 0; z‑index: 9999;"></emoji-picker>
+    </div>
+
     <button id="chatSend" title="Send">
-        <i class="fa-solid fa-paper-plane"></i>
+      <i class="fa-solid fa-paper-plane"></i>
     </button>
-</div>
+  </div>
 
 
 </div>
-
-
+<script src="/sen_template/js/react.js"></script>
+<script src="/sen_template/js/reply.js"></script>
 <script src="/sen_template/js/drag.js"></script>
 <script src="/sen_template/js/login.js"></script>
 <script src="/sen_template/js/activeUsers.js"></script>
 <script src="/sen_template/js/dateTime.js"></script>
 <script src="/sen_template/js/heartbeat.js"></script>
-<script src="/sen_template/js/react_reply.js"></script>
+
 <script>
-const ROOT_PATH = "/sen_template"; 
-const chatMessages = document.getElementById("chatMessages");
-const chatInput = document.getElementById("chatInput");
-const chatSend = document.getElementById("chatSend");
-let user = null; // logged-in user { employee_id, full_name }
-let replyToId = null;
+document.getElementById("closeChatHeader").onclick = function () {
+    document.getElementById("chatBox").style.display = "none";
+};
 
-// Set reply
-function replyToMessage(messageId, fullName, messageText) {
-  replyToId = messageId;
-  document.getElementById("replyingToText").textContent = `${fullName}: ${messageText}`;
-  document.getElementById("replyingTo").style.display = "block";
-  chatInput.focus();
-}
+  const ROOT_PATH = "/sen_template";
+  const chatMessages = document.getElementById("chatMessages");
+  const chatInput = document.getElementById("chatInput");
+  const chatSend = document.getElementById("chatSend");
+  let user = null; // logged-in user { employee_id, full_name }
+let activeBubble = null; // currently selected bubble
 
-// Cancel reply
-function cancelReply() {
-  replyToId = null;
-  document.getElementById("replyingTo").style.display = "none";
-  chatInput.placeholder = "Type a message...";
-}
-// Create a single global tooltip once
-let reactionsTooltip = document.getElementById("reactionsTooltip");
-if (!reactionsTooltip) {
-  reactionsTooltip = document.createElement("div");
-  reactionsTooltip.id = "reactionsTooltip";
-  Object.assign(reactionsTooltip.style, {
-    position: "fixed",
-    background: "#fff",
-    color: "#000",
-    border: "1px solid #ccc",
-    borderRadius: "8px",
-    padding: "6px 10px",
-    boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
-    fontSize: "12px",
-    minWidth: "140px",
-    maxWidth: "300px",
-    maxHeight: "150px",
-    overflowY: "auto",
-    display: "none",
-    zIndex: "99999",
-    whiteSpace: "normal",
-    wordWrap: "break-word",
-    textAlign: "left"
-  });
-  document.body.appendChild(reactionsTooltip);
-}
-function updateReactionsDiv(container, reactions) {
-  container.innerHTML = "";
-  if (!Array.isArray(reactions) || reactions.length === 0) {
-    container.style.display = "none";
-    return;
-  }
-  container.style.display = "flex";
-  container.style.gap = "4px";
-
-  // Create one tooltip per message container if it doesn't exist
-  let tooltip = container.querySelector(".reactionsTooltip");
-  if (!tooltip) {
-    tooltip = document.createElement("div");
-    tooltip.className = "reactionsTooltip";
-    Object.assign(tooltip.style, {
-      position: "fixed", // relative to viewport
-      background: "#fff",
-      color: "#000",
-      border: "1px solid #ccc",
-      borderRadius: "8px",
-      padding: "6px 10px",
-      boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
-      fontSize: "12px",
-      minWidth: "140px",
-      maxWidth: "300px",
-      maxHeight: "150px",
-      overflowY: "auto",
-      display: "none",
-      zIndex: "99999",
-      whiteSpace: "normal",
-      wordWrap: "break-word",
-      textAlign: "left"
-    });
-    document.body.appendChild(tooltip);
-  }
-
-  reactions.forEach(r => {
-    if (!Array.isArray(r.users) || r.users.length === 0) return;
-
-    const span = document.createElement("span");
-    span.textContent = `${r.emoji} ${r.users.length}`;
-    span.style.cursor = "pointer";
-    span.style.padding = "2px 6px";
-    span.style.borderRadius = "4px";
-
-    // Hover: show tooltip with all reactions
-    span.addEventListener("mouseenter", (e) => {
-      tooltip.innerHTML = ""; // clear previous
-      reactions.forEach(rx => {
-        rx.users.forEach(u => {
-          const line = document.createElement("div");
-          line.textContent = `${rx.emoji} - ${u}`;
-          line.style.marginBottom = "2px";
-          tooltip.appendChild(line);
-        });
-      });
-
-      tooltip.style.display = "block";
-
-      const rect = container.getBoundingClientRect(); // position relative to message container
-
-      // Horizontal positioning
-      let left = rect.left;
-      if (left + tooltip.offsetWidth > window.innerWidth) left = window.innerWidth - tooltip.offsetWidth - 8;
-      if (left < 4) left = 4;
-      tooltip.style.left = left + "px";
-
-      // Vertical positioning
-      const spaceBelow = window.innerHeight - rect.bottom;
-      const spaceAbove = rect.top;
-      let top;
-      if (spaceBelow < tooltip.offsetHeight && spaceAbove > tooltip.offsetHeight) {
-        top = rect.top - tooltip.offsetHeight - 4; // above
-      } else {
-        top = rect.bottom + 4; // below
-      }
-      tooltip.style.top = top + "px";
-    });
-
-    span.addEventListener("mouseleave", () => {
-      tooltip.style.display = "none";
-    });
-
-    container.appendChild(span);
-  });
-
-  // Hide tooltip on click outside
-  document.addEventListener("click", (event) => {
-    if (!tooltip.contains(event.target)) tooltip.style.display = "none";
-  });
-}
-
-// Load messages
 async function loadMessages() {
-  if (!user) return;
-  try {
-    const resp = await fetch("/sen_template/process/chat/fetch_messages.php", { credentials: "same-origin" });
-    const data = await resp.json();
-    if (!Array.isArray(data)) return;
-    chatMessages.innerHTML = "";
+    if (!user) return;
+    try {
+        const resp = await fetch("/sen_template/process/chat/fetch_messages.php", { credentials: "same-origin" });
+        const data = await resp.json();
+        if (!Array.isArray(data)) return;
+        chatMessages.innerHTML = "";
 
-    data.forEach(msg => {
-      const isSelf = msg.full_name === user.full_name;
+        data.forEach(msg => {
+            const isSelf = msg.full_name === user.full_name;
 
-      const msgWrapper = document.createElement("div");
-      msgWrapper.className = isSelf ? "user-message-wrapper" : "other-message-wrapper";
-      msgWrapper.style.marginBottom = "8px";
+            const msgWrapper = document.createElement("div");
+            msgWrapper.className = isSelf ? "user-message-wrapper" : "other-message-wrapper";
+            msgWrapper.style.marginBottom = "8px";
+            msgWrapper.style.position = "relative";
 
-      const msgBubble = document.createElement("div");
-      msgBubble.className = isSelf ? "chat-message user" : "chat-message other";
-      msgBubble.style.position = "relative";
+            const msgBubble = document.createElement("div");
+            msgBubble.className = isSelf ? "chat-message user" : "chat-message other";
+            msgBubble.style.position = "relative";
+            msgBubble.style.cursor = "pointer";
+            msgBubble.id = "msg-" + (msg.id || `msg-${Math.random()}`);
 
-      const [datePart, timePart] = msg.datetime.split(' ');
-      let [hour, minute, second] = timePart.split(':').map(Number);
-      const ampm = hour >= 12 ? 'PM' : 'AM';
-      hour = hour % 12 || 12;
-      const timestamp = `${datePart} ${hour}:${minute.toString().padStart(2,'0')}:${second.toString().padStart(2,'0')} ${ampm}`;
+            // --- MESSAGE TEXT ---
+            const textDiv = document.createElement("div");
+            textDiv.textContent = msg.message;
+            msgBubble.appendChild(textDiv);
 
-      msgBubble.innerHTML = `
-        ${msg.message}
-        <div style="font-size:10px;color:${isSelf ? "#ccc" : "#555"};margin-top:2px;">
-          ${timestamp}
-        </div>
-      `;
+            // --- TIMESTAMP ---
+            const [datePart, timePart] = msg.datetime.split(' ');
+            let [hour, minute, second] = timePart.split(':').map(Number);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            hour = hour % 12 || 12;
+            const timestamp = `${datePart} ${hour}:${minute.toString().padStart(2,'0')}:${second.toString().padStart(2,'0')} ${ampm}`;
 
-      msgBubble.id = "msg-" + (msg.id || `msg-${Math.random()}`);
+            const tsDiv = document.createElement("div");
+            tsDiv.style.fontSize = "10px";
+            tsDiv.style.color = isSelf ? "#ccc" : "#555";
+            tsDiv.style.marginTop = "2px";
+            tsDiv.textContent = timestamp;
+            msgBubble.appendChild(tsDiv);
 
-      // Reply preview
-      if (msg.reply_to_id && msg.reply_message) {
+            // --- ATTACHMENTS ---
+            if (Array.isArray(msg.attachments) && msg.attachments.length > 0) {
+                const attachContainer = document.createElement("div");
+                attachContainer.style.marginTop = "6px";
+
+                msg.attachments.forEach(att => {
+                    const type = att.type.split('/')[0]; // image, video, etc.
+                    if (type === "image") {
+                        const a = document.createElement("a");
+                        a.href = `data:${att.type};base64,${att.content}`;
+                        a.download = att.name;
+
+                        const img = document.createElement("img");
+                        img.src = `data:${att.type};base64,${att.content}`;
+                        img.alt = att.name;
+                        img.style.maxWidth = "200px";
+                        img.style.borderRadius = "6px";
+                        img.style.display = "block";
+                        img.style.marginBottom = "4px";
+
+                        a.appendChild(img);
+                        attachContainer.appendChild(a);
+
+                    } else if (type === "video") {
+                        const vid = document.createElement("video");
+                        vid.src = `data:${att.type};base64,${att.content}`;
+                        vid.controls = true;
+                        vid.style.maxWidth = "220px";
+                        vid.style.display = "block";
+                        vid.style.marginBottom = "4px";
+                        attachContainer.appendChild(vid);
+                    } else {
+                        const a = document.createElement("a");
+                        a.href = `data:${att.type};base64,${att.content}`;
+                        a.download = att.name;
+                        a.textContent = `${att.name}`;
+                        a.style.display = "block";
+                        attachContainer.appendChild(a);
+                    }
+                });
+
+                msgBubble.appendChild(attachContainer);
+            }
+    // --- Edited Badge ---
+     if (msg.message_history) {
+                const editedBadge = document.createElement("span");
+                editedBadge.textContent = "Edited";
+                editedBadge.style.fontSize = "10px";
+                editedBadge.style.color = "#007bff";
+                editedBadge.style.pointerEvents = "none";
+                editedBadge.style.background = "rgba(255,255,255,0.2)";
+                editedBadge.style.padding = "1px 4px";
+                editedBadge.style.borderRadius = "4px";
+                editedBadge.style.display = "inline-block";
+                editedBadge.style.marginTop = "4px";
+                editedBadge.style.marginBottom = "4px";
+                msgBubble.appendChild(editedBadge);
+            }
+
+
+if (msg.attachment) {
+    const ext = msg.attachment_type?.split('/')[0];
+    if (ext === "image") {
+        const img = document.createElement("img");
+        img.src = msg.attachment;
+        img.style.maxWidth = "200px";
+        msgBubble.appendChild(img);
+    } else if (ext === "video") {
+        const vid = document.createElement("video");
+        vid.src = msg.attachment;
+        vid.controls = true;
+        vid.style.maxWidth = "220px";
+        msgBubble.appendChild(vid);
+    } else {
+        const a = document.createElement("a");
+        a.href = msg.attachment;
+        a.download = msg.attachment_name;
+        a.textContent = `${msg.attachment_name}`;
+        msgBubble.appendChild(a);
+    }
+}
+
+    // --- Reply Preview ---
+    if (msg.reply_to_id && msg.reply_message) {
         const replyDiv = document.createElement("div");
         replyDiv.className = "reply-preview";
         replyDiv.innerHTML = `<strong>${msg.reply_full_name || "Unknown"}:</strong> ${msg.reply_message}`;
-        replyDiv.style.textAlign = isSelf ? "right" : "left";
-        replyDiv.style.opacity = "0.7";
-        replyDiv.style.margin = "2px 0";
-        replyDiv.style.maxWidth = "220px";
-        replyDiv.style.wordWrap = "break-word";
-        replyDiv.style.padding = "4px 8px";
-        replyDiv.style.borderLeft = "3px solid #ccc";
-        replyDiv.style.borderRadius = "6px";
-        replyDiv.style.cursor = "pointer";
-
+        Object.assign(replyDiv.style, {
+            textAlign: isSelf ? "right" : "left",
+            opacity: "0.7",
+            margin: "2px 0",
+            maxWidth: "220px",
+            wordWrap: "break-word",
+            padding: "4px 8px",
+            borderLeft: "3px solid #ccc",
+            borderRadius: "6px",
+            cursor: "pointer"
+        });
         replyDiv.addEventListener("click", () => {
-          const targetMsg = document.getElementById("msg-" + msg.reply_to_id);
-          if (!targetMsg) return;
-          targetMsg.scrollIntoView({ behavior: "smooth", block: "center" });
-          let blinkCount = 0;
-          const originalBg = targetMsg.style.backgroundColor;
-          const blinkInterval = setInterval(() => {
-            targetMsg.style.backgroundColor = blinkCount % 2 === 0 ? "#cce5ff" : originalBg;
-            blinkCount++;
-            if (blinkCount > 3) clearInterval(blinkInterval);
-          }, 300);
+            const targetMsg = document.getElementById("msg-" + msg.reply_to_id);
+            if (!targetMsg) return;
+            targetMsg.scrollIntoView({ behavior: "smooth", block: "center" });
+            let blinkCount = 0;
+            const originalBg = targetMsg.style.backgroundColor;
+            const blinkInterval = setInterval(() => {
+                targetMsg.style.backgroundColor = blinkCount % 2 === 0 ? "#cce5ff" : originalBg;
+                blinkCount++;
+                if (blinkCount > 3) clearInterval(blinkInterval);
+            }, 300);
         });
         msgWrapper.appendChild(replyDiv);
-      }
-
-      // Reactions container
-      const reactionsDiv = document.createElement("div");
-      reactionsDiv.className = "reactions";
-      reactionsDiv.style.display = "flex";
-      reactionsDiv.style.gap = "4px";
-      reactionsDiv.style.margin = "2px 0";
-      reactionsDiv.style.flexWrap = "wrap";
-      reactionsDiv.style.justifyContent = isSelf ? "flex-end" : "flex-start";
-
-      // Actions (reply + react)
-      const actionsDiv = document.createElement("div");
-      actionsDiv.className = "message-actions";
-      actionsDiv.style.display = "flex";
-      actionsDiv.style.gap = "6px";
-      actionsDiv.style.marginTop = "2px";
-      actionsDiv.style.opacity = "0";
-      actionsDiv.style.transition = "0.2s";
-      actionsDiv.style.alignItems = "center";
-
-      msgBubble.addEventListener("mouseenter", () => actionsDiv.style.opacity = "1");
-      msgBubble.addEventListener("mouseleave", () => actionsDiv.style.opacity = "0");
-
-      // Reply icon
-      const replyIcon = document.createElement("i");
-      replyIcon.className = "fa-solid fa-reply";
-      replyIcon.title = "Reply";
-      replyIcon.style.cursor = "pointer";
-      replyIcon.addEventListener("click", () => replyToMessage(msg.id || "", msg.full_name, msg.message));
-      actionsDiv.appendChild(replyIcon);
-
-      // React icon
-      const reactIcon = document.createElement("i");
-      reactIcon.className = "fa-regular fa-face-smile";
-      reactIcon.title = "React";
-      reactIcon.style.cursor = "pointer";
-
-      // Emoji picker
-      const emojiPicker = document.createElement("div");
-      emojiPicker.classList.add("emoji-picker");
-      emojiPicker.style.display = "none";
-      emojiPicker.style.position = "absolute";
-      emojiPicker.style.bottom = "24px";
-      emojiPicker.style.left = "0";
-      emojiPicker.style.background = "#fff";
-      emojiPicker.style.border = "1px solid #ccc";
-      emojiPicker.style.borderRadius = "8px";
-      emojiPicker.style.padding = "2px 4px";
-      emojiPicker.style.boxShadow = "0 4px 10px rgba(0,0,0,0.2)";
-      emojiPicker.style.gap = "4px";
-      emojiPicker.style.flexWrap = "wrap";
-      emojiPicker.style.zIndex = "9999";
-
-      const emojis = ["😄", "😢", "😡", "❤️", "👍"];
-
-      emojis.forEach(e => {
-        const btn = document.createElement("button");
-        btn.textContent = e;
-        btn.style.border = "none";
-        btn.style.background = "transparent";
-        btn.style.cursor = "pointer";
-        btn.style.fontSize = "16px";
-        btn.style.padding = "2px";
-      btn.addEventListener("click", async () => {
-  try {
-    const resp = await fetch("/sen_template/process/chat/react_message.php", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message_id: msg.id, emoji: e }),
-      credentials: "same-origin"
-    });
-    const data = await resp.json();
-
-    if (data.status === "success") {
-      // The backend should return updated reactions array after toggling
-      updateReactionsDiv(reactionsDiv, data.reactions);
     }
-  } catch(err) {
-    console.error("Failed to react:", err);
-  }
+
+    // --- Reactions & Actions ---
+const reactionsDiv = document.createElement("div");
+reactionsDiv.className = "reactions";
+Object.assign(reactionsDiv.style, {
+    display: "flex",
+    gap: "4px",
+    justifyContent: isSelf ? "flex-end" : "flex-start",
+    alignItems: "center",
+    cursor: "pointer",
+    fontSize: "14px",
+    padding: "2px 4px",
+    borderRadius: "4px",
+    background: "transparent"
 });
-        emojiPicker.appendChild(btn);
-      }); 
 
-      reactIcon.addEventListener("click", (event) => {
-        event.stopPropagation();
-        emojiPicker.style.display = emojiPicker.style.display === "flex" ? "none" : "flex";
-      });
-
-      document.addEventListener("click", (event) => {
-        if (!emojiPicker.contains(event.target) && event.target !== reactIcon) emojiPicker.style.display = "none";
-      });
-
-      actionsDiv.appendChild(reactIcon);
-      actionsDiv.appendChild(reactionsDiv);
-      msgBubble.appendChild(actionsDiv);
-      msgBubble.appendChild(emojiPicker);
-
-      if (msg.reactions && msg.reactions.length > 0) updateReactionsDiv(reactionsDiv, msg.reactions);
-
-      if (!isSelf) {
-        const nameDiv = document.createElement("div");
-        nameDiv.className = "other-name";
-        nameDiv.textContent = msg.full_name;
-        msgWrapper.insertBefore(nameDiv, msgWrapper.firstChild);
-      }
-
-      msgWrapper.appendChild(msgBubble);
-      chatMessages.appendChild(msgWrapper);
+// Combine all reactions in a single text line
+if (Array.isArray(msg.reactions) && msg.reactions.length > 0) {
+    let summaryText = "";
+    msg.reactions.forEach(r => {
+        summaryText += `${r.emoji}${r.users.length} `; 
     });
 
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    reactionsDiv.textContent = summaryText.trim();
 
-  } catch (err) {
-    console.error("Failed to load messages:", err);
-  }
+
+    reactionsDiv.addEventListener("mouseenter", () => {
+        let tooltip = document.getElementById("reactionsTooltip");
+        if (!tooltip) {
+            tooltip = document.createElement("div");
+            tooltip.id = "reactionsTooltip";
+            Object.assign(tooltip.style, {
+                position: "fixed",
+                background: "#fff",
+                color: "#000",
+                border: "1px solid #ccc",
+                borderRadius: "8px",
+                padding: "6px 10px",
+                boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
+                fontSize: "12px",
+                maxWidth: "300px",
+                maxHeight: "150px",
+                overflowY: "auto",
+                display: "none",
+                zIndex: "99999",
+                whiteSpace: "normal",
+                wordWrap: "break-word",
+                textAlign: "left"
+            });
+            document.body.appendChild(tooltip);
+        }
+
+        tooltip.innerHTML = "";
+        msg.reactions.forEach(r => {
+            r.users.forEach(u => {
+                const line = document.createElement("div");
+                line.textContent = `${r.emoji} - ${u}`;
+                tooltip.appendChild(line);
+            });
+        });
+
+        tooltip.style.display = "block";
+
+        const rect = reactionsDiv.getBoundingClientRect();
+        let left = rect.left;
+        if (left + tooltip.offsetWidth > window.innerWidth) left = window.innerWidth - tooltip.offsetWidth - 8;
+        tooltip.style.left = left + "px";
+
+        const spaceBelow = window.innerHeight - rect.bottom;
+        const spaceAbove = rect.top;
+        tooltip.style.top = (spaceBelow < tooltip.offsetHeight && spaceAbove > tooltip.offsetHeight)
+            ? rect.top - tooltip.offsetHeight - 4
+            : rect.bottom + 4 + "px";
+    });
+
+    reactionsDiv.addEventListener("mouseleave", () => {
+        const tooltip = document.getElementById("reactionsTooltip");
+        if (tooltip) tooltip.style.display = "none";
+    });
 }
 
-// Send message
-chatSend.onclick = async () => {
-  const message = chatInput.value.trim();
-  if (!message) return;
 
-  try {
-    const resp = await fetch("/sen_template/process/chat/send_messages.php", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message, reply_to_id: replyToId }),
-      credentials: "same-origin"
+
+    const actionsDiv = document.createElement("div");
+    actionsDiv.className = "message-actions";
+    Object.assign(actionsDiv.style, { display: "flex", gap: "6px", marginTop: "4px", alignItems: "center" });
+
+    // Reply Icon
+    const replyIcon = document.createElement("i");
+    replyIcon.className = "fa-solid fa-reply";
+    replyIcon.title = "Reply";
+    replyIcon.style.cursor = "pointer";
+    replyIcon.addEventListener("click", () => window.replyToMessage(msg.id || "", msg.full_name, msg.message));
+    actionsDiv.appendChild(replyIcon);
+
+    // Emoji picker & reactions (existing)
+    const { reactIcon, emojiPicker } = window.attachEmojiPicker(msgBubble, msg.id, reactionsDiv);
+    [reactIcon, emojiPicker, reactionsDiv].forEach(el => el.addEventListener("click", e => e.stopPropagation()));
+    actionsDiv.appendChild(reactIcon);
+    actionsDiv.appendChild(emojiPicker);
+    actionsDiv.appendChild(reactionsDiv);
+    msgBubble.appendChild(actionsDiv);
+
+    // --- Edit & Delete Icons ---
+    const editIcon = document.createElement("i");
+    editIcon.className = "fa-solid fa-pen-to-square";
+    editIcon.title = "Edit";
+    Object.assign(editIcon.style, {
+        position: "absolute",
+        left: "-28px",
+        top: "50%",
+        transform: "translateY(-50%)",
+        fontSize: "14px",
+        cursor: "pointer",
+        display: msg.message_history ? "none" : "none", // hide if message_history exists
+        color: "#007bff",
+        zIndex: "10"
     });
-    const data = await resp.json();
-    if (data.status === "success") {
-      chatInput.value = "";
-      cancelReply();
-      loadMessages();
-    } else {
-      alert("Send failed: " + (data.message || "Unknown error"));
-    }
-  } catch (err) {
-    console.error("Send failed:", err);
-    alert("Send failed: error");
-  }
-};
+    editIcon.addEventListener("click", () => window.editMessage(msg.datetime, msg.message, msg.id));
 
-// Enter key to send
-chatInput.addEventListener("keydown", e => {
-  if (e.key === "Enter") {
-    if (e.shiftKey) {
-      const start = chatInput.selectionStart;
-      const end = chatInput.selectionEnd;
-      chatInput.value = chatInput.value.substring(0, start) + "\n" + chatInput.value.substring(end);
-      chatInput.selectionStart = chatInput.selectionEnd = start + 1;
-      e.preventDefault();
-    } else {
-      e.preventDefault();
-      chatSend.click();
+    const deleteIcon = document.createElement("i");
+    deleteIcon.className = "fa-solid fa-trash";
+    deleteIcon.title = "Delete";
+    Object.assign(deleteIcon.style, {
+        position: "absolute",
+        left: "-50px",
+        top: "50%",
+        transform: "translateY(-50%)",
+        fontSize: "14px",
+        cursor: "pointer",
+        display: "none",
+        color: "#dc3545",
+        zIndex: "10"
+    });
+    deleteIcon.addEventListener("click", () => window.deleteMessage(msg.datetime));
+
+    msgBubble.appendChild(editIcon);
+    msgBubble.appendChild(deleteIcon);
+
+// Toggle edit/delete icons
+msgBubble.addEventListener("click", e => {
+    e.stopPropagation();
+    if (!isSelf) return;
+
+    if (activeBubble && activeBubble !== msgBubble) {
+        const icons = activeBubble.querySelectorAll("i.fa-pen-to-square, i.fa-trash");
+        icons.forEach(i => i.style.display = "none");
     }
-  }
+
+    // Only toggle edit icon if message is not edited
+    const showEdit = !msg.message_history;
+    editIcon.style.display = showEdit ? "inline-block" : "none";
+
+    // Always allow delete icon to toggle
+    const visible = deleteIcon.style.display === "inline-block";
+    deleteIcon.style.display = visible ? "none" : "inline-block";
+
+    activeBubble = msgBubble;
 });
 
-// Auto refresh every 30s
-setInterval(loadMessages, 30000);
-window.addEventListener("DOMContentLoaded", loadMessages);
+
+    document.addEventListener("click", () => {
+        if (activeBubble) {
+            const icons = activeBubble.querySelectorAll("i.fa-pen-to-square, i.fa-trash");
+            icons.forEach(i => i.style.display = "none");
+            activeBubble = null;
+        }
+    });
+
+    // Show sender name for other messages
+           if (!isSelf) {
+                const nameDiv = document.createElement("div");
+                nameDiv.className = "other-name";
+                nameDiv.textContent = msg.full_name;
+                msgWrapper.insertBefore(nameDiv, msgWrapper.firstChild);
+            }
+
+            msgWrapper.appendChild(msgBubble);
+            chatMessages.appendChild(msgWrapper);
+        });
+
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    } catch (err) {
+        console.error("Failed to load messages:", err);
+    }
+}
+
+
+
+
+  // Enter key to send
+  chatInput.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      if (e.shiftKey) {
+        const start = chatInput.selectionStart;
+        const end = chatInput.selectionEnd;
+        chatInput.value = chatInput.value.substring(0, start) + "\n" + chatInput.value.substring(end);
+        chatInput.selectionStart = chatInput.selectionEnd = start + 1;
+        e.preventDefault();
+      } else {
+        e.preventDefault();
+        chatSend.click();
+      }
+    }
+  });
+
+  // Auto refresh every 30s
+  setInterval(loadMessages, 30000);
+  window.addEventListener("DOMContentLoaded", loadMessages);
+
+</script>
+
+
+
+
+
+
+ 
+
+
+<script>
+// ----------------- EDIT / REPLY HANDLING -----------------
+let editingMessageId = null;
+let editingMessageDatetime = null;
+let selectedFiles = [];
+
+function editMessage(datetime, message, message_id) {
+    chatInput.value = message;
+    chatInput.focus();
+
+    editingMessageId = message_id;
+    editingMessageDatetime = datetime;
+
+    const replyingDiv = document.getElementById("replyingTo");
+    replyingDiv.style.display = "block";
+    replyingDiv.querySelector("#replyingToText").textContent = "Editing message...";
+}
+
+// ----------------- ATTACHMENTS -----------------
+const attachBtn = document.getElementById("attachBtn");
+const fileInput = document.getElementById("fileInput");
+
+attachBtn.addEventListener("click", () => fileInput.click());
+fileInput.addEventListener("change", () => {
+    selectedFiles = Array.from(fileInput.files);
+
+    const replyingDiv = document.getElementById("replyingTo");
+    const textEl = replyingDiv.querySelector("#replyingToText");
+
+    if (window.replyToId && textEl.dataset.replyText) {
+        // If replying, preserve reply text and optionally show attachments
+        if (selectedFiles.length > 0) {
+            textEl.textContent = `${textEl.dataset.replyText} + ${selectedFiles.length === 1 ? selectedFiles[0].name : selectedFiles.length + " files"}`;
+        } else {
+            textEl.textContent = textEl.dataset.replyText;
+        }
+    } else if (selectedFiles.length > 0) {
+        // Only attachment, no reply
+        textEl.textContent = selectedFiles.length === 1 ? `Attachment selected: ${selectedFiles[0].name}` : `${selectedFiles.length} files selected`;
+    }
+
+    // Show box only if replying or attachments exist
+    replyingDiv.style.display = (window.replyToId || selectedFiles.length > 0) ? "block" : "none";
+});
+
+function replyToMessage(msgId, fullName, message) {
+    window.replyToId = msgId;
+
+    const replyingDiv = document.getElementById("replyingTo");
+    const textEl = replyingDiv.querySelector("#replyingToText");
+    textEl.textContent = `Replying to ${fullName}: ${message}`;
+    textEl.dataset.replyText = textEl.textContent; // store original reply text
+
+    replyingDiv.style.display = "block";
+}
+
+
+// ----------------- SEND MESSAGE HANDLER -----------------
+chatSend.onclick = async () => {
+    let message = chatInput.value.trim();
+
+    if (!message && selectedFiles.length === 0 && !window.replyToId) return;
+    if (!message && window.replyToId) message = "[Reply]";
+
+    const form = new FormData();
+    if (message) form.append("message", message);
+    if (window.replyToId) form.append("reply_to_id", window.replyToId);
+    selectedFiles.forEach(f => form.append("attachments[]", f));
+
+    try {
+        let resp;
+        if (editingMessageId) {
+            // EDIT mode
+            resp = await fetch("/sen_template/process/chat/edit_message.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    message_id: editingMessageId,
+                    datetime: editingMessageDatetime,
+                    message: message
+                }),
+                credentials: "same-origin"
+            });
+        } else {
+            // NEW message
+            resp = await fetch("/sen_template/process/chat/send_messages.php", {
+                method: "POST",
+                body: form,
+                credentials: "same-origin"
+            });
+        }
+
+        const data = await resp.json();
+
+        if (data.status === "success") {
+            // Reset everything
+            chatInput.value = "";
+            selectedFiles = [];
+            fileInput.value = "";
+            window.replyToId = null;
+            editingMessageId = null;
+            editingMessageDatetime = null;
+
+            const replyingDiv = document.getElementById("replyingTo");
+            replyingDiv.style.display = "none";
+            replyingDiv.querySelector("#replyingToText").textContent = "";
+
+            loadMessages();
+        } else {
+            chatInput.value = "⚠️ " + (data.message || "Failed");
+            chatInput.focus();
+        }
+
+    } catch (err) {
+        console.error("Send/Edit error:", err);
+        chatInput.value = "⚠️ Network error";
+    }
+};
+
+
+
+// ----------------- DELETE MESSAGE -----------------
+function deleteMessage(datetime, message_id) {
+    if (!confirm("Are you sure you want to delete this message?")) return;
+
+    fetch("/sen_template/process/chat/delete_message.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ datetime, message_id }),
+        credentials: "same-origin"
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.status === "success") {
+            loadMessages();
+        } else {
+            chatInput.value = "⚠️ " + (data.message || "Delete failed");
+            chatInput.focus();
+        }
+    });
+};
+
+</script>
+
+
+
+
+<script type="module">
+  import '/sen_template/emoji/node_modules/emoji-picker-element/index.js';
+
+  const chatBox = document.getElementById('chatBox');
+  const chatInput = document.getElementById("chatInput");
+  const emojiBtn = document.getElementById("emojiBtn");
+
+  // Append picker inside chat box
+  const picker = document.createElement('emoji-picker');
+  chatBox.appendChild(picker);
+
+  // Toggle picker
+  emojiBtn.addEventListener('click', e => {
+    e.stopPropagation(); // prevent document click
+    picker.style.display = picker.style.display === 'block' ? 'none' : 'block';
+  });
+
+  // Insert emoji without closing picker
+  picker.addEventListener('emoji-click', event => {
+    const emoji = event.detail.unicode;
+    const start = chatInput.selectionStart;
+    const end = chatInput.selectionEnd;
+    chatInput.value = chatInput.value.slice(0, start) + emoji + chatInput.value.slice(end);
+    chatInput.selectionStart = chatInput.selectionEnd = start + emoji.length;
+    chatInput.focus();
+    // picker.style.display = 'none';  <-- removed this line
+  });
+
+  // Close picker if click outside
+  document.addEventListener('click', e => {
+    if (!picker.contains(e.target) && e.target !== emojiBtn) {
+      picker.style.display = 'none';
+    }
+  });
+
+  // Prevent picker clicks from closing it
+  picker.addEventListener('click', e => e.stopPropagation());
 </script>
