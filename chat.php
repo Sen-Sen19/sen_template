@@ -432,6 +432,10 @@ emoji-picker {
       font-size:12px;
   ">✖</button>
   </div>
+<div id="sendingLoaderContainer" style="display:none; margin:6px 10px;"></div>
+
+
+
   <div class="chat-input">
     <button id="attachBtn" title="Attachment">
       <i class="fa-solid fa-paperclip"></i>
@@ -538,15 +542,18 @@ async function loadMessages() {
                         a.appendChild(img);
                         attachContainer.appendChild(a);
 
-                    } else if (type === "video") {
-                        const vid = document.createElement("video");
-                        vid.src = `data:${att.type};base64,${att.content}`;
-                        vid.controls = true;
-                        vid.style.maxWidth = "220px";
-                        vid.style.display = "block";
-                        vid.style.marginBottom = "4px";
-                        attachContainer.appendChild(vid);
-                    } else {
+                  } else if (type === "video") {
+    const a = document.createElement("a");
+    a.href = att.file_url;     // file url from PHP
+    a.download = att.name;     // ensure download
+    a.textContent = `Download Video (${att.name})`;
+    a.style.display = "block";
+    a.style.color = "#00aaff";
+    a.style.marginBottom = "4px";
+    attachContainer.appendChild(a);
+}
+
+ else {
                         const a = document.createElement("a");
                         a.href = `data:${att.type};base64,${att.content}`;
                         a.download = att.name;
@@ -908,9 +915,50 @@ function replyToMessage(msgId, fullName, message) {
 // ----------------- SEND MESSAGE HANDLER -----------------
 chatSend.onclick = async () => {
     let message = chatInput.value.trim();
-
     if (!message && selectedFiles.length === 0 && !window.replyToId) return;
     if (!message && window.replyToId) message = "[Reply]";
+
+    const loaderContainer = document.getElementById("sendingLoaderContainer");
+    loaderContainer.innerHTML = ""; // Clear previous loader
+    loaderContainer.style.display = "block";
+
+    // Create sending bubble
+    const sendingWrapper = document.createElement("div");
+    sendingWrapper.style.display = "flex";
+    sendingWrapper.style.alignItems = "center";
+    sendingWrapper.style.justifyContent = "flex-end"; // <-- right align
+    sendingWrapper.style.gap = "8px";
+    sendingWrapper.style.marginBottom = "6px";
+
+    // Bubble with actual message
+    const bubble = document.createElement("div");
+    bubble.textContent = message;
+    bubble.style.background = "#d8d8d8ff";  // blue for user
+    bubble.style.color = "#fff";
+    bubble.style.padding = "6px 10px";
+    bubble.style.borderRadius = "12px";
+    bubble.style.fontSize = "13px";
+    bubble.style.border = "1px solid #ebebebff";
+    bubble.style.maxWidth = "70%";
+    bubble.style.wordBreak = "break-word";
+    bubble.style.display = "flex";
+    bubble.style.alignItems = "center";
+    bubble.style.gap = "6px";
+
+    // Spinner
+    const spinner = document.createElement("div");
+    spinner.style.width = "14px";
+    spinner.style.height = "14px";
+    spinner.style.border = "2px solid rgba(255,255,255,0.5)";
+    spinner.style.borderTopColor = "#fff";
+    spinner.style.borderRadius = "50%";
+    spinner.style.animation = "spin .8s linear infinite";
+
+    // Add spinner to bubble on the left
+    bubble.prepend(spinner);
+
+    sendingWrapper.appendChild(bubble);
+    loaderContainer.appendChild(sendingWrapper);
 
     const form = new FormData();
     if (message) form.append("message", message);
@@ -920,7 +968,6 @@ chatSend.onclick = async () => {
     try {
         let resp;
         if (editingMessageId) {
-            // EDIT mode
             resp = await fetch("/sen_template/process/chat/edit_message.php", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -932,7 +979,6 @@ chatSend.onclick = async () => {
                 credentials: "same-origin"
             });
         } else {
-            // NEW message
             resp = await fetch("/sen_template/process/chat/send_messages.php", {
                 method: "POST",
                 body: form,
@@ -943,7 +989,6 @@ chatSend.onclick = async () => {
         const data = await resp.json();
 
         if (data.status === "success") {
-            // Reset everything
             chatInput.value = "";
             selectedFiles = [];
             fileInput.value = "";
@@ -955,7 +1000,7 @@ chatSend.onclick = async () => {
             replyingDiv.style.display = "none";
             replyingDiv.querySelector("#replyingToText").textContent = "";
 
-            loadMessages();
+            await loadMessages(); // Replace the temporary bubble with real messages
         } else {
             chatInput.value = "⚠️ " + (data.message || "Failed");
             chatInput.focus();
@@ -964,8 +1009,11 @@ chatSend.onclick = async () => {
     } catch (err) {
         console.error("Send/Edit error:", err);
         chatInput.value = "⚠️ Network error";
+    } finally {
+        loaderContainer.style.display = "none"; // hide sending bubble
     }
 };
+
 
 
 
