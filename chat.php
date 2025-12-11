@@ -742,60 +742,43 @@ if (Array.isArray(msg.reactions) && msg.reactions.length > 0) {
 
     reactionsDiv.textContent = summaryText.trim();
 
+reactionsDiv.addEventListener("mouseenter", () => {
+  const tooltip = document.getElementById("reactionsTooltip"); // always use the global one
+  if (!tooltip) return; // safety check
 
-    reactionsDiv.addEventListener("mouseenter", () => {
-        let tooltip = document.getElementById("reactionsTooltip");
-        if (!tooltip) {
-            tooltip = document.createElement("div");
-            tooltip.id = "reactionsTooltip";
-            Object.assign(tooltip.style, {
-                position: "fixed",
-                background: "#fff",
-                color: "#000",
-                border: "1px solid #ccc",
-                borderRadius: "8px",
-                padding: "6px 10px",
-                boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
-                fontSize: "12px",
-                maxWidth: "300px",
-                maxHeight: "150px",
-                overflowY: "auto",
-                display: "none",
-                zIndex: "99999",
-                whiteSpace: "normal",
-                wordWrap: "break-word",
-                textAlign: "left"
-            });
-            document.body.appendChild(tooltip);
-        }
-
-        tooltip.innerHTML = "";
-        msg.reactions.forEach(r => {
-            r.users.forEach(u => {
-                const line = document.createElement("div");
-                line.textContent = `${r.emoji} - ${u}`;
-                tooltip.appendChild(line);
-            });
-        });
-
-        tooltip.style.display = "block";
-
-        const rect = reactionsDiv.getBoundingClientRect();
-        let left = rect.left;
-        if (left + tooltip.offsetWidth > window.innerWidth) left = window.innerWidth - tooltip.offsetWidth - 8;
-        tooltip.style.left = left + "px";
-
-        const spaceBelow = window.innerHeight - rect.bottom;
-        const spaceAbove = rect.top;
-        tooltip.style.top = (spaceBelow < tooltip.offsetHeight && spaceAbove > tooltip.offsetHeight)
-            ? rect.top - tooltip.offsetHeight - 4
-            : rect.bottom + 4 + "px";
+  tooltip.innerHTML = "";
+  msg.reactions.forEach(r => {
+    r.users.forEach(u => {
+      const line = document.createElement("div");
+      line.textContent = `${r.emoji} - ${u}`;
+      tooltip.appendChild(line);
     });
+  });
 
-    reactionsDiv.addEventListener("mouseleave", () => {
-        const tooltip = document.getElementById("reactionsTooltip");
-        if (tooltip) tooltip.style.display = "none";
-    });
+  tooltip.style.display = "block";
+
+  const tooltipWidth = 250;
+  tooltip.style.width = tooltipWidth + "px";
+  tooltip.style.maxWidth = tooltipWidth + "px";
+
+  const rect = reactionsDiv.getBoundingClientRect();
+  let left = rect.left + rect.width / 2 - tooltipWidth / 2;
+  if (left + tooltipWidth > window.innerWidth) left = window.innerWidth - tooltipWidth - 8;
+  if (left < 4) left = 4;
+  tooltip.style.left = left + "px";
+
+  const spaceBelow = window.innerHeight - rect.bottom;
+  const spaceAbove = rect.top;
+  tooltip.style.top = (spaceAbove > tooltip.offsetHeight + 8) 
+      ? rect.top - tooltip.offsetHeight - 4 
+      : rect.bottom + 4 + "px";
+});
+
+reactionsDiv.addEventListener("mouseleave", () => {
+  const tooltip = document.getElementById("reactionsTooltip");
+  if (tooltip) tooltip.style.display = "none";
+});
+
 }
 
 
