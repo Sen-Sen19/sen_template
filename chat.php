@@ -310,6 +310,36 @@ emoji-picker {
 /* ============================================================
    END OF FULL RESPONSIVE CSS
    ============================================================ */
+/* Spinner animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Bubble loader animation */
+.sending-bubble {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 6px;
+  animation: slideIn 0.3s ease-out;
+}
+
+.sending-bubble div.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.5);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Slide in effect */
+@keyframes slideIn {
+  0% { opacity: 0; transform: translateX(20px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
 
 </style>
 
@@ -407,6 +437,30 @@ emoji-picker {
 
   <!-- Chat messages container -->
   <div class="chat-messages" id="chatMessages"></div>
+<!-- Editing message bar -->
+<div id="editingBar" style="
+    display:none;
+    position: relative;
+    padding:6px 10px;
+    background:#ffeeba;
+    border-left:3px solid #f0ad4e;
+    font-size:12px;
+    margin:6px;
+    border-radius:6px;
+    box-shadow:0 2px 5px rgba(0,0,0,0.1);
+">
+  <span id="editingText">Editing message...</span>
+  <button onclick="cancelEdit()" style="
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      border:none;
+      background:none;
+      cursor:pointer;
+      font-size:12px;
+  ">✖</button>
+</div>
 
   <!-- Input -->
   <div id="replyingTo" style="
@@ -475,8 +529,8 @@ document.getElementById("closeChatHeader").onclick = function () {
   const chatMessages = document.getElementById("chatMessages");
   const chatInput = document.getElementById("chatInput");
   const chatSend = document.getElementById("chatSend");
-  let user = null; // logged-in user { employee_id, full_name }
-let activeBubble = null; // currently selected bubble
+  let user = null; 
+let activeBubble = null; 
 
 async function loadMessages() {
     if (!user) return;
@@ -500,71 +554,64 @@ async function loadMessages() {
             msgBubble.style.cursor = "pointer";
             msgBubble.id = "msg-" + (msg.id || `msg-${Math.random()}`);
 
-            // --- MESSAGE TEXT ---
+            // --- Message text ---
             const textDiv = document.createElement("div");
             textDiv.textContent = msg.message;
             msgBubble.appendChild(textDiv);
 
-            // --- TIMESTAMP ---
-            const [datePart, timePart] = msg.datetime.split(' ');
-            let [hour, minute, second] = timePart.split(':').map(Number);
-            const ampm = hour >= 12 ? 'PM' : 'AM';
-            hour = hour % 12 || 12;
-            const timestamp = `${datePart} ${hour}:${minute.toString().padStart(2,'0')}:${second.toString().padStart(2,'0')} ${ampm}`;
+            // --- Attachments ---
+          // --- Attachments (lazy load) ---
+if (Array.isArray(msg.attachments) && msg.attachments.length > 0) {
+    const attachContainer = document.createElement("div");
+    attachContainer.style.marginTop = "6px";
 
-            const tsDiv = document.createElement("div");
-            tsDiv.style.fontSize = "10px";
-            tsDiv.style.color = isSelf ? "#ccc" : "#555";
-            tsDiv.style.marginTop = "2px";
-            tsDiv.textContent = timestamp;
-            msgBubble.appendChild(tsDiv);
+    msg.attachments.forEach(att => {
+        const type = att.type.split('/')[0];
 
-            // --- ATTACHMENTS ---
-            if (Array.isArray(msg.attachments) && msg.attachments.length > 0) {
-                const attachContainer = document.createElement("div");
-                attachContainer.style.marginTop = "6px";
+        if (type === "image" || type === "video") {
+            const placeholder = document.createElement("button");
+            placeholder.textContent = type === "image" ? `View Image (${att.name})` : `Play Video (${att.name})`;
+            placeholder.style.display = "block";
+            placeholder.style.color = "#00aaff";
+            placeholder.style.cursor = "pointer";
+            placeholder.style.border = "1px solid #00aaff";
+            placeholder.style.borderRadius = "6px";
+            placeholder.style.background = "transparent";
+            placeholder.style.padding = "4px 8px";
+            placeholder.style.marginBottom = "4px";
 
-                msg.attachments.forEach(att => {
-                    const type = att.type.split('/')[0]; // image, video, etc.
-                    if (type === "image") {
-                        const a = document.createElement("a");
-                        a.href = `data:${att.type};base64,${att.content}`;
-                        a.download = att.name;
+            placeholder.addEventListener("click", () => {
+                if (type === "image") {
+                    const img = document.createElement("img");
+                    img.src = `data:${att.type};base64,${att.content}`; // load on click
+                    img.alt = att.name;
+                    img.style.maxWidth = "200px";
+                    img.style.borderRadius = "6px";
+                    placeholder.replaceWith(img);
+                } else if (type === "video") {
+                    const vid = document.createElement("video");
+                    vid.src = att.file_url || att.content; // prefer file_url if available
+                    vid.controls = true;
+                    vid.style.maxWidth = "220px";
+                    placeholder.replaceWith(vid);
+                }
+            });
 
-                        const img = document.createElement("img");
-                        img.src = `data:${att.type};base64,${att.content}`;
-                        img.alt = att.name;
-                        img.style.maxWidth = "200px";
-                        img.style.borderRadius = "6px";
-                        img.style.display = "block";
-                        img.style.marginBottom = "4px";
+            attachContainer.appendChild(placeholder);
+        } else {
+            // other files (PDF, doc, etc.) load immediately as link
+            const a = document.createElement("a");
+            a.href = `data:${att.type};base64,${att.content}`;
+            a.download = att.name;
+            a.textContent = att.name;
+            a.style.display = "block";
+            attachContainer.appendChild(a);
+        }
+    });
 
-                        a.appendChild(img);
-                        attachContainer.appendChild(a);
-
-                  } else if (type === "video") {
-    const a = document.createElement("a");
-    a.href = att.file_url;     // file url from PHP
-    a.download = att.name;     // ensure download
-    a.textContent = `Download Video (${att.name})`;
-    a.style.display = "block";
-    a.style.color = "#00aaff";
-    a.style.marginBottom = "4px";
-    attachContainer.appendChild(a);
+    msgBubble.appendChild(attachContainer);
 }
 
- else {
-                        const a = document.createElement("a");
-                        a.href = `data:${att.type};base64,${att.content}`;
-                        a.download = att.name;
-                        a.textContent = `${att.name}`;
-                        a.style.display = "block";
-                        attachContainer.appendChild(a);
-                    }
-                });
-
-                msgBubble.appendChild(attachContainer);
-            }
     // --- Edited Badge ---
      if (msg.message_history) {
                 const editedBadge = document.createElement("span");
@@ -581,28 +628,64 @@ async function loadMessages() {
                 msgBubble.appendChild(editedBadge);
             }
 
-
 if (msg.attachment) {
     const ext = msg.attachment_type?.split('/')[0];
-    if (ext === "image") {
-        const img = document.createElement("img");
-        img.src = msg.attachment;
-        img.style.maxWidth = "200px";
-        msgBubble.appendChild(img);
-    } else if (ext === "video") {
-        const vid = document.createElement("video");
-        vid.src = msg.attachment;
-        vid.controls = true;
-        vid.style.maxWidth = "220px";
-        msgBubble.appendChild(vid);
+
+    if (ext === "image" || ext === "video") {
+        const placeholder = document.createElement("button");
+        placeholder.textContent = ext === "image" ? `View Image (${msg.attachment_name})` : `Play Video (${msg.attachment_name})`;
+        Object.assign(placeholder.style, {
+            display: "block",
+            color: "#00aaff",
+            cursor: "pointer",
+            border: "1px solid #00aaff",
+            borderRadius: "6px",
+            background: "transparent",
+            padding: "4px 8px",
+            marginTop: "6px",
+            wordBreak: "break-word",
+            maxWidth: "100%" // ensures it never overflows the bubble
+        });
+
+        placeholder.addEventListener("click", () => {
+            if (ext === "image") {
+                const img = document.createElement("img");
+                img.src = msg.attachment; // load on click
+                img.alt = msg.attachment_name;
+                Object.assign(img.style, {
+                    maxWidth: "100%",  // fit bubble width
+                    borderRadius: "6px",
+                    display: "block",
+                    marginTop: "6px"
+                });
+                placeholder.replaceWith(img);
+            } else {
+                const vid = document.createElement("video");
+                vid.src = msg.attachment;
+                vid.controls = true;
+                Object.assign(vid.style, {
+                    maxWidth: "100%",
+                    display: "block",
+                    marginTop: "6px",
+                    borderRadius: "6px"
+                });
+                placeholder.replaceWith(vid);
+            }
+        });
+
+        msgBubble.appendChild(placeholder);
     } else {
         const a = document.createElement("a");
         a.href = msg.attachment;
         a.download = msg.attachment_name;
-        a.textContent = `${msg.attachment_name}`;
+        a.textContent = msg.attachment_name;
+        a.style.display = "block";
+        a.style.marginTop = "6px";
         msgBubble.appendChild(a);
     }
 }
+
+
 
     // --- Reply Preview ---
     if (msg.reply_to_id && msg.reply_message) {
@@ -860,7 +943,6 @@ msgBubble.addEventListener("click", e => {
 let editingMessageId = null;
 let editingMessageDatetime = null;
 let selectedFiles = [];
-
 function editMessage(datetime, message, message_id) {
     chatInput.value = message;
     chatInput.focus();
@@ -868,10 +950,21 @@ function editMessage(datetime, message, message_id) {
     editingMessageId = message_id;
     editingMessageDatetime = datetime;
 
-    const replyingDiv = document.getElementById("replyingTo");
-    replyingDiv.style.display = "block";
-    replyingDiv.querySelector("#replyingToText").textContent = "Editing message...";
+    const editingBar = document.getElementById("editingBar");
+    editingBar.style.display = "block";
 }
+
+function cancelEdit() {
+    chatInput.value = "";
+    editingMessageId = null;
+    editingMessageDatetime = null;
+
+    const editingBar = document.getElementById("editingBar");
+    editingBar.style.display = "none";
+
+    chatInput.focus();
+}
+
 
 // ----------------- ATTACHMENTS -----------------
 const attachBtn = document.getElementById("attachBtn");
@@ -918,6 +1011,9 @@ chatSend.onclick = async () => {
     if (!message && selectedFiles.length === 0 && !window.replyToId) return;
     if (!message && window.replyToId) message = "[Reply]";
 
+    // Clear input immediately to prevent double sending
+    chatInput.value = "";
+
     const loaderContainer = document.getElementById("sendingLoaderContainer");
     loaderContainer.innerHTML = ""; // Clear previous loader
     loaderContainer.style.display = "block";
@@ -926,14 +1022,13 @@ chatSend.onclick = async () => {
     const sendingWrapper = document.createElement("div");
     sendingWrapper.style.display = "flex";
     sendingWrapper.style.alignItems = "center";
-    sendingWrapper.style.justifyContent = "flex-end"; // <-- right align
+    sendingWrapper.style.justifyContent = "flex-end";
     sendingWrapper.style.gap = "8px";
     sendingWrapper.style.marginBottom = "6px";
 
-    // Bubble with actual message
     const bubble = document.createElement("div");
     bubble.textContent = message;
-    bubble.style.background = "#d8d8d8ff";  // blue for user
+    bubble.style.background = "#d8d8d8ff";
     bubble.style.color = "#fff";
     bubble.style.padding = "6px 10px";
     bubble.style.borderRadius = "12px";
@@ -945,7 +1040,6 @@ chatSend.onclick = async () => {
     bubble.style.alignItems = "center";
     bubble.style.gap = "6px";
 
-    // Spinner
     const spinner = document.createElement("div");
     spinner.style.width = "14px";
     spinner.style.height = "14px";
@@ -954,9 +1048,7 @@ chatSend.onclick = async () => {
     spinner.style.borderRadius = "50%";
     spinner.style.animation = "spin .8s linear infinite";
 
-    // Add spinner to bubble on the left
     bubble.prepend(spinner);
-
     sendingWrapper.appendChild(bubble);
     loaderContainer.appendChild(sendingWrapper);
 
@@ -989,7 +1081,6 @@ chatSend.onclick = async () => {
         const data = await resp.json();
 
         if (data.status === "success") {
-            chatInput.value = "";
             selectedFiles = [];
             fileInput.value = "";
             window.replyToId = null;
@@ -1005,7 +1096,6 @@ chatSend.onclick = async () => {
             chatInput.value = "⚠️ " + (data.message || "Failed");
             chatInput.focus();
         }
-
     } catch (err) {
         console.error("Send/Edit error:", err);
         chatInput.value = "⚠️ Network error";
@@ -1045,7 +1135,7 @@ function deleteMessage(datetime, message_id) {
 
 <script type="module">
   import '/sen_template/emoji/node_modules/emoji-picker-element/index.js';
-
+ 
   const chatBox = document.getElementById('chatBox');
   const chatInput = document.getElementById("chatInput");
   const emojiBtn = document.getElementById("emojiBtn");
