@@ -84,7 +84,6 @@ label {
   font-size: 1em;
   border-radius: 60px !important;
 }
-
 .btn-block {
   position: relative;
   width: 100%;
@@ -96,14 +95,41 @@ label {
   border: none;
   border-radius: 25px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
+  transition: 
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
   margin-top: 20px;
 }
 
+/* 🔥 HOVER EFFECT (BOTH BUTTONS) */
 .btn-block:hover {
   background: #6c757d;
   color: #fff;
   cursor: pointer;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.3);
+}
+
+/* anchor-specific safety */
+a.btn-block {
+  text-decoration: none;
+}
+
+
+.redirect-btn {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  background: #403f3f;
+  color: #fff;
+  margin-top: 10px;
+}
+
+.redirect-btn:hover {
+  background: #6c757d;
+  color: #fff;
 }
 
 </style>
@@ -152,6 +178,15 @@ label {
           <button type="submit" class="btn-block" name="Login" value="login">Login</button>
         </div>
       </div>
+      <div class="row">
+  <div class="col-12">
+  <a href="redirector.php" class="btn-block redirect-btn">
+  Redirector
+</a>
+
+  </div>
+</div>
+
     </form>
 
   </div>

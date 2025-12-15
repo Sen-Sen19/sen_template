@@ -9,9 +9,9 @@ if (!isset($_SESSION['chat_user'])) {
     exit;
 }
 
-// Fetch messages
+// Fetch latest 20 messages
 $sql = "
-    SELECT TOP (1000)
+    SELECT TOP (200)
         m.message_id,
         m.employee_id,
         m.full_name,
@@ -28,7 +28,7 @@ $sql = "
     FROM [sen_template_db].[dbo].[messages] m
     LEFT JOIN [sen_template_db].[dbo].[messages] r
         ON m.reply_to_id = r.message_id
-    ORDER BY m.datetime ASC
+    ORDER BY m.datetime DESC
 ";
 
 $stmt = sqlsrv_query($conn, $sql);
@@ -62,17 +62,7 @@ while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
     $attachmentBase64 = null;
     if (!empty($row['attachment'])) {
         $fileData = is_resource($row['attachment']) ? stream_get_contents($row['attachment']) : $row['attachment'];
-        
-        // Determine MIME type
-        $mimeType = $row['attachment_type'] ?? null;
-        if (!$mimeType) {
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mimeType = finfo_buffer($finfo, $fileData);
-            finfo_close($finfo);
-            if (!$mimeType) $mimeType = 'application/octet-stream';
-        }
-
-        // Convert to data URL
+        $mimeType = $row['attachment_type'] ?? 'application/octet-stream';
         $attachmentBase64 = 'data:' . $mimeType . ';base64,' . base64_encode($fileData);
     }
 
