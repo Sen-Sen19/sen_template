@@ -1,0 +1,294 @@
+document.addEventListener('DOMContentLoaded', () => {
+        loadAccounts();
+
+        // Edit image upload
+        const editImageBox = document.getElementById('editImageUploadBox');
+        const editImageInput = document.getElementById('edit_profile_image');
+        window.editSelectedFile = null;
+
+        if (editImageBox && editImageInput) {
+            editImageBox.addEventListener('click', () => editImageInput.click());
+            editImageBox.addEventListener('dragover', e => { e.preventDefault(); editImageBox.classList.add('dragover'); });
+            editImageBox.addEventListener('dragleave', () => editImageBox.classList.remove('dragover'));
+            editImageBox.addEventListener('drop', e => {
+                e.preventDefault();
+                editImageBox.classList.remove('dragover');
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) { editSelectedFile = file; previewEditImage(file); }
+            });
+            editImageInput.addEventListener('change', e => { const file = e.target.files[0]; if (file) { editSelectedFile = file; previewEditImage(file); } });
+        }
+
+        function previewEditImage(file) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const oldImg = editImageBox.querySelector('img'); if (oldImg) oldImg.remove();
+                const placeholder = editImageBox.querySelector('.image-upload-placeholder'); if (placeholder) placeholder.style.display = 'none';
+                const img = document.createElement('img'); img.src = e.target.result; img.alt = "Preview"; editImageBox.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        window.resetEditImagePreview = function () {
+            editSelectedFile = null;
+            const img = editImageBox.querySelector('img'); if (img) img.remove();
+            const placeholder = editImageBox.querySelector('.image-upload-placeholder'); if (placeholder) placeholder.style.display = 'block';
+            editImageInput.value = '';
+        }
+    });
+// ====================== LOAD ACCOUNTS ======================
+function loadAccounts() {
+  const tbody = document.getElementById('admin_body');
+  if (!tbody) return;
+
+  fetch('../../process/admin/fetch_account.php')
+    .then(resp => resp.json())
+    .then(result => {
+      const data = result.accounts;
+      const serverTime = result.server_time;
+
+      // Parse server Manila time
+      const [srvDate, srvTime] = serverTime.split(' ');
+      const [srvYear, srvMonth, srvDay] = srvDate.split('-').map(Number);
+      const [srvHour, srvMin, srvSec] = srvTime.split(':').map(Number);
+      const nowManila = new Date(srvYear, srvMonth - 1, srvDay, srvHour, srvMin, srvSec);
+
+      tbody.innerHTML = '';
+
+      data.forEach(row => {
+        let activeHTML = '—';
+        if (row.last_actived) {
+          const [datePart, timePart] = row.last_actived.split(' ');
+          const [year, month, day] = datePart.split('-').map(Number);
+          const [hour, minute, second] = timePart.split(':').map(Number);
+          const lastActive = new Date(year, month - 1, day, hour, minute, second);
+
+          const diffMs = nowManila - lastActive;
+          const diffMins = Math.floor(diffMs / 60000);
+
+          if (diffMins <= 2 && diffMins >= 0) {
+            activeHTML = `<span style="display:inline-block;width:10px;height:10px;background-color:#28a745;border-radius:50%;" title="Active now"></span>`;
+          } else if (diffMins < 0) {
+            activeHTML = `<span title="Future time">—</span>`;
+          } else {
+            const diffHrs = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHrs / 24);
+            if (diffDays > 0) activeHTML = `${diffDays}d ago`;
+            else if (diffHrs > 0) activeHTML = `${diffHrs}h ago`;
+            else activeHTML = `${diffMins}m ago`;
+          }
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.employee_id || ''}</td>
+          <td>${row.full_name || ''}</td>
+          <td>${row.username || ''}</td>
+          <td>${row.password || ''}</td>
+          <td>${row.department || ''}</td>
+          <td>${row.role || ''}</td>
+          <td>${row.ip_address || ''}</td>
+          <td>${activeHTML}</td>
+        `;
+
+        tr.style.cursor = 'pointer';
+        tr.addEventListener('click', () => {
+          document.getElementById('edit_employee_id').value = row.employee_id;
+          document.getElementById('edit_full_name').value = row.full_name;
+          document.getElementById('edit_username').value = row.username;
+          document.getElementById('edit_password').value = row.password;
+          document.getElementById('edit_department').value = row.department;
+          document.getElementById('edit_role').value = row.role;
+
+          // Preload existing image if available
+          const editImageBox = document.getElementById('editImageUploadBox');
+          const placeholder = editImageBox.querySelector('.image-upload-placeholder');
+          editSelectedFile = null;
+          editImageBox.querySelectorAll('img').forEach(img => img.remove());
+          if (row.img) {
+            const img = document.createElement('img');
+            img.src = row.img; 
+            img.alt = "Preview"; 
+            editImageBox.appendChild(img);
+            if (placeholder) placeholder.style.display = 'none';
+          } else if (placeholder) {
+            placeholder.style.display = 'block';
+          }
+
+          $('#editRecordModal').modal('show');
+        });
+
+        tbody.appendChild(tr);
+      });
+    })
+    .catch(e => console.error('❌ Error loading accounts:', e));
+}
+
+
+
+    // ====================== SAVE EDIT ======================
+    function saveEdit() {
+        let formData = new FormData();
+        formData.append('employee_id', document.getElementById('edit_employee_id').value);
+        formData.append('full_name', document.getElementById('edit_full_name').value);
+        formData.append('username', document.getElementById('edit_username').value);
+        formData.append('password', document.getElementById('edit_password').value);
+        formData.append('department', document.getElementById('edit_department').value);
+
+        formData.append('role', document.getElementById('edit_role').value);
+        if (editSelectedFile) formData.set('profile_image', editSelectedFile);
+
+        fetch('../../process/admin/update_account.php', { method: 'POST', body: formData })
+            .then(res => res.text())
+            .then(result => {
+                if (result.trim() == 'success') {
+                    Swal.fire({ icon: 'success', title: 'Account Updated', showConfirmButton: false, timer: 1500 })
+                        .then(() => { $('#editRecordModal').modal('hide'); loadAccounts(); resetEditImagePreview(); });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Update Failed', text: result, showConfirmButton: false, timer: 2000 });
+                }
+            }).catch(err => { Swal.fire({ icon: 'error', title: 'AJAX Error', text: err, showConfirmButton: false, timer: 2000 }); });
+    }
+
+    // ====================== DELETE ======================
+    function confirmDelete() {
+        const username = document.getElementById('edit_username').value;
+        if (!username) return;
+        Swal.fire({ title: 'Are you sure?', text: `Delete account "${username}"?`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Yes, delete it!' })
+            .then(r => { if (r.isConfirmed) deleteAccount(username); });
+    }
+    function deleteAccount(username) {
+        let fd = new FormData(); fd.append('username', username);
+        fetch('../../process/admin/delete_account.php', { method: 'POST', body: fd })
+            .then(res => res.text())
+            .then(result => {
+                if (result.trim() == 'success') {
+                    Swal.fire({ icon: 'success', title: 'Deleted!', text: `Account "${username}" deleted.`, showConfirmButton: false, timer: 1500 })
+                        .then(() => { $('#editRecordModal').modal('hide'); loadAccounts(); });
+                } else { Swal.fire({ icon: 'error', title: 'Delete Failed', text: result, showConfirmButton: true }); }
+            }).catch(err => { Swal.fire({ icon: 'error', title: 'AJAX Error', text: err, showConfirmButton: true }); });
+    }
+
+
+    // ====================== ADD ======================
+    document.addEventListener('DOMContentLoaded', () => {
+    const imageUploadBox = document.getElementById('imageUploadBox');
+    const imageInput = document.getElementById('profile_image');
+    let selectedFile = null;
+
+    if (!imageUploadBox || !imageInput) {
+        console.error("Image upload elements not found!");
+        return;
+    }
+
+
+    imageUploadBox.addEventListener('click', () => imageInput.click());
+
+
+    imageUploadBox.addEventListener('dragover', e => {
+        e.preventDefault();
+        imageUploadBox.classList.add('dragover');
+    });
+    imageUploadBox.addEventListener('dragleave', () => {
+        imageUploadBox.classList.remove('dragover');
+    });
+    imageUploadBox.addEventListener('drop', e => {
+        e.preventDefault();
+        imageUploadBox.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            selectedFile = file;
+            previewImage(file);
+        }
+    });
+
+    imageInput.addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (file) {
+            selectedFile = file;
+            previewImage(file);
+        }
+    });
+
+    function previewImage(file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          
+            const oldImg = imageUploadBox.querySelector('img');
+            if (oldImg) oldImg.remove();
+
+     
+            const placeholder = imageUploadBox.querySelector('.image-upload-placeholder');
+            if (placeholder) placeholder.style.display = 'none';
+
+        
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.alt = "Preview";
+            imageUploadBox.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+    }
+
+
+    window.resetImagePreview = function() {
+        selectedFile = null;
+
+        const img = imageUploadBox.querySelector('img');
+        if (img) img.remove();
+
+        const placeholder = imageUploadBox.querySelector('.image-upload-placeholder');
+        if (placeholder) placeholder.style.display = 'block';
+
+        imageInput.value = '';
+    };
+
+   
+    window.saveData = function() {
+        const form = document.getElementById('myForm');
+        const formData = new FormData(form);
+
+        if (selectedFile) {
+            formData.set('profile_image', selectedFile);
+        }
+
+        fetch('../../process/admin/save_account.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.text())
+        .then(result => {
+            if (result.trim() === "success") {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Account Added',
+                    text: 'The account has been saved successfully!',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    $('#addRecordModal').modal('hide');
+                    loadAccounts(); 
+                });
+                form.reset();
+                resetImagePreview();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result,
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'AJAX Error',
+                text: error,
+                showConfirmButton: false,
+                timer: 2000
+            });
+        });
+    };
+});

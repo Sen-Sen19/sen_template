@@ -59,3 +59,5 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelector(".chat-input").style.filter = "none";
     };
 });
+
+

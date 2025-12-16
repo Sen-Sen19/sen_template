@@ -1,0 +1,112 @@
+<?php include 'plugins/navbar.php'; ?>
+<?php include 'plugins/sidebar/admin_bar.php'; ?>
+
+
+<style>
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .content-wrapper {
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    .custom-add-btn {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+    }
+
+    .custom-table-wrapper {
+        height: 60vh;
+        overflow-y: auto;
+        display: inline-block;
+        margin-top: 20px;
+        border-top: 1px solid gray;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .p-20 {
+        padding: 20px;
+    }
+</style>
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6"></div>
+                <div class="col-sm-6">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card card-gray-dark card-outline">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                            </h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <button class="btn btn-block btn-primary custom-add-btn" id="openModalBtn"
+                                        data-toggle="modal" data-target="#addRecordModal">
+                                        <i class="fas fa-plus mr-2"></i>Add Account
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="accounts_table_res" class="table-responsive custom-table-wrapper">
+                                <table id="account" class="table table-sm table-head-fixed text-nowrap table-hover">
+                                    <thead class="text-center">
+                                        <tr>
+                                            <th>ID Number</th>
+                                            <th>Full Name</th>
+                                            <th>Username</th>
+                                            <th>Password</th>
+                                            <th>Department</th>
+                                            <th>IP Address</th>
+                   
+                                            <th>Type</th>
+                                                                      <th>Active</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin_body" class="text-center p-20">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<script src="plugins/js/admin_script.js"></script>
+
+
+<?php include 'plugins/admin_footer.php'; ?>

@@ -26,7 +26,7 @@
 <?php
 //MODALS
 include '../../modals/logout_modal.php';
-
+include '../../modals/code/account_modal.php';
 ?>
 <!-- jQuery -->
 <script src="../../plugins/jquery/dist/jquery.min.js"></script>

@@ -342,6 +342,52 @@ emoji-picker {
   0% { opacity: 0; transform: translateX(20px); }
   100% { opacity: 1; transform: translateX(0); }
 }
+.mention-box {
+    position: absolute;
+    bottom: 60px;
+    left: 10px;
+    width: 260px;
+    max-height: 220px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    z-index: 9999;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.mention-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.mention-item:hover,
+.mention-item.active {
+    background: #e6f2ff;
+}
+
+.mention-item img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.chat-message b.mention {
+    color: #007bff;
+    font-weight: 600;
+}
+.chat-message strong,
+.chat-message b {
+    font-weight: 700 !important;
+    color: #007bff;
+}
+strong.mention {
+    font-weight: 700 !important;
+}
 
 </style>
 
@@ -349,7 +395,7 @@ emoji-picker {
 <div class="chat-toggle" id="chatToggle"><i class="fa-solid fa-comments"></i></div>
 <div class="chat-box" id="chatBox">
 <div class="chat-header">
-    <span class="header-title">Sen Template</span>
+    <span class="header-title">Message</span>
 
     <div style="
         position:absolute; 
@@ -497,6 +543,7 @@ emoji-picker {
       <i class="fa-solid fa-paperclip"></i>
     </button>
     <input type="file" id="fileInput" multiple style="display:none;" />
+<div id="mentionBox" class="mention-box" style="display:none;"></div>
 
     <textarea id="chatInput" placeholder="Type a message..." rows="1" style="resize:none;"></textarea>
     <div style="position: relative; display: inline-block;">
@@ -522,7 +569,20 @@ emoji-picker {
 <script src="/sen_template/js/dateTime.js"></script>
 <script src="/sen_template/js/heartbeat.js"></script>
 <script src="/sen_template/js/message.js"></script>
+<script>
+  let usersList = [];
+let mentionIndex = -1;
 
+async function loadUsers() {
+    const res = await fetch("/sen_template/process/account_view.php", {
+        credentials: "same-origin"
+    });
+    usersList = await res.json();
+}
+
+loadUsers();
+
+</script>
 <script>
 document.getElementById("closeChatHeader").onclick = function () {
     document.getElementById("chatBox").style.display = "none";
@@ -562,7 +622,12 @@ async function loadMessages() {
 
             // --- Message text ---
             const textDiv = document.createElement("div");
-            textDiv.textContent = msg.message;
+       textDiv.innerHTML = msg.message.replace(
+    /@([a-zA-Z]+(?:\s[a-zA-Z]+)*)/g,
+    '<strong class="mention">@$1</strong>'
+);
+
+
             msgBubble.appendChild(textDiv);
 
             if (msg.datetime) {
@@ -734,7 +799,6 @@ if (msg.attachment) {
         msgWrapper.appendChild(replyDiv);
     }
 
-    // --- Reactions & Actions ---
 const reactionsDiv = document.createElement("div");
 reactionsDiv.className = "reactions";
 Object.assign(reactionsDiv.style, {
@@ -785,9 +849,11 @@ reactionsDiv.addEventListener("mouseenter", () => {
 
   const spaceBelow = window.innerHeight - rect.bottom;
   const spaceAbove = rect.top;
-  tooltip.style.top = (spaceAbove > tooltip.offsetHeight + 8) 
-      ? rect.top - tooltip.offsetHeight - 4 
-      : rect.bottom + 4 + "px";
+tooltip.style.top =
+  (spaceAbove > tooltip.offsetHeight + 8)
+    ? (rect.top - tooltip.offsetHeight - 4) + "px"
+    : (rect.bottom + 4) + "px";
+
 });
 
 reactionsDiv.addEventListener("mouseleave", () => {
@@ -926,6 +992,55 @@ msgBubble.addEventListener("click", e => {
   // Auto refresh every 30s
   setInterval(loadMessages, 30000);
   window.addEventListener("DOMContentLoaded", loadMessages);
+const mentionBox = document.getElementById("mentionBox");
+
+chatInput.addEventListener("input", e => {
+    const cursorPos = chatInput.selectionStart;
+    const text = chatInput.value.slice(0, cursorPos);
+    const match = text.match(/@([\w\s]*)$/);
+
+    if (!match) {
+        mentionBox.style.display = "none";
+        return;
+    }
+
+    const search = match[1].toLowerCase();
+    const matches = usersList.filter(u =>
+        u.full_name.toLowerCase().includes(search)
+    ).slice(0, 6);
+
+    if (matches.length === 0) {
+        mentionBox.style.display = "none";
+        return;
+    }
+
+    mentionBox.innerHTML = "";
+    mentionIndex = -1;
+
+    matches.forEach((u, i) => {
+        const div = document.createElement("div");
+        div.className = "mention-item";
+        div.innerHTML = `
+            <img src="${u.img || ''}">
+            <span>${u.full_name}</span>
+        `;
+
+        div.onclick = () => insertMention(u.full_name);
+        mentionBox.appendChild(div);
+    });
+
+    mentionBox.style.display = "block";
+});
+function insertMention(name) {
+    const cursorPos = chatInput.selectionStart;
+    const text = chatInput.value;
+    const before = text.slice(0, cursorPos).replace(/@[\w\s]*$/, "");
+    const after = text.slice(cursorPos);
+
+    chatInput.value = before + `@${name} ` + after;
+    chatInput.focus();
+    mentionBox.style.display = "none";
+}
 
 </script>
 

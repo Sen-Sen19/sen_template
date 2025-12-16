@@ -5,7 +5,6 @@ include 'plugins/sidebar/admin_bar.php';
 <?php include '../../chat.php'; ?>
 
 <style>
-
   .modal-header.bg-dark {
     background-color: #000;
     border-top-left-radius: 4px;
@@ -32,12 +31,12 @@ include 'plugins/sidebar/admin_bar.php';
   .modal-header .close {
     opacity: 1;
   }
-  #imageDropArea.dragover {
-  border-color: #00650c;
-  background-color: rgba(0, 128, 0, 0.05);
-  transition: 0.2s;
-}
 
+  #imageDropArea.dragover {
+    border-color: #00650c;
+    background-color: rgba(0, 128, 0, 0.05);
+    transition: 0.2s;
+  }
 </style>
 
 <div class="content-wrapper">
@@ -49,7 +48,7 @@ include 'plugins/sidebar/admin_bar.php';
         <div class="col-sm-12">
           <div class="card card-gray-dark card-outline">
             <div class="card-header">
-                         <?php include '../../dist/include/active_status.php'; ?>
+              <?php include '../../dist/include/active_status.php'; ?>
 
               <h3 class="card-title">
                 <i class="nav-icon fas fa-user"></i> ADMIN
@@ -77,10 +76,21 @@ include 'plugins/sidebar/admin_bar.php';
                 </div>
                 <div class="col-md-2 d-flex justify-content-center">
                   <button class="btn btn-danger custom-btn" id="deleteBtn"
-                    style="height: 35px; width: 100%; background-color:#3d3b3e; border-color:black;">
+                    style="height: 35px; width: 100%; background-color:#ea0009; border-color:red;">
                     <i class="fas fa-trash mr-2"></i>Delete
                   </button>
                 </div>
+
+
+
+                <div class="col-md-2 d-flex justify-content-center">
+                  <button class="btn btn-danger custom-btn" data-toggle="modal" data-target="#codeModal"
+                    style="height: 35px; width: 100%; background-color:#3d3b3e; border-color:black;">
+                    <i class="fas fa-code mr-2"></i>Code
+                  </button>
+
+                </div>
+
               </div>
             </div>
 
@@ -95,7 +105,7 @@ include 'plugins/sidebar/admin_bar.php';
                     <th>Department</th>
                     <th>Password</th>
                     <th>Type</th>
-                     <th>Active</th>
+                    <th>Active</th>
                     <th>Select</th>
                   </tr>
                 </thead>
@@ -177,138 +187,146 @@ include 'plugins/sidebar/admin_bar.php';
   </div>
 </div>
 
+
+
+
+
+
+
+
+
 <script>
-const dropArea = document.getElementById('imageDropArea');
-const profileImage = document.getElementById('profileImage');
-const imagePreview = document.getElementById('imagePreview');
+  const dropArea = document.getElementById('imageDropArea');
+  const profileImage = document.getElementById('profileImage');
+  const imagePreview = document.getElementById('imagePreview');
 
-// ========== IMAGE UPLOAD & DRAG AREA ==========
-dropArea.addEventListener('click', () => profileImage.click());
-dropArea.addEventListener('dragover', (e) => {
-  e.preventDefault();
-  dropArea.classList.add('dragover');
-});
-dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
-dropArea.addEventListener('drop', (e) => {
-  e.preventDefault();
-  dropArea.classList.remove('dragover');
-  const file = e.dataTransfer.files[0];
-  if (file && file.type.startsWith('image/')) {
-    profileImage.files = e.dataTransfer.files;
-    previewImage();
+  // ========== IMAGE UPLOAD & DRAG AREA ==========
+  dropArea.addEventListener('click', () => profileImage.click());
+  dropArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropArea.classList.add('dragover');
+  });
+  dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
+  dropArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropArea.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      profileImage.files = e.dataTransfer.files;
+      previewImage();
+    }
+  });
+  profileImage.addEventListener('change', previewImage);
+  function previewImage() {
+    const file = profileImage.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => (imagePreview.src = e.target.result);
+    reader.readAsDataURL(file);
   }
-});
-profileImage.addEventListener('change', previewImage);
-function previewImage() {
-  const file = profileImage.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => (imagePreview.src = e.target.result);
-  reader.readAsDataURL(file);
-}
 
-document.addEventListener('DOMContentLoaded', () => {
-  const adminBody = document.getElementById('admin_body');
-  const deleteBtn = document.getElementById('deleteBtn');
-  const addRecordModal = $('#addRecordModal');
+  document.addEventListener('DOMContentLoaded', () => {
+    const adminBody = document.getElementById('admin_body');
+    const deleteBtn = document.getElementById('deleteBtn');
+    const addRecordModal = $('#addRecordModal');
 
-  // Form fields
-  const employeeIdField = document.getElementById('employeeId');
-  const fullNameField   = document.getElementById('fullName');
-  const usernameField   = document.getElementById('username');
-  const departmentField = document.getElementById('department');
-  const passwordField   = document.getElementById('password');
-  const typeField       = document.getElementById('type');
+    // Form fields
+    const employeeIdField = document.getElementById('employeeId');
+    const fullNameField = document.getElementById('fullName');
+    const usernameField = document.getElementById('username');
+    const departmentField = document.getElementById('department');
+    const passwordField = document.getElementById('password');
+    const typeField = document.getElementById('type');
 
-  let isEditing = false; // 🧠 track mode (Add vs Edit)
+    let isEditing = false; // 🧠 track mode (Add vs Edit)
 
-  // ========== OPEN ADD MODAL ==========
-  document.getElementById('openModalBtn').addEventListener('click', () => {
-    isEditing = false;
+    // ========== OPEN ADD MODAL ==========
+    document.getElementById('openModalBtn').addEventListener('click', () => {
+      isEditing = false;
 
-    // 🧼 Reset form fields
-    employeeIdField.value = '';
-    fullNameField.value = '';
-    usernameField.value = '';
-    departmentField.value = '';
-    passwordField.value = '';
-    typeField.value = 'user';
-    employeeIdField.readOnly = false;
-    fullNameField.readOnly = false;
+      // 🧼 Reset form fields
+      employeeIdField.value = '';
+      fullNameField.value = '';
+      usernameField.value = '';
+      departmentField.value = '';
+      passwordField.value = '';
+      typeField.value = 'user';
+      employeeIdField.readOnly = false;
+      fullNameField.readOnly = false;
 
-    // 🧼 Reset image
-    imagePreview.src = "../../dist/img/office-man.png";
-    profileImage.value = '';
+      // 🧼 Reset image
+      imagePreview.src = "../../dist/img/office-man.png";
+      profileImage.value = '';
 
-    // ✅ Update modal title
-    document.getElementById('addRecordModalLabel').innerText = "Add Account";
+      // ✅ Update modal title
+      document.getElementById('addRecordModalLabel').innerText = "Add Account";
 
-    $('#addRecordModal').modal('show');
-  });
+      $('#addRecordModal').modal('show');
+    });
 
-  // ========== SUBMIT ADD/UPDATE ==========
-  document.getElementById('addAccountForm').addEventListener('submit', (event) => {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const url = isEditing
-      ? '../../process/account_update.php'
-      : '../../process/account_add.php';
+    // ========== SUBMIT ADD/UPDATE ==========
+    document.getElementById('addAccountForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      const url = isEditing
+        ? '../../process/account_update.php'
+        : '../../process/account_add.php';
 
-    fetch(url, { method: 'POST', body: formData })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: 'Account saved successfully!',
-            timer: 1000,
-            showConfirmButton: false,
-          }).then(() => {
-            $('#addRecordModal').modal('hide');
-            loadAccounts();
-          });
-        } else {
-        Swal.fire({
-  icon: 'error',
-  title: 'Error',
-  text: data.message || 'An unknown error occurred.',
-});
+      fetch(url, { method: 'POST', body: formData })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Success',
+              text: 'Account saved successfully!',
+              timer: 1000,
+              showConfirmButton: false,
+            }).then(() => {
+              $('#addRecordModal').modal('hide');
+              loadAccounts();
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: data.message || 'An unknown error occurred.',
+            });
 
-        }
-      })
-      .catch(error => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'An error occurred: ' + error,
-        });
-      });
-  });
-
-  // ========== LOAD ACCOUNTS ==========
-  function loadAccounts() {
-    Promise.all([
-      fetch('../../process/account_view.php').then(r => r.json()),
-      fetch('../../process/active_view.php').then(r => r.json())
-    ])
-    .then(([accounts, activeUsers]) => {
-      adminBody.innerHTML = "";
-      accounts.forEach(row => {
-        const tr = document.createElement('tr');
-        const maskedPassword = '•'.repeat(row.password.length);
-        let isActive = false;
-
-        activeUsers.forEach(active => {
-          const activeFlag = active.is_active === true || active.is_active === "true" || active.is_active == 1;
-          if (active.username.trim().toLowerCase() === row.username.trim().toLowerCase() && activeFlag) {
-            isActive = true;
           }
+        })
+        .catch(error => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred: ' + error,
+          });
         });
+    });
 
-        const circleColor = isActive ? "green" : "gray";
+    // ========== LOAD ACCOUNTS ==========
+    function loadAccounts() {
+      Promise.all([
+        fetch('../../process/account_view.php').then(r => r.json()),
+        fetch('../../process/active_view.php').then(r => r.json())
+      ])
+        .then(([accounts, activeUsers]) => {
+          adminBody.innerHTML = "";
+          accounts.forEach(row => {
+            const tr = document.createElement('tr');
+            const maskedPassword = '•'.repeat(row.password.length);
+            let isActive = false;
 
-        tr.innerHTML = `
+            activeUsers.forEach(active => {
+              const activeFlag = active.is_active === true || active.is_active === "true" || active.is_active == 1;
+              if (active.username.trim().toLowerCase() === row.username.trim().toLowerCase() && activeFlag) {
+                isActive = true;
+              }
+            });
+
+            const circleColor = isActive ? "green" : "gray";
+
+            tr.innerHTML = `
           <td>${row.employee_id}</td>
           <td>${row.full_name}</td>
           <td>${row.username}</td>
@@ -322,105 +340,105 @@ document.addEventListener('DOMContentLoaded', () => {
           <td><input type="checkbox" class="select-checkbox" data-employee-id="${row.employee_id}"></td>
         `;
 
-        // prevent checkbox click from triggering edit
-        tr.querySelector('.select-checkbox').addEventListener('click', e => e.stopPropagation());
+            // prevent checkbox click from triggering edit
+            tr.querySelector('.select-checkbox').addEventListener('click', e => e.stopPropagation());
 
-        // 🧠 Row click to edit
-        tr.addEventListener('click', () => {
-          isEditing = true;
+            // 🧠 Row click to edit
+            tr.addEventListener('click', () => {
+              isEditing = true;
 
-          // 🧼 Reset previous file
-          profileImage.value = "";
+              // 🧼 Reset previous file
+              profileImage.value = "";
 
-          // 🖼 Set image preview
-          imagePreview.src = (row.img && row.img.startsWith('data:image'))
-            ? row.img
-            : "../../dist/img/office-man.png";
+              // 🖼 Set image preview
+              imagePreview.src = (row.img && row.img.startsWith('data:image'))
+                ? row.img
+                : "../../dist/img/office-man.png";
 
-          // ✅ Populate fields BEFORE modal show
-          employeeIdField.value = row.employee_id || '';
-          fullNameField.value   = row.full_name || '';
-          usernameField.value   = row.username || '';
-          departmentField.value = row.department || '';
-          passwordField.value   = row.password || '';
-          typeField.value       = row.role || 'user';
+              // ✅ Populate fields BEFORE modal show
+              employeeIdField.value = row.employee_id || '';
+              fullNameField.value = row.full_name || '';
+              usernameField.value = row.username || '';
+              departmentField.value = row.department || '';
+              passwordField.value = row.password || '';
+              typeField.value = row.role || 'user';
 
-          employeeIdField.readOnly = true;
-          fullNameField.readOnly   = true;
+              employeeIdField.readOnly = true;
+              fullNameField.readOnly = true;
 
-          // ✅ Update modal title
-          document.getElementById('addRecordModalLabel').innerText = "Edit Account";
+              // ✅ Update modal title
+              document.getElementById('addRecordModalLabel').innerText = "Edit Account";
 
-          $('#addRecordModal').modal('show');
-        });
+              $('#addRecordModal').modal('show');
+            });
 
-        adminBody.appendChild(tr);
-      });
-    })
-    .catch(err => console.error("⚠️ Fetch error:", err));
-  }
-
-
-  // ================== DELETE SELECTED ==================
-  deleteBtn.addEventListener('click', () => {
-    const selectedCheckboxes = document.querySelectorAll('.select-checkbox:checked');
-    const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.dataset.employeeId);
-
-    if (selectedIds.length === 0) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'No Account Selected',
-        text: 'Please select at least one account to delete.',
-      });
-      return;
+            adminBody.appendChild(tr);
+          });
+        })
+        .catch(err => console.error("⚠️ Fetch error:", err));
     }
 
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'You are about to delete the selected accounts. This action cannot be undone.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'No, keep them',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        fetch('../../process/account_delete.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ids: selectedIds }),
-        })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              Swal.fire({
-                icon: 'success',
-                title: 'Deleted',
-                text: 'Selected accounts have been deleted.',
-                timer: 1000,
-                showConfirmButton: false,
-              }).then(() => loadAccounts());
-            } else {
+
+    // ================== DELETE SELECTED ==================
+    deleteBtn.addEventListener('click', () => {
+      const selectedCheckboxes = document.querySelectorAll('.select-checkbox:checked');
+      const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.dataset.employeeId);
+
+      if (selectedIds.length === 0) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'No Account Selected',
+          text: 'Please select at least one account to delete.',
+        });
+        return;
+      }
+
+      Swal.fire({
+        title: 'Are you sure?',
+        text: 'You are about to delete the selected accounts. This action cannot be undone.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, keep them',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          fetch('../../process/account_delete.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ids: selectedIds }),
+          })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Deleted',
+                  text: 'Selected accounts have been deleted.',
+                  timer: 1000,
+                  showConfirmButton: false,
+                }).then(() => loadAccounts());
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'An error occurred while deleting accounts.',
+                });
+              }
+            })
+            .catch(error => {
               Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'An error occurred while deleting accounts.',
+                text: 'An error occurred: ' + error,
               });
-            }
-          })
-          .catch(error => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'An error occurred: ' + error,
             });
-          });
-      }
+        }
+      });
     });
-  });
 
-  loadAccounts();
-  setInterval(loadAccounts, 60000);
-});
+    loadAccounts();
+    setInterval(loadAccounts, 60000);
+  });
 </script>
 
 

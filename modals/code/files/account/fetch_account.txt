@@ -1,0 +1,38 @@
+<?php
+include '../conn/conn2.php';
+date_default_timezone_set('Asia/Manila');
+
+$sql = "SELECT employee_id, full_name, username, password, department, ip_address, role, img, last_actived
+        FROM account ORDER BY full_name ASC";
+$stmt = sqlsrv_query($conn, $sql);
+if ($stmt === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+$data = [];
+while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+    if (!empty($row['img'])) {
+        $row['img'] = 'data:image/jpeg;base64,' . base64_encode($row['img']);
+    } else {
+        $row['img'] = null;
+    }
+
+    if (!empty($row['last_actived'])) {
+        $dt = new DateTime($row['last_actived']->format('Y-m-d H:i:s'), new DateTimeZone('Asia/Manila'));
+        $row['last_actived'] = $dt->format('Y-m-d H:i:s');
+    } else {
+        $row['last_actived'] = null;
+    }
+
+    $data[] = $row;
+}
+
+
+$response = [
+    'server_time' => date('Y-m-d H:i:s'),
+    'accounts' => $data
+];
+
+echo json_encode($response);
+
+?>

@@ -1,0 +1,21 @@
+<?php
+include '../conn/conn2.php';
+
+$username = $_POST['username'] ?? '';
+
+if ($username === '') {
+    echo "error: Username is required";
+    exit;
+}
+
+$sql = "DELETE FROM account WHERE username = ?";
+$params = [$username];
+
+$stmt = sqlsrv_query($conn, $sql, $params);
+
+if ($stmt) {
+    echo "success";
+} else {
+    echo "error: " . print_r(sqlsrv_errors(), true);
+}
+?>

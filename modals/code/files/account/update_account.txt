@@ -1,0 +1,44 @@
+<?php
+include '../conn/conn2.php';
+
+$employee_id = $_POST['employee_id'] ?? '';
+$full_name   = $_POST['full_name'] ?? '';
+$username    = $_POST['username'] ?? '';
+$password    = $_POST['password'] ?? '';
+$department  = $_POST['department'] ?? '';
+$role        = $_POST['role'] ?? '';
+
+
+$imgData = null;
+if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
+    $imgData = file_get_contents($_FILES['profile_image']['tmp_name']);
+}
+
+
+if (!empty($username)) {
+
+    if ($imgData !== null) {
+
+        $sql = "UPDATE account 
+                SET full_name=?, password=?, department=?, role=?, img=CONVERT(VARBINARY(MAX), ?) 
+                WHERE username=?";
+        $params = array($full_name, $password, $department, $role, $imgData, $username);
+    } else {
+        $sql = "UPDATE account 
+                SET full_name=?, password=?, department=?, role=? 
+                WHERE username=?";
+        $params = array($full_name, $password, $department, $role, $username);
+    }
+
+    $stmt = sqlsrv_query($conn, $sql, $params);
+
+    if ($stmt) {
+        echo "success";
+    } else {
+        echo "error: " . print_r(sqlsrv_errors(), true);
+    }
+
+} else {
+    echo "Missing username.";
+}
+?>

@@ -17,7 +17,7 @@
   transform: translateX(-50%);
   display: flex;
   gap: 10px;
-  flex-wrap: wrap; /* Allows wrapping on smaller screens */
+  flex-wrap: wrap; 
   align-items: center;
   z-index: 10;
 }
@@ -38,7 +38,7 @@
   border-radius: 20px;
   border: 2px solid #005e0cff;
   outline: none;
-  background: rgba(255, 255, 255, 0.5)
+  background: rgba(255, 255, 255, 0.5);
   color: #fff;
   font-weight: 600;
 }
@@ -58,12 +58,20 @@
   opacity: 0.85;
 }
 
-/* Action buttons */
-#controls button#addBtn { background: #006effff; color: #fff; }
-#controls button#editBtn { background: #ffc107; color: #fff; }
-#controls button#backBtn { background: #dc3545; color: #fff; }
+/* Category-like action buttons (default gray, colored on hover) */
+#controls button#addBtn,
+#controls button#editBtn,
+#controls button#backBtn {
+  background: #888888; /* default gray */
+  color: #fff;
+}
+
+#controls button#addBtn:hover { background: #006eff; }  /* blue on hover */
+#controls button#editBtn:hover { background: #ffc107; } /* yellow on hover */
+#controls button#backBtn:hover { background: #dc3545; } /* red on hover */
 
 </style>
+
 </head>
 <body>
 <div id="controls">
@@ -78,7 +86,7 @@
   <input type="text" placeholder="Search..." oninput="searchBlocks(this.value)">
     <button id="addBtn">Add</button>
   <button id="editBtn">Edit</button>
-  <button id="backBtn">Back</button>
+  <button id="backBtn">Back</button>        
 
 </div>
 
@@ -140,7 +148,7 @@ const data = [
 const blocks = [];
 const blockSize = 100;
 
-// Create blocks
+
 data.forEach(d=>{
   const body = Bodies.rectangle(Math.random()*app.screen.width, -Math.random()*300, blockSize, blockSize, { 
     restitution:0.5, friction:0.3, frictionAir:0.02,
@@ -151,12 +159,19 @@ data.forEach(d=>{
 
   const gfx = new PIXI.Container();
   const rect = new PIXI.Graphics();
-// Generate a random gray shade (from dark to light)
-let gray = Math.floor(Math.random() * 156) + 100; // 100–255 for visible gray
-let color = (gray << 16) | (gray << 8) | gray;
 
-// Decide border color based on gray shade (contrast with fill)
-let borderColor = gray > 180 ? 0x000000 : 0xffffff;
+let color, borderColor;
+if(d.cat === "live") {
+    color = 0x00921b; // Green
+    borderColor = 0x006600;
+} else if(d.cat === "local") {
+    color = 0xf4ff00; // Yellow
+    borderColor = 0x999900;
+} else if(d.cat === "web") {
+    color = 0x003cc0; // Blue
+    borderColor = 0x003366;
+}
+
 
 rect.lineStyle(3, borderColor); // 3px border
 rect.beginFill(color, 1);
@@ -164,8 +179,16 @@ rect.drawRoundedRect(-blockSize/2, -blockSize/2, blockSize, blockSize, 12);
 rect.endFill();
 
 
-// Decide text color based on gray shade
-let textColor = gray > 180 ? 0x000000 : 0xffffff;
+
+let textColor;
+if(d.cat === "live") {        // green
+    textColor = 0xffffff;     // white text
+} else if(d.cat === "local") { // yellow
+    textColor = 0x000000;     // black text
+} else if(d.cat === "web") {   // blue
+    textColor = 0xffffff;     // white text
+}
+
 
 const text = new PIXI.Text(d.name,{
     fontSize: 16,
@@ -220,13 +243,12 @@ app.ticker.add(()=>{
   });
 });
 
-// Arrange category
-// Arrange category
+
 function activateCategory(cat){
-  // Remove active class from all buttons
+
   document.querySelectorAll('#controls button').forEach(btn => btn.classList.remove('active'));
 
-  // Add active class to the clicked category button
+ 
   document.querySelector(`#controls button[onclick="activateCategory('${cat}')"]`).classList.add('active');
 
   const padding = 40;
