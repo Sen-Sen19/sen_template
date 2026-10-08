@@ -5,8 +5,8 @@
  * | Account Management
  * |--------------------------------------------------------------------------
  * | Account table with search by ID / role, add, edit, and delete.
- * | Uses mock data for now — replace fetchAccounts() and the save/delete
- * | handlers with real API calls later.
+ * | Accounts come from sen_template_db.dbo.accounts and are joined with
+ * | emp_mgt_db.dbo.m_employees (emp_no = id_no) by ../../api/admin/accounts.php.
  * |--------------------------------------------------------------------------
  */
 
@@ -38,9 +38,7 @@ include('../../reusable/topbar.php');
         <select id="searchRole" class="form-select nexus-form-control">
             <option value="">All roles</option>
             <option value="Admin">Admin</option>
-            <option value="Supervisor">Supervisor</option>
-            <option value="Employee">Employee</option>
-            <option value="Guest">Guest</option>
+            <option value="User">User</option>
         </select>
 
         <button type="button" id="btnAdd" class="btn nexus-btn-primary">
@@ -60,10 +58,12 @@ include('../../reusable/topbar.php');
                     <tr>
                         <th>ID No.</th>
                         <th>Full Name</th>
+                        <th>Department</th>
+                        <th>Section</th>
+                        <th>Position</th>
                         <th>Password</th>
                         <th>Role</th>
                         <th>Last Active</th>
-                        <th>IP Address</th>
                     </tr>
                 </thead>
                 <tbody id="acctBody"></tbody>
@@ -95,7 +95,7 @@ include('../../reusable/topbar.php');
                     </h5>
 
                     <p class="nexus-modal-subtitle" id="acctModalSubtitle">
-                        Create a new system account.
+                        Enter the ID No. to load the employee.
                     </p>
                 </div>
 
@@ -110,24 +110,50 @@ include('../../reusable/topbar.php');
 
             <div class="modal-body">
 
-                <div class="mb-3">
-                    <label for="fId" class="form-label">ID No.</label>
-                    <input
-                        type="text"
-                        class="form-control nexus-form-control"
-                        id="fId"
-                        maxlength="20"
-                        placeholder="Enter ID no.">
-                </div>
+                <!-- Photo on the left, ID / name / details beside it -->
+                <div class="acct-profile">
 
-                <div class="mb-3">
-                    <label for="fName" class="form-label">Full Name</label>
-                    <input
-                        type="text"
-                        class="form-control nexus-form-control"
-                        id="fName"
-                        maxlength="100"
-                        placeholder="Enter full name">
+                    <div class="acct-photo-frame">
+                        <img id="photoImg" alt="Employee photo" hidden>
+                        <i class="bi bi-person" id="photoPlaceholder"></i>
+                    </div>
+
+                    <div class="acct-profile-info">
+
+                        <label for="fId" class="form-label">ID No.</label>
+                        <input
+                            type="text"
+                            class="form-control nexus-form-control"
+                            id="fId"
+                            maxlength="30"
+                            autocomplete="off"
+                            placeholder="Enter ID no. (example: 24-11114)">
+
+                        <div class="acct-profile-name" id="pName">—</div>
+                        <div class="acct-profile-sub" id="pSub"></div>
+
+                        <!-- Employee details (add only) -->
+                        <div class="acct-details" id="acctDetails" hidden>
+                            <div>
+                                <span class="acct-detail-label">Department</span>
+                                <span class="acct-detail-value" id="dDept">—</span>
+                            </div>
+                            <div>
+                                <span class="acct-detail-label">Section</span>
+                                <span class="acct-detail-value" id="dSection">—</span>
+                            </div>
+                            <div>
+                                <span class="acct-detail-label">Position</span>
+                                <span class="acct-detail-value" id="dPosition">—</span>
+                            </div>
+                            <div>
+                                <span class="acct-detail-label">Provider</span>
+                                <span class="acct-detail-value" id="dProvider">—</span>
+                            </div>
+                        </div>
+
+                    </div>
+
                 </div>
 
                 <div class="mb-3">
@@ -145,9 +171,7 @@ include('../../reusable/topbar.php');
                     <label for="fRole" class="form-label">Role</label>
                     <select class="form-select nexus-form-control" id="fRole">
                         <option value="Admin">Admin</option>
-                        <option value="Supervisor">Supervisor</option>
-                        <option value="Employee">Employee</option>
-                        <option value="Guest">Guest</option>
+                        <option value="User">User</option>
                     </select>
                 </div>
 
@@ -188,12 +212,133 @@ include('../../reusable/topbar.php');
 
 </div>
 
+<style>
+/* ==================== PROFILE ==================== */
+
+.acct-profile {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.acct-photo-frame {
+  width: 96px;
+  height: 96px;
+  flex: 0 0 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+  border-radius: 14px;
+  background: #f5f5f7;
+}
+
+.acct-photo-frame img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.acct-photo-frame i {
+  color: #9a9a9f;
+  font-size: 40px;
+}
+
+/* keep the hidden attribute working on elements that set display */
+.acct-photo-frame [hidden],
+.acct-details[hidden] {
+  display: none !important;
+}
+
+.acct-profile-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.acct-profile-name {
+  margin-top: 12px;
+  color: #1d1d1f;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.acct-profile-sub {
+  margin-top: 2px;
+  color: #6e6e73;
+  font-size: 12px;
+}
+
+.acct-profile-sub:empty {
+  display: none;
+}
+
+.acct-profile-sub.is-error {
+  color: #e24b4a;
+}
+
+/* ==================== DETAILS ==================== */
+
+.acct-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 14px;
+  margin-top: 12px;
+}
+
+.acct-detail-label {
+  display: block;
+  color: #9a9a9f;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.acct-detail-value {
+  display: block;
+  margin-top: 2px;
+  color: #1d1d1f;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 575.98px) {
+  .acct-profile {
+    gap: 14px;
+  }
+
+  .acct-photo-frame {
+    width: 72px;
+    height: 72px;
+    flex-basis: 72px;
+  }
+
+  .acct-photo-frame i {
+    font-size: 30px;
+  }
+
+  .acct-details {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
 <script>
     /* ==================== CONFIG ==================== */
 
+    const API_URL = '../../api/admin/accounts.php';
+    const IMG_URL = '../../api/admin/employee_image.php';
     const BATCH_SIZE = 15;
-    const ROLES = ['Admin', 'Supervisor', 'Employee', 'Guest'];
-    const ROLE_COLOR = { Admin: 'blue', Supervisor: 'yellow', Employee: 'green', Guest: 'gray' };
+    const ROLE_COLOR = { Admin: 'blue', User: 'green' };
+    const ADD_HINT = 'Enter the ID No. above and press Enter.';
 
     const els = {
         scroll: document.getElementById('acctScroll'),
@@ -206,58 +351,71 @@ include('../../reusable/topbar.php');
         title: document.getElementById('acctModalTitle'),
         subtitle: document.getElementById('acctModalSubtitle'),
         fId: document.getElementById('fId'),
-        fName: document.getElementById('fName'),
         fPassword: document.getElementById('fPassword'),
         fPasswordHint: document.getElementById('fPasswordHint'),
         fRole: document.getElementById('fRole'),
         fError: document.getElementById('fError'),
         btnSave: document.getElementById('btnSave'),
-        btnDelete: document.getElementById('btnDelete')
+        btnDelete: document.getElementById('btnDelete'),
+        photoImg: document.getElementById('photoImg'),
+        photoPlaceholder: document.getElementById('photoPlaceholder'),
+        pName: document.getElementById('pName'),
+        pSub: document.getElementById('pSub'),
+        details: document.getElementById('acctDetails'),
+        dDept: document.getElementById('dDept'),
+        dSection: document.getElementById('dSection'),
+        dPosition: document.getElementById('dPosition'),
+        dProvider: document.getElementById('dProvider')
     };
 
     let modal = null;
-    let accounts = [];
-    let filtered = [];
+    let rows = [];        // rows loaded so far (used by the edit modal)
+    let total = null;     // total matching rows on the server (null = not loaded yet)
     let rendered = 0;
     let isLoading = false;
+    let loadToken = 0;    // ignores late responses after the filters change
     let editingId = null; // null = adding
 
-    /* ==================== MOCK DATA ==================== */
-
-    // Imaginary data — remove when the real endpoint is ready
-    function buildMockAccounts() {
-        const first = ['Juan', 'Maria', 'Jose', 'Ana', 'Mark', 'Grace', 'Paolo', 'Liza', 'Carlo', 'Joy', 'Ramon', 'Bea', 'Noel', 'Cathy', 'Dante'];
-        const last = ['Santos', 'Reyes', 'Cruz', 'Bautista', 'Garcia', 'Mendoza', 'Torres', 'Flores', 'Ramos', 'Aquino', 'Villanueva', 'Castillo'];
-        const list = [];
-        let seed = 7;
-        const rnd = (n) => {
-            seed = (seed * 9301 + 49297) % 233280;
-            return Math.floor((seed / 233280) * n);
-        };
-
-        for (let i = 0; i < 120; i++) {
-            const role = i < 3 ? 'Admin' : ROLES[rnd(4)];
-            const d = new Date(2026, 9, 2, 8, 0, 0);
-            d.setMinutes(d.getMinutes() - rnd(60 * 24 * 30));
-            list.push({
-                id_no: String(10001 + i),
-                full_name: first[rnd(first.length)] + ' ' + last[rnd(last.length)],
-                password: '********',
-                role: role,
-                last_active: d,
-                ip_address: '192.168.' + (1 + rnd(5)) + '.' + (10 + rnd(200))
-            });
-        }
-        return list.sort((a, b) => b.last_active - a.last_active);
-    }
+    let photoToken = 0;       // ignores late photo responses
+    let lookupToken = 0;      // ignores late employee lookups
+    let lookupId = null;      // last ID that finished a lookup
+    let lookupPending = null; // ID currently being looked up
+    let lookupOk = false;     // employee found for lookupId
+    let lookupHasAccount = false;
 
     /* ==================== FETCH / API ==================== */
 
-    // Swap this body for a fetch() to your PHP endpoint later
-    function fetchAccounts(offset, limit) {
-        return new Promise((resolve) => {
-            setTimeout(() => resolve(filtered.slice(offset, offset + limit)), 180);
+    async function fetchAccounts(offset, limit) {
+        const params = new URLSearchParams({
+            action: 'list',
+            offset: offset,
+            limit: limit,
+            q: els.searchId.value.trim(),
+            role: els.searchRole.value
         });
+        const res = await fetch(API_URL + '?' + params.toString());
+        return res.json();
+    }
+
+    async function fetchEmployee(empNo) {
+        try {
+            const res = await fetch(API_URL + '?' + new URLSearchParams({ action: 'employee', emp_no: empNo }).toString());
+            return await res.json();
+        } catch (e) {
+            return { status: false, message: 'Could not load employee details.' };
+        }
+    }
+
+    async function postApi(action, data) {
+        const fd = new FormData();
+        fd.append('action', action);
+        Object.entries(data).forEach(([k, v]) => fd.append(k, v));
+        try {
+            const res = await fetch(API_URL, { method: 'POST', body: fd });
+            return await res.json();
+        } catch (e) {
+            return { status: false, message: 'Request failed. Please try again.' };
+        }
     }
 
     /* ==================== RENDER ==================== */
@@ -266,39 +424,61 @@ include('../../reusable/topbar.php');
         return `<tr data-id="${esc(a.id_no)}">
             <td class="cell-strong">${esc(a.id_no)}</td>
             <td>${esc(a.full_name)}</td>
+            <td>${esc(a.dept || '—')}</td>
+            <td>${esc(a.section || '—')}</td>
+            <td>${esc(a.position || '—')}</td>
             <td class="cell-mono">••••••••</td>
             <td><span class="nexus-badge ${ROLE_COLOR[a.role] || 'gray'}">${esc(a.role)}</span></td>
-            <td>${fmtDate(a.last_active)}</td>
-            <td class="cell-mono">${esc(a.ip_address)}</td>
+            <td title="${esc(a.last_active || '')}">${fmtAgo(a.last_active_ago)}</td>
         </tr>`;
     }
 
     async function loadNextBatch() {
-        if (isLoading || rendered >= filtered.length) return;
+        if (isLoading || (total !== null && rendered >= total)) return;
+        const token = loadToken;
         isLoading = true;
         els.state.innerHTML = '<div class="spinner-border spinner-border-sm text-primary"></div>';
 
-        const batch = await fetchAccounts(rendered, BATCH_SIZE);
-        els.body.insertAdjacentHTML('beforeend', batch.map(rowHtml).join(''));
-        rendered += batch.length;
+        let res;
+        try {
+            res = await fetchAccounts(rendered, BATCH_SIZE);
+        } catch (e) {
+            res = { status: false, message: 'Could not load accounts.' };
+        }
+        if (token !== loadToken) return; // filters changed while loading
+
+        if (!res.status) {
+            isLoading = false;
+            els.state.textContent = res.message || 'Could not load accounts.';
+            return;
+        }
+
+        total = res.total;
+        rows.push(...res.data);
+        els.body.insertAdjacentHTML('beforeend', res.data.map(rowHtml).join(''));
+        rendered += res.data.length;
 
         isLoading = false;
         updateState();
 
         // Fill the container if the first batch doesn't overflow it
-        if (els.scroll.scrollHeight <= els.scroll.clientHeight && rendered < filtered.length) {
+        if (res.data.length && els.scroll.scrollHeight <= els.scroll.clientHeight && rendered < total) {
             loadNextBatch();
         }
     }
 
     function updateState() {
-        els.count.textContent = `Showing ${rendered} of ${filtered.length}`;
-        els.state.textContent = filtered.length === 0 ? 'No accounts found.' : '';
+        els.count.textContent = `Showing ${rendered} of ${total}`;
+        els.state.textContent = total === 0 ? 'No accounts found.' : '';
     }
 
     function resetTable() {
-        els.body.innerHTML = '';
+        loadToken++;
+        isLoading = false;
+        rows = [];
+        total = null;
         rendered = 0;
+        els.body.innerHTML = '';
         els.scroll.scrollTop = 0;
         loadNextBatch();
     }
@@ -306,14 +486,96 @@ include('../../reusable/topbar.php');
     /* ==================== SEARCH / FILTER ==================== */
 
     function applyFilters() {
-        const q = els.searchId.value.trim().toLowerCase();
-        const role = els.searchRole.value;
-
-        filtered = accounts.filter((a) =>
-            (!q || a.id_no.toLowerCase().includes(q)) &&
-            (!role || a.role === role)
-        );
         resetTable();
+    }
+
+    /* ==================== PHOTO ==================== */
+
+    function resetPhoto() {
+        photoToken++;
+        els.photoImg.hidden = true;
+        els.photoImg.removeAttribute('src');
+        els.photoPlaceholder.hidden = false;
+    }
+
+    function loadPhoto(id) {
+        if (!id) return resetPhoto();
+
+        const token = ++photoToken;
+        const probe = new Image();
+        probe.onload = () => {
+            if (token !== photoToken) return;
+            els.photoImg.src = probe.src;
+            els.photoImg.hidden = false;
+            els.photoPlaceholder.hidden = true;
+        };
+        probe.onerror = () => {
+            if (token !== photoToken) return;
+            els.photoImg.hidden = true;
+            els.photoPlaceholder.hidden = false;
+        };
+        probe.src = IMG_URL + '?id_no=' + encodeURIComponent(id);
+    }
+
+    /* ==================== EMPLOYEE LOOKUP ==================== */
+
+    function setProfile(name, sub, isError) {
+        els.pName.textContent = name;
+        els.pSub.textContent = sub || '';
+        els.pSub.classList.toggle('is-error', !!isError);
+    }
+
+    function showDetails(emp) {
+        els.dDept.textContent = emp.dept || '—';
+        els.dSection.textContent = emp.section || '—';
+        els.dPosition.textContent = emp.position || '—';
+        els.dProvider.textContent = emp.provider || '—';
+        els.details.hidden = false;
+    }
+
+    function resetProfile(sub) {
+        resetPhoto();
+        els.details.hidden = true;
+        setProfile('—', sub || '');
+        lookupToken++;
+        lookupId = null;
+        lookupPending = null;
+        lookupOk = false;
+        lookupHasAccount = false;
+    }
+
+    async function lookupEmployee(id) {
+        if (!id) return resetProfile(ADD_HINT);
+
+        const token = ++lookupToken;
+        lookupPending = id;
+        setProfile('Loading…', '');
+        els.details.hidden = true;
+        loadPhoto(id);
+
+        const res = await fetchEmployee(id);
+        if (token !== lookupToken) return;
+
+        lookupPending = null;
+        lookupId = id;
+
+        if (!res.status) {
+            lookupOk = false;
+            lookupHasAccount = false;
+            resetPhoto();
+            els.details.hidden = true;
+            setProfile('—', res.message || 'Employee not found.', true);
+            return;
+        }
+
+        lookupOk = true;
+        lookupHasAccount = !!res.has_account;
+        setProfile(
+            res.data.full_name || '—',
+            lookupHasAccount ? 'This ID already has an account.' : '',
+            lookupHasAccount
+        );
+        showDetails(res.data);
     }
 
     /* ==================== EVENTS ==================== */
@@ -327,11 +589,26 @@ include('../../reusable/topbar.php');
         let timer;
         els.searchId.addEventListener('input', () => {
             clearTimeout(timer);
-            timer = setTimeout(applyFilters, 200);
+            timer = setTimeout(applyFilters, 250);
         });
         els.searchRole.addEventListener('change', applyFilters);
 
         els.btnAdd.addEventListener('click', () => openModal(null));
+
+        // Add mode: load the employee when the ID is entered (Enter key or leaving the field)
+        const lookupFromField = () => {
+            if (els.fId.readOnly) return;
+            const id = els.fId.value.trim();
+            if (id && (id === lookupId || id === lookupPending)) return;
+            lookupEmployee(id);
+        };
+        els.fId.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                lookupFromField();
+            }
+        });
+        els.fId.addEventListener('blur', lookupFromField);
 
         els.body.addEventListener('click', (e) => {
             const tr = e.target.closest('tr[data-id]');
@@ -351,57 +628,73 @@ include('../../reusable/topbar.php');
 
         if (id === null) {
             els.title.textContent = 'Add Account';
-            els.subtitle.textContent = 'Create a new system account.';
+            els.subtitle.textContent = 'Enter the ID No. to load the employee.';
             els.fId.value = '';
             els.fId.readOnly = false;
-            els.fName.value = '';
-            els.fRole.value = 'Employee';
+            els.fRole.value = 'User';
             els.fPasswordHint.textContent = '';
             els.btnDelete.classList.add('invisible');
+            resetProfile(ADD_HINT);
         } else {
-            const a = accounts.find((x) => x.id_no === id);
+            const a = rows.find((x) => x.id_no === id);
             if (!a) return;
             els.title.textContent = 'Edit Account';
-            els.subtitle.textContent = 'Update the account information below.';
+            els.subtitle.textContent = 'You can change the password and role.';
             els.fId.value = a.id_no;
             els.fId.readOnly = true;
-            els.fName.value = a.full_name;
             els.fRole.value = a.role;
+            if (els.fRole.value !== a.role) els.fRole.value = 'User'; // old role not in the list
             els.fPasswordHint.textContent = 'Leave blank to keep the current password.';
             els.btnDelete.classList.remove('invisible');
+            resetProfile('');
+            setProfile(a.full_name || '—', '');
+            loadPhoto(a.id_no);
         }
         modal.show();
     }
 
-    function saveAccount() {
-        const id = els.fId.value.trim();
-        const name = els.fName.value.trim();
+    async function saveAccount() {
+        const adding = editingId === null;
+        const id = adding ? els.fId.value.trim() : editingId;
         const pass = els.fPassword.value;
         const role = els.fRole.value;
 
-        if (!id || !name) return (els.fError.textContent = 'ID No. and Full Name are required.');
-        if (editingId === null && !pass) return (els.fError.textContent = 'Password is required for new accounts.');
-        if (editingId === null && accounts.some((a) => a.id_no === id)) return (els.fError.textContent = 'ID No. already exists.');
+        if (!id) return (els.fError.textContent = 'ID No. is required.');
+        if (adding && !pass) return (els.fError.textContent = 'Password is required for new accounts.');
 
-        if (editingId === null) {
-            accounts.unshift({
-                id_no: id,
-                full_name: name,
-                password: pass, // real system: hash server-side, never store plain text
-                role: role,
-                last_active: new Date(),
-                ip_address: '—'
-            });
-        } else {
-            const a = accounts.find((x) => x.id_no === editingId);
-            a.full_name = name;
-            a.role = role;
-            if (pass) a.password = pass;
+        els.fError.textContent = '';
+        els.btnSave.disabled = true;
+
+        if (adding) {
+            // The lookup may still be running if Save was clicked right after typing
+            if (lookupId !== id) await lookupEmployee(id);
+            if (!lookupOk) {
+                els.fError.textContent = 'Employee not found. Check the ID No.';
+                els.btnSave.disabled = false;
+                return;
+            }
+            if (lookupHasAccount) {
+                els.fError.textContent = 'This ID already has an account.';
+                els.btnSave.disabled = false;
+                return;
+            }
+        }
+
+        const res = await postApi(adding ? 'create' : 'update', {
+            id_no: id,
+            password: pass,
+            role: role
+        });
+        els.btnSave.disabled = false;
+
+        if (!res.status) {
+            els.fError.textContent = res.message || 'Could not save the account.';
+            return;
         }
 
         modal.hide();
         applyFilters();
-        toast(editingId === null ? 'Account added.' : 'Account updated.');
+        toast(res.message);
     }
 
     /* ==================== DELETE ==================== */
@@ -425,10 +718,16 @@ include('../../reusable/topbar.php');
         }
         if (!ok) return;
 
-        accounts = accounts.filter((a) => a.id_no !== id);
+        const res = await postApi('delete', { id_no: id });
+
+        if (!res.status) {
+            els.fError.textContent = res.message || 'Could not delete the account.';
+            return;
+        }
+
         modal.hide();
         applyFilters();
-        toast('Account deleted.');
+        toast(res.message);
     }
 
     /* ==================== UTILS ==================== */
@@ -437,9 +736,25 @@ include('../../reusable/topbar.php');
         return String(v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
 
-    function fmtDate(d) {
-        const p = (n) => String(n).padStart(2, '0');
-        return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+    // "Active now" within 2 minutes, then "3 mins ago", "1 hour ago", "3 days ago"...
+    function fmtAgo(seconds) {
+        if (seconds === null || seconds === undefined) return '—';
+
+        const mins = Math.floor(seconds / 60);
+        if (mins <= 2) return '<span class="text-success fw-semibold">Active now</span>';
+        if (mins < 60) return `${mins} mins ago`;
+
+        const hours = Math.floor(mins / 60);
+        if (hours < 24) return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
+
+        const days = Math.floor(hours / 24);
+        if (days < 30) return `${days} ${days === 1 ? 'day' : 'days'} ago`;
+
+        const months = Math.floor(days / 30);
+        if (months < 12) return `${months} ${months === 1 ? 'month' : 'months'} ago`;
+
+        const years = Math.floor(days / 365);
+        return `${years} ${years === 1 ? 'year' : 'years'} ago`;
     }
 
     function toast(msg) {
@@ -452,7 +767,6 @@ include('../../reusable/topbar.php');
 
     document.addEventListener('DOMContentLoaded', function() {
         modal = new bootstrap.Modal(document.getElementById('acctModal'));
-        accounts = buildMockAccounts();
         bindEvents();
         applyFilters();
     });

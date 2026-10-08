@@ -1,9 +1,19 @@
+<?php include_once 'reusable/header.php'; ?>
+<?php
+// Turn the relative $system (e.g. "../../") into an absolute web path (e.g. "/nexus")
+$base = rtrim($system ?? '', '/');
+$scriptDir = realpath(dirname($_SERVER['SCRIPT_FILENAME']) . '/' . ($system ?? ''));
+$docRoot   = realpath($_SERVER['DOCUMENT_ROOT'] ?? '');
+if ($scriptDir && $docRoot && strncasecmp($scriptDir, $docRoot, strlen($docRoot)) === 0) {
+    $base = rtrim(str_replace('\\', '/', substr($scriptDir, strlen($docRoot))), '/');
+}
+?>
 <style>
 /* ==================== FONT ==================== */
 
 @font-face {
   font-family: "Mona Sans";
-  src: url("dist/font/monasans/MonaSans-Regular.ttf") format("truetype");
+  src: url("<?php echo $base; ?>/dist/font/monasans/MonaSans-Regular.ttf") format("truetype");
   font-display: swap;
 }
 
@@ -41,14 +51,14 @@ html[data-theme="dark"] {
 
   --login-text: #f0f6fc;
   --login-muted: #8b949e;
-  --login-subtle: #6e7681;
+  --login-subtle: #8c959f;
 
   --login-blue: #58a6ff;
   --login-blue-hover: #79c0ff;
 
   --login-danger: #f85149;
   --login-danger-bg: #2d1117;
-  --login-danger-border: #f8514966;
+  --login-danger-border: #ff818266;
 
   --login-focus: rgba(88, 166, 255, 0.2);
 }
@@ -167,7 +177,7 @@ body {
   position: absolute;
   z-index: -2;
   inset: 0;
-  background: url("dist/img/furukawa-bg.JPG") 100% center / cover no-repeat;
+  background: url("<?php echo $base; ?>/dist/img/furukawa-bg.JPG") 100% center / cover no-repeat;
   opacity: var(--panel-photo-opacity);
   filter: grayscale(100%) blur(1px);
   pointer-events: none;
@@ -420,6 +430,11 @@ body {
   font-size: 14px;
 }
 
+/* Hidden until a failed login (does not depend on Bootstrap's d-none) */
+.login-error.d-none {
+  display: none !important;
+}
+
 /* ==================== FORM ==================== */
 
 .login-form-group {
@@ -440,16 +455,19 @@ body {
 }
 
 .login-input {
+  box-sizing: border-box;
+  display: block;
   width: 100%;
   height: 40px;
-  padding: 8px 11px;
+  min-height: 40px;
+  padding: 0 11px;
   border: 1px solid var(--login-border);
   border-radius: 6px;
   background: var(--login-surface);
   color: var(--login-text);
   font-family: inherit;
   font-size: 13px;
-  line-height: 1.5;
+  line-height: 38px;
   box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.03);
   transition:
     border-color 0.15s ease,
@@ -477,6 +495,11 @@ html[data-theme="dark"] .login-input:-webkit-autofill:focus {
   -webkit-text-fill-color: var(--login-text);
   -webkit-box-shadow: 0 0 0 1000px var(--login-surface) inset;
   transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Never show Bootstrap's "Required" text */
+#login_form .invalid-feedback {
+  display: none !important;
 }
 
 /* ==================== BUTTONS ==================== */
@@ -671,6 +694,8 @@ html[data-theme="dark"] .login-input:-webkit-autofill:focus {
 
   .login-input {
     height: 42px;
+    min-height: 42px;
+    line-height: 40px;
   }
 
   .login-button {
@@ -732,16 +757,16 @@ html[data-theme="dark"] .login-input:-webkit-autofill:focus {
 }
 </style>
 <title>Template</title>
-<link rel="icon" type="image/png" href="<?php echo htmlspecialchars(($system ?? '') . 'dist/img/logo.png'); ?>">
+<link rel="icon" type="image/png" href="<?php echo htmlspecialchars($base . '/dist/img/logo.png'); ?>">
 <main class="login-page">
     <section class="system-panel">
         <div class="system-content">
             <div class="brand">
                 <div class="brand-icon">
-                   <img
-    src="<?php echo htmlspecialchars(($system ?? '') . 'dist/img/FALP.png'); ?>"
-    alt="FALP"
-    onerror="this.style.display='none'">
+                    <img
+                        src="<?php echo htmlspecialchars($base . '/dist/img/FALP.png'); ?>"
+                        alt="FALP"
+                        onerror="this.style.display='none'">
                 </div>
                 <div>
                     <p class="brand-name">
@@ -757,7 +782,7 @@ html[data-theme="dark"] .login-input:-webkit-autofill:focus {
         <div class="system-identity">
             <div class="system-icon">
                 <img
-    src="<?php echo htmlspecialchars(($system ?? '') . 'dist/img/logo.png'); ?>" alt="System Logo" aria-hidden="true">
+                    src="<?php echo htmlspecialchars($base . '/dist/img/logo.png'); ?>" alt="System Logo" aria-hidden="true">
             </div>
             <h1 class="system-title">Nexus Template</h1>
             <div
@@ -770,33 +795,29 @@ html[data-theme="dark"] .login-input:-webkit-autofill:focus {
                 </div>
             </div>
 
- <p class="system-description">
-    <?php echo $system_description ?? 'System description goes here.'; ?>
-</p>
-       <div class="system-actions">
-    <div class="nexus-dropdown">
-        <a href="#" id="viewer_btn" class="system-action primary">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/>
-                <circle cx="12" cy="12" r="3"/>
-            </svg>
-            <span>Viewer</span>
-        </a>
+            <p class="system-description">
+                <?php echo $system_description ?? 'System description goes here.'; ?>
+            </p>
 
-        <a href="#" class="system-action primary">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-            </svg>
-            <span>Work Instructions</span>
-        </a>
-    </div>
-</div>
+            <div class="system-actions">
+                <div class="nexus-dropdown">
+                    <a href="#" id="viewer_btn" class="system-action primary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        <span>Viewer</span>
+                    </a>
 
-        </div>
-    </div>
-
-
+                    <a href="#" class="system-action primary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                        </svg>
+                        <span>Work Instructions</span>
+                    </a>
+                </div>
+            </div>
 
         </div>
     </section>
@@ -825,27 +846,24 @@ html[data-theme="dark"] .login-input:-webkit-autofill:focus {
 
                 <div id="loginError" class="login-error d-none" role="alert">
                     <i class="fa-solid fa-circle-exclamation"></i>
-                  <span id="loginErrorText">Invalid Emp No or password.</span>
+                    <span id="loginErrorText">Invalid Emp No or password.</span>
                 </div>
 
                 <form id="login_form" class="needs-validation" data-submit-callback="login_authenticate" novalidate>
 
-           <div class="login-form-group">
-    <label for="login_form_username" class="login-label">Emp No</label>
-    <input type="text" class="login-input" id="login_form_username" name="username"
-        placeholder="Enter your employee number" autocomplete="username" required>
-    <div class="invalid-feedback">Required</div>
-</div>
+                    <div class="login-form-group">
+                        <label for="login_form_username" class="login-label">Emp No</label>
+                        <input type="text" class="login-input" id="login_form_username" name="username"
+                            placeholder="Enter your employee number" autocomplete="username" required>
+                    </div>
 
                     <div class="login-form-group password-group">
                         <label for="login_form_password" class="login-label">Password</label>
                         <input type="password" class="login-input" id="login_form_password" name="password"
                             placeholder="Enter your password" autocomplete="current-password" required>
-                        <div class="invalid-feedback">Required</div>
                     </div>
 
                     <div class="d-flex gap-2">
-
                         <button type="submit" class="login-button">
                             <i class="fa-solid fa-right-to-bracket"></i>&emsp;Sign in
                         </button>
@@ -860,68 +878,83 @@ html[data-theme="dark"] .login-input:-webkit-autofill:focus {
                 </div>
             </div>
 
-
         </div>
     </section>
 
 </main>
 <script>
-    const SYSTEM_URL = <?php echo json_encode(trim($system ?? '')); ?>;
+/* ==================== CONFIG ==================== */
 
-    async function login_authenticate(form) {
-        event.preventDefault();
-        const formdata = new FormData(form);
-        const loader = form.closest('.login-card').querySelector('.loading-overlay');
-        const loginError = document.getElementById('loginError');
-        const loginErrorText = document.getElementById('loginErrorText');
+const SYSTEM_URL = <?php echo json_encode($base); ?>;
 
-        $.ajax({
-            url: SYSTEM_URL + '/api/common/login.php',
-            type: 'POST',
-            data: formdata,
-            processData: false,
-            contentType: false,
-            cache: false,
-            dataType: 'json',
-            beforeSend: function() {
-                loader.classList.add('active');
-                loginError.classList.add('d-none');
-            },
-            success: function(response) {
-                if (response.status == true && response.registered == false) {
-                    Swal.fire({
-                        title: "Not yet activated",
-                        text: 'Confirm activation via registered email',
-                        icon: "warning",
-                        showCancelButton: false,
-                        confirmButtonColor: "#3085d6",
-                        confirmButtonText: "Confirm",
-                        customClass: {
-                            container: 'blur'
-                        }
-                    });
-                    return 0;
-                }
-                if (response.status == false) {
-                   loginErrorText.textContent = 'Invalid Emp No and/or Password';
-                    loginError.classList.remove('d-none');
-                    form.reset();
-                    return 0;
-                }
-                window.location = SYSTEM_URL + '/pages/process_design';
-            },
-            error: function() {
-                loginErrorText.textContent = 'Something went wrong. Please try again.';
+/* ==================== FETCH / API ==================== */
+
+async function login_authenticate(form, event) {
+    event.preventDefault();
+
+    const username = form.querySelector('#login_form_username');
+    const password = form.querySelector('#login_form_password');
+    const loader = form.closest('.login-card').querySelector('.loading-overlay');
+    const loginError = document.getElementById('loginError');
+    const loginErrorText = document.getElementById('loginErrorText');
+
+    // Empty fields: no request, no error message
+    if (!username.value.trim()) { username.focus(); return; }
+    if (!password.value) { password.focus(); return; }
+
+    $.ajax({
+        url: SYSTEM_URL + '/api/login.php',
+        type: 'POST',
+        data: new FormData(form),
+        processData: false,
+        contentType: false,
+        cache: false,
+        dataType: 'json',
+        beforeSend: function () {
+            loader.classList.add('active');
+            loginError.classList.add('d-none');
+        },
+        success: function (response) {
+            if (response.status === true) {
+                window.location = response.redirect || (SYSTEM_URL + '/pages/process_design');
+            } else {
+                // Wrong Emp No and/or password
+                loginErrorText.textContent = 'Invalid Emp No or password.';
                 loginError.classList.remove('d-none');
-            },
-            complete: function() {
-                loader.classList.remove('active');
+                password.value = '';
+                password.focus();
             }
-        });
-    }
-
-    // Viewer Page button: go to process_design as a viewer (no login required)
-    document.getElementById('viewer_btn').addEventListener('click', function() {
-        window.location = SYSTEM_URL + '/pages/process_design?mode=viewer';
+        },
+        error: function () {
+            loginErrorText.textContent = 'Something went wrong. Please try again.';
+            loginError.classList.remove('d-none');
+        },
+        complete: function () {
+            loader.classList.remove('active');
+        }
     });
+}
+
+/* ==================== EVENTS ==================== */
+
+// Viewer Page button: go to process_design as a viewer (no login required)
+document.getElementById('viewer_btn').addEventListener('click', function () {
+    window.location = SYSTEM_URL + '/pages/process_design?mode=viewer';
+});
+
+/* ==================== INIT ==================== */
+
+// Handle forms with data-submit-callback attribute
+document.addEventListener('DOMContentLoaded', function () {
+    const forms = document.querySelectorAll('form[data-submit-callback]');
+    forms.forEach(form => {
+        const callbackName = form.getAttribute('data-submit-callback');
+        if (window[callbackName] && typeof window[callbackName] === 'function') {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                window[callbackName](this, e);
+            });
+        }
+    });
+});
 </script>

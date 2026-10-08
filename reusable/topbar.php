@@ -1,3 +1,38 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
+<?php
+/* ==================== UPDATE LAST ACTIVE / IP ==================== */
+
+if (!empty($_SESSION['user_id'])) {
+
+    // Reuse the connection if the page already has one, otherwise load it
+    if (!isset($conn_sen)) {
+        $connFile = __DIR__ . '/../api/connection/template_conn.php'; // adjust to your real path
+        if (is_file($connFile)) {
+            require_once $connFile;
+        }
+    }
+
+    if (isset($conn_sen) && $conn_sen) {
+        $manilaNow = (new DateTime('now', new DateTimeZone('Asia/Manila')))->format('Y-m-d H:i:s');
+
+        $stmtActive = sqlsrv_query(
+            $conn_sen,
+            "UPDATE [sen_template_db].[dbo].[accounts]
+             SET [last_active] = ?, [ip_address] = ?
+             WHERE [id] = ?",
+            [$manilaNow, $_SERVER['REMOTE_ADDR'] ?? '', $_SESSION['user_id']]
+        );
+
+        if ($stmtActive) {
+            sqlsrv_free_stmt($stmtActive);
+        }
+    }
+}
+?>
 <style>
 /* ==================== TOPBAR TOKENS ==================== */
 
@@ -195,6 +230,8 @@
 }
 
 .app-topbar .user-avatar {
+  position: relative;
+  overflow: hidden;
   width: 30px;
   height: 30px;
   flex: 0 0 30px;
@@ -206,6 +243,14 @@
   color: #ffffff;
   font-size: 11px;
   font-weight: 650;
+}
+
+.app-topbar .user-avatar img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .app-topbar .user-details {
@@ -229,12 +274,6 @@
 
 .user-role {
   margin-top: 2px;
-  color: var(--template-topbar-text-muted);
-  font-size: 9px;
-}
-
-.user-chevron {
-  margin-left: 2px;
   color: var(--template-topbar-text-muted);
   font-size: 9px;
 }
@@ -439,6 +478,15 @@ if (!function_exists('isActive')) {
 // If $system isn't set, fall back to a relative path (a bare "/dist/..." breaks the logo in subfolders)
 $logo_url = htmlspecialchars((isset($system) && $system !== '' ? rtrim($system, '/') . '/' : '') . 'dist/img/logo.png');
 
+// Signed-in employee's photo (falls back to the initial if there is no photo)
+$photo_url = '';
+if (!empty($_SESSION['id_no'])) {
+    $photo_url = htmlspecialchars(
+        (isset($system) && $system !== '' ? rtrim($system, '/') . '/' : '../../')
+        . 'api/admin/employee_image.php?id_no=' . urlencode($_SESSION['id_no'])
+    );
+}
+
 ?>
 
 <!-- ==================== TOPBAR ==================== -->
@@ -485,11 +533,25 @@ $logo_url = htmlspecialchars((isset($system) && $system !== '' ? rtrim($system, 
                     data-bs-toggle="dropdown"
                     aria-expanded="false">
 
-                    <span class="user-avatar">N</span>
+                    <span class="user-avatar"><?php echo isset($_SESSION['full_name']) ? mb_substr($_SESSION['full_name'], 0, 1) : 'N'; ?><?php if ($photo_url): ?><img src="<?= $photo_url ?>" alt="" onerror="this.remove()"><?php endif; ?></span>
 
                     <span class="user-details">
-                        <span class="user-name">newt_</span>
-                        <span class="user-role">Employee</span>
+                        <span class="user-name"><?php
+                            if (!empty($_SESSION['full_name'])) {
+                                echo htmlspecialchars($_SESSION['full_name']);
+                            } elseif (!empty($_SESSION['id_no'])) {
+                                echo htmlspecialchars($_SESSION['id_no']);
+                            } else {
+                                echo 'newt_';
+                            }
+                            ?></span>
+                        <span class="user-role"><?php
+                            if (!empty($_SESSION['role'])) {
+                                echo htmlspecialchars($_SESSION['role']);
+                            } else {
+                                echo 'Employee';
+                            }
+                            ?></span>
                     </span>
 
                     <i class="bi bi-chevron-down user-chevron"></i>
@@ -510,7 +572,7 @@ $logo_url = htmlspecialchars((isset($system) && $system !== '' ? rtrim($system, 
                     </li>
 
                     <li>
-                        <a class="dropdown-item text-danger" href="logout.php">
+                        <a class="dropdown-item text-danger" href="<?php echo htmlspecialchars($system ?? ''); ?>/logout.php">
                             <i class="bi bi-box-arrow-right"></i>
                             <span>Sign Out</span>
                         </a>
@@ -550,14 +612,28 @@ $logo_url = htmlspecialchars((isset($system) && $system !== '' ? rtrim($system, 
 
             <div class="mobile-account-card">
 
-                <div class="user-avatar">N</div>
+                <div class="user-avatar"><?php echo isset($_SESSION['full_name']) ? mb_substr($_SESSION['full_name'], 0, 1) : 'N'; ?><?php if ($photo_url): ?><img src="<?= $photo_url ?>" alt="" onerror="this.remove()"><?php endif; ?></div>
 
                 <div class="user-details">
-                    <span class="user-name">newt_</span>
-                    <span class="user-role">Employee</span>
+                    <span class="user-name"><?php
+                        if (!empty($_SESSION['full_name'])) {
+                            echo htmlspecialchars($_SESSION['full_name']);
+                        } elseif (!empty($_SESSION['id_no'])) {
+                            echo htmlspecialchars($_SESSION['id_no']);
+                        } else {
+                            echo 'newt_';
+                        }
+                        ?></span>
+                    <span class="user-role"><?php
+                        if (!empty($_SESSION['role'])) {
+                            echo htmlspecialchars($_SESSION['role']);
+                        } else {
+                            echo 'Employee';
+                        }
+                        ?></span>
                 </div>
 
-                <a href="logout.php" class="text-danger" aria-label="Sign out">
+                <a href="<?php echo htmlspecialchars($system ?? ''); ?>/logout.php" class="text-danger" aria-label="Sign out">
                     <i class="bi bi-box-arrow-right"></i>
                 </a>
 

@@ -2,7 +2,6 @@
 // Project root URL, e.g. "/sen_template". Auto-detected from the current script.
 $system = $system ?? '/' . explode('/', trim($_SERVER['SCRIPT_NAME'], '/'))[0];
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,7 +15,8 @@ $system = $system ?? '/' . explode('/', trim($_SERVER['SCRIPT_NAME'], '/'))[0];
     <title>FALP NEXUS</title>
 
 
-<title><?php echo htmlspecialchars($page_title ?? 'Template'); ?></title>
-<link rel="icon" type="image/png" href="../../dist/img/logo.png">
-<link rel="stylesheet" href="<?php echo htmlspecialchars($page_css ?? ''); ?>">
+    <title><?php echo htmlspecialchars($page_title ?? 'Template'); ?></title>
+    <link rel="icon" type="image/png" href="../../dist/img/logo.png">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars($page_css ?? ''); ?>">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
