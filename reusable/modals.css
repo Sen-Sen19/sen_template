@@ -1,0 +1,4585 @@
+/* =========================================================
+   NEXUS MODAL PAGE
+   ========================================================= */
+
+:root {
+  --nexus-modal-text: #1f2328;
+  --nexus-modal-muted: #656d76;
+  --nexus-modal-border: #d0d7de;
+  --nexus-modal-border-light: #eaeef2;
+  --nexus-modal-surface: #ffffff;
+  --nexus-modal-surface-alt: #f6f8fa;
+  --nexus-modal-primary: #0969da;
+  --nexus-modal-primary-hover: #0860c7;
+  --nexus-modal-success: #1a7f37;
+  --nexus-modal-warning: #bf8700;
+  --nexus-modal-danger: #cf222e;
+}
+
+/* =========================================================
+   COMPONENT SECTION
+   ========================================================= */
+
+.nexus-component-section {
+  width: 100%;
+  margin-bottom: 20px;
+  overflow: hidden;
+  background: var(--nexus-modal-surface);
+  border: 1px solid var(--nexus-modal-border);
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(27, 31, 36, 0.04);
+}
+
+.nexus-component-section:last-child {
+  margin-bottom: 0;
+}
+
+/* =========================================================
+   SECTION HEADER
+   ========================================================= */
+
+.nexus-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+  padding: 18px 20px 14px;
+  background: var(--nexus-modal-surface);
+}
+
+.nexus-section-title {
+  margin: 0;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: -0.01em;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-section-description {
+  max-width: 760px;
+  margin: 4px 0 0;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   PREVIEW CARD
+   ========================================================= */
+
+.nexus-preview-card {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 72px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--nexus-modal-border-light);
+  background: var(--nexus-modal-surface-alt);
+}
+
+.nexus-preview-card > .d-flex {
+  width: 100%;
+}
+
+/* =========================================================
+   BUTTON BASE
+   ========================================================= */
+
+.nexus-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.05s ease;
+}
+
+.nexus-btn i {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.nexus-btn:active {
+  transform: translateY(1px);
+}
+
+/* =========================================================
+   PRIMARY
+   ========================================================= */
+
+.nexus-btn-primary {
+  color: #ffffff;
+  background: var(--nexus-modal-primary);
+  border-color: var(--nexus-modal-primary);
+}
+
+.nexus-btn-primary:hover {
+  color: #ffffff;
+  background: var(--nexus-modal-primary-hover);
+  border-color: var(--nexus-modal-primary-hover);
+}
+
+/* =========================================================
+   SECONDARY
+   ========================================================= */
+
+.nexus-btn-secondary {
+  color: var(--nexus-modal-text);
+  background: #ffffff;
+  border-color: var(--nexus-modal-border);
+}
+
+.nexus-btn-secondary:hover {
+  color: var(--nexus-modal-text);
+  background: #f3f4f6;
+  border-color: #afb8c1;
+}
+
+/* =========================================================
+   INFO
+   ========================================================= */
+
+.nexus-btn-info {
+  color: #ffffff;
+  background: var(--nexus-modal-primary);
+  border-color: var(--nexus-modal-primary);
+}
+
+.nexus-btn-info:hover {
+  color: #ffffff;
+  background: var(--nexus-modal-primary-hover);
+  border-color: var(--nexus-modal-primary-hover);
+}
+
+/* =========================================================
+   SUCCESS
+   ========================================================= */
+
+.nexus-btn-success {
+  color: #ffffff;
+  background: var(--nexus-modal-success);
+  border-color: var(--nexus-modal-success);
+}
+
+.nexus-btn-success:hover {
+  color: #ffffff;
+  background: #176f31;
+  border-color: #176f31;
+}
+
+/* =========================================================
+   WARNING
+   ========================================================= */
+
+.nexus-btn-warning {
+  color: #1f2328;
+  background: #f0b429;
+  border-color: #f0b429;
+}
+
+.nexus-btn-warning:hover {
+  color: #1f2328;
+  background: #d99d17;
+  border-color: #d99d17;
+}
+
+/* =========================================================
+   DANGER
+   ========================================================= */
+
+.nexus-btn-danger {
+  color: #ffffff;
+  background: var(--nexus-modal-danger);
+  border-color: var(--nexus-modal-danger);
+}
+
+.nexus-btn-danger:hover {
+  color: #ffffff;
+  background: #b91c27;
+  border-color: #b91c27;
+}
+
+/* =========================================================
+   MODAL BASE
+   ========================================================= */
+
+.nexus-modal .modal-dialog {
+  width: auto;
+  max-width: 500px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.nexus-modal .modal-content {
+  overflow: hidden;
+  background: var(--nexus-modal-surface);
+  border: 1px solid var(--nexus-modal-border);
+  border-radius: 12px;
+  box-shadow:
+    0 8px 24px rgba(140, 149, 159, 0.2),
+    0 2px 8px rgba(27, 31, 36, 0.08);
+}
+
+/* =========================================================
+   MODAL HEADER
+   ========================================================= */
+
+.nexus-modal .modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+  padding: 16px 20px;
+  background: var(--nexus-modal-surface);
+  border-bottom: 1px solid var(--nexus-modal-border-light);
+}
+
+.nexus-modal .modal-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 21px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-modal-subtitle {
+  margin: 3px 0 0;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-modal .btn-close {
+  flex: 0 0 auto;
+  margin: 0 0 0 16px;
+}
+/* =========================================================
+   MODAL BODY
+   ========================================================= */
+
+.nexus-modal .modal-body {
+  padding: 20px;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 13px;
+  line-height: 21px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-modal .modal-body p:last-child {
+  margin-bottom: 0;
+}
+
+/* =========================================================
+   MODAL FOOTER
+   ========================================================= */
+
+.nexus-modal .modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 12px 20px;
+  gap: 8px;
+  background: var(--nexus-modal-surface-alt);
+  border-top: 1px solid var(--nexus-modal-border-light);
+}
+
+.nexus-modal .modal-footer .btn {
+  min-height: 34px;
+  padding: 6px 14px;
+  border-radius: 7px;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* =========================================================
+   MODAL HEADING WITH ICON
+   ========================================================= */
+
+.nexus-modal-heading {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 10px;
+}
+
+.nexus-modal-heading > div:last-child {
+  min-width: 0;
+}
+
+.nexus-modal-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.nexus-modal-icon-info {
+  color: #0969da;
+  background: #ddf4ff;
+}
+
+.nexus-modal-icon-success {
+  color: #1a7f37;
+  background: #dafbe1;
+}
+
+.nexus-modal-icon-warning {
+  color: #9a6700;
+  background: #fff8c5;
+}
+
+.nexus-modal-icon-danger {
+  color: #cf222e;
+  background: #ffebe9;
+}
+
+/* =========================================================
+   SEMANTIC MODAL VARIANTS
+   ========================================================= */
+
+.nexus-modal-info .modal-header {
+  border-left: 3px solid #0969da;
+}
+
+.nexus-modal-success .modal-header {
+  border-left: 3px solid #1a7f37;
+}
+
+.nexus-modal-warning .modal-header {
+  border-left: 3px solid #9a6700;
+}
+
+.nexus-modal-danger .modal-header {
+  border-left: 3px solid #cf222e;
+}
+
+/* =========================================================
+   SCROLLABLE MODAL
+   ========================================================= */
+
+.nexus-modal .modal-dialog-scrollable {
+  height: calc(100% - 3.5rem);
+}
+
+.nexus-modal .modal-dialog-scrollable .modal-content {
+  max-height: 100%;
+}
+
+.nexus-modal-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--nexus-modal-border-light);
+}
+
+.nexus-modal-list-item:first-of-type {
+  padding-top: 4px;
+}
+
+.nexus-modal-list-item:last-child {
+  border-bottom: 0;
+}
+
+.nexus-modal-list-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border-radius: 50%;
+  color: #1a7f37;
+  background: #dafbe1;
+  font-size: 12px;
+}
+
+.nexus-modal-list-item strong {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-modal-list-item p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 17px;
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.nexus-modal .form-label {
+  margin-bottom: 6px;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-form-control {
+  min-height: 36px;
+  padding: 7px 10px;
+  border-color: var(--nexus-modal-border);
+  border-radius: 7px;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--nexus-modal-text);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.nexus-form-control:focus {
+  border-color: #0969da;
+  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.12);
+}
+
+/* =========================================================
+   BACKDROP
+   ========================================================= */
+
+.modal-backdrop.show {
+  opacity: 0.45;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 991.98px) {
+  .nexus-page-header {
+    margin-bottom: 24px;
+  }
+
+  .nexus-page-title {
+    font-size: 26px;
+    line-height: 34px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .nexus-page-title {
+    font-size: 24px;
+    line-height: 32px;
+  }
+
+  .nexus-page-description {
+    font-size: 13px;
+    line-height: 20px;
+  }
+
+  .nexus-section-header {
+    padding: 16px;
+  }
+
+  .nexus-preview-card {
+    padding: 14px 16px;
+  }
+
+  .nexus-section-description {
+    font-size: 11px;
+    line-height: 18px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .nexus-component-section {
+    border-radius: 8px;
+  }
+
+  .nexus-page-header {
+    margin-bottom: 20px;
+  }
+
+  .nexus-page-title {
+    font-size: 22px;
+    line-height: 30px;
+  }
+
+  .nexus-page-description {
+    font-size: 12px;
+    line-height: 19px;
+  }
+
+  .nexus-section-title {
+    font-size: 15px;
+    line-height: 22px;
+  }
+
+  .nexus-preview-card {
+    min-height: 64px;
+  }
+
+  .nexus-preview-card > .d-flex {
+    flex-wrap: wrap;
+  }
+
+  .nexus-preview-card .btn {
+    max-width: 100%;
+  }
+
+  .nexus-modal .modal-dialog {
+    margin: 12px;
+  }
+
+  .nexus-modal .modal-header {
+    padding: 14px 16px;
+  }
+
+  .nexus-modal .modal-body {
+    padding: 16px;
+  }
+
+  .nexus-modal .modal-footer {
+    padding: 10px 16px;
+    flex-wrap: wrap;
+  }
+
+  .nexus-modal .modal-footer .btn {
+    flex: 1 1 auto;
+  }
+
+  .nexus-modal-heading {
+    gap: 8px;
+  }
+
+  .nexus-modal-icon {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+  }
+}
+
+@media (max-width: 400px) {
+  .nexus-preview-card .btn {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   NEXUS LARGE MODALS
+   ========================================================= */
+
+/* =========================================================
+   LARGE MODAL BASE
+   ========================================================= */
+
+.nexus-large-modal .modal-dialog {
+  width: auto;
+  max-width: 900px;
+}
+
+.nexus-large-modal .modal-content {
+  border-radius: 12px;
+}
+
+/* =========================================================
+   MODAL TITLE ROW
+   ========================================================= */
+
+.nexus-modal-title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+
+.nexus-modal-title-row .modal-title {
+  flex: 0 1 auto;
+}
+
+/* =========================================================
+   STATUS BADGES
+   ========================================================= */
+
+.nexus-status-success,
+.nexus-status-warning,
+.nexus-status-danger,
+.nexus-status-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  padding: 2px 8px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 16px;
+}
+
+.nexus-status-success {
+  color: #1a7f37;
+  background: #dafbe1;
+  border-color: #aceebb;
+}
+
+.nexus-status-warning {
+  color: #9a6700;
+  background: #fff8c5;
+  border-color: #f5df8a;
+}
+
+.nexus-status-danger {
+  color: #cf222e;
+  background: #ffebe9;
+  border-color: #ffb8b2;
+}
+
+.nexus-status-info {
+  color: #0969da;
+  background: #ddf4ff;
+  border-color: #b6e3ff;
+}
+
+/* =========================================================
+   SUMMARY GRID
+   ========================================================= */
+
+.nexus-large-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--nexus-modal-surface-alt);
+}
+
+.nexus-large-summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  padding: 14px 16px;
+  border-right: 1px solid var(--nexus-modal-border-light);
+}
+
+.nexus-large-summary-item:last-child {
+  border-right: 0;
+}
+
+.nexus-large-summary-label,
+.nexus-large-field-label {
+  display: block;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 15px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-large-summary-item strong,
+.nexus-large-info-grid strong,
+.nexus-workorder-item strong {
+  display: block;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+  color: var(--nexus-modal-text);
+}
+
+/* =========================================================
+   CONTENT SECTIONS
+   ========================================================= */
+
+.nexus-large-content-section {
+  margin-top: 24px;
+}
+
+.nexus-large-content-title {
+  margin: 0 0 10px;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-large-content-text {
+  margin: 0;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   FEATURE GRID
+   ========================================================= */
+
+.nexus-large-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.nexus-large-feature {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 9px 11px;
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 7px;
+  background: var(--nexus-modal-surface-alt);
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 11px;
+  line-height: 17px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-large-feature i {
+  flex-shrink: 0;
+  color: var(--nexus-modal-success);
+  font-size: 14px;
+}
+
+/* =========================================================
+   AVATAR
+   ========================================================= */
+
+.nexus-large-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 50%;
+  background: #f1f3f5;
+  border: 1px solid var(--nexus-modal-border);
+  color: var(--nexus-modal-text);
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* =========================================================
+   INFORMATION GRID
+   ========================================================= */
+
+.nexus-large-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 8px;
+  background: var(--nexus-modal-border-light);
+}
+
+.nexus-large-info-grid > div {
+  min-width: 0;
+  padding: 13px 15px;
+  background: var(--nexus-modal-surface);
+}
+
+/* =========================================================
+   LARGE LIST
+   ========================================================= */
+
+.nexus-large-list {
+  margin: 0;
+  padding-left: 20px;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 12px;
+  line-height: 21px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-large-list li {
+  margin-bottom: 5px;
+}
+
+.nexus-large-list li:last-child {
+  margin-bottom: 0;
+}
+
+/* =========================================================
+   WORK ORDER GRID
+   ========================================================= */
+
+.nexus-workorder-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 8px;
+  background: var(--nexus-modal-border-light);
+}
+
+.nexus-workorder-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  padding: 14px 16px;
+  background: var(--nexus-modal-surface);
+}
+
+/* =========================================================
+   CALLOUT
+   ========================================================= */
+
+.nexus-large-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid #f5df8a;
+  border-radius: 8px;
+  background: #fff8c5;
+}
+
+.nexus-large-callout i {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #9a6700;
+  font-size: 14px;
+}
+
+.nexus-large-callout p {
+  margin: 0;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 12px;
+  line-height: 19px;
+  color: #6e5500;
+}
+
+/* =========================================================
+   TIMELINE
+   ========================================================= */
+
+.nexus-large-timeline {
+  position: relative;
+  padding-left: 22px;
+}
+
+.nexus-large-timeline::before {
+  content: "";
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 5px;
+  width: 1px;
+  background: var(--nexus-modal-border);
+}
+
+.nexus-large-timeline-item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  padding-bottom: 18px;
+}
+
+.nexus-large-timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.nexus-large-timeline-dot {
+  position: absolute;
+  top: 4px;
+  left: -21px;
+  width: 11px;
+  height: 11px;
+  border: 2px solid var(--nexus-modal-surface);
+  border-radius: 50%;
+  background: var(--nexus-modal-primary);
+  box-shadow: 0 0 0 1px var(--nexus-modal-primary);
+}
+
+.nexus-large-timeline-item strong {
+  display: block;
+  margin-bottom: 2px;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 17px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-large-timeline-item p {
+  margin: 0 0 2px;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 11px;
+  line-height: 17px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-large-timeline-item small {
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 10px;
+  line-height: 15px;
+  color: #8c959f;
+}
+
+/* =========================================================
+   REVIEW BOX
+   ========================================================= */
+
+.nexus-large-review-box {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 8px;
+  background: var(--nexus-modal-border-light);
+}
+
+.nexus-large-review-box > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 14px 16px;
+  background: var(--nexus-modal-surface);
+}
+
+/* =========================================================
+   IMPACT GRID
+   ========================================================= */
+
+.nexus-large-impact {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.nexus-large-impact > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 7px;
+  background: var(--nexus-modal-surface-alt);
+}
+
+.nexus-large-impact span,
+.nexus-advisory-schedule span {
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 10px;
+  line-height: 15px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-large-impact strong,
+.nexus-advisory-schedule strong {
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+  color: var(--nexus-modal-text);
+}
+
+/* =========================================================
+   ADVISORY
+   ========================================================= */
+
+.nexus-advisory-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid #b6e3ff;
+  border-radius: 8px;
+  background: #ddf4ff;
+}
+
+.nexus-advisory-banner > i {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #0969da;
+  font-size: 16px;
+}
+
+.nexus-advisory-banner strong {
+  display: block;
+  margin-bottom: 3px;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+  color: #0969da;
+}
+
+.nexus-advisory-banner p {
+  margin: 0;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 11px;
+  line-height: 18px;
+  color: #245b7a;
+}
+
+/* =========================================================
+   ADVISORY SCHEDULE
+   ========================================================= */
+
+.nexus-advisory-schedule {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.nexus-advisory-schedule > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 7px;
+  background: var(--nexus-modal-surface-alt);
+}
+
+/* =========================================================
+   LARGE FORM
+   ========================================================= */
+
+.nexus-large-modal .form-select.nexus-form-control {
+  padding-right: 34px;
+}
+
+.nexus-large-modal textarea.nexus-form-control {
+  resize: vertical;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 767.98px) {
+  .nexus-large-modal .modal-dialog {
+    max-width: none;
+  }
+
+  .nexus-large-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .nexus-large-summary-item:nth-child(2) {
+    border-right: 0;
+  }
+
+  .nexus-large-summary-item:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--nexus-modal-border-light);
+  }
+
+  .nexus-large-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .nexus-large-feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nexus-workorder-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nexus-large-review-box {
+    grid-template-columns: 1fr;
+  }
+
+  .nexus-large-impact {
+    grid-template-columns: 1fr;
+  }
+
+  .nexus-advisory-schedule {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .nexus-large-modal .modal-dialog {
+    margin: 12px;
+  }
+
+  .nexus-large-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .nexus-large-summary-item {
+    border-right: 0;
+    border-bottom: 1px solid var(--nexus-modal-border-light);
+  }
+
+  .nexus-large-summary-item:last-child {
+    border-bottom: 0;
+  }
+
+  .nexus-large-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nexus-large-info-grid > div {
+    border-bottom: 1px solid var(--nexus-modal-border-light);
+  }
+
+  .nexus-large-info-grid > div:last-child {
+    border-bottom: 0;
+  }
+
+  .nexus-large-avatar {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    font-size: 11px;
+  }
+
+  .nexus-large-content-section {
+    margin-top: 20px;
+  }
+
+  .nexus-advisory-banner {
+    padding: 12px;
+  }
+}
+
+/* =========================================================
+   SMALL MODALS
+   ========================================================= */
+
+.nexus-small-modal .modal-dialog {
+  max-width: 360px;
+}
+
+.nexus-small-modal .modal-content {
+  border-radius: 10px;
+}
+
+.nexus-small-modal .modal-header {
+  min-height: 58px;
+  padding: 13px 16px;
+}
+
+.nexus-small-modal .modal-body {
+  padding: 16px;
+  font-size: 12px;
+  line-height: 19px;
+}
+
+.nexus-small-modal .modal-footer {
+  padding: 10px 16px;
+}
+
+.nexus-small-modal .modal-footer .btn {
+  min-height: 32px;
+  padding: 5px 12px;
+  font-size: 12px;
+}
+
+/* =========================================================
+   SMALL MODAL HELP TEXT
+   ========================================================= */
+
+.nexus-modal-help-text {
+  font-size: 11px;
+  line-height: 17px;
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   SMALL MODAL DETAIL LIST
+   ========================================================= */
+
+.nexus-small-detail-list {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--nexus-modal-border-light);
+}
+
+.nexus-small-detail-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 38px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--nexus-modal-border-light);
+}
+
+.nexus-small-detail-item:last-child {
+  border-bottom: 0;
+}
+
+.nexus-small-detail-label {
+  font-size: 11px;
+  line-height: 17px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-small-detail-item strong {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 17px;
+  color: var(--nexus-modal-text);
+  text-align: right;
+}
+
+/* =========================================================
+   SMALL MODAL STATUS
+   ========================================================= */
+
+.nexus-small-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 7px;
+  border: 1px solid #d0d7de;
+  border-radius: 999px;
+  background: #f6f8fa;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 15px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-small-status::before {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #bf8700;
+  content: "";
+}
+
+/* =========================================================
+   SMALL MODAL ICON ADJUSTMENT
+   ========================================================= */
+
+.nexus-small-modal .nexus-modal-icon {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  border-radius: 7px;
+  font-size: 14px;
+}
+
+.nexus-small-modal .nexus-modal-heading {
+  gap: 8px;
+}
+
+/* =========================================================
+   SMALL MODAL RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 575.98px) {
+  .nexus-small-modal .modal-dialog {
+    max-width: none;
+    margin: 12px;
+  }
+
+  .nexus-small-modal .modal-header {
+    padding: 12px 14px;
+  }
+
+  .nexus-small-modal .modal-body {
+    padding: 14px;
+  }
+
+  .nexus-small-modal .modal-footer {
+    padding: 10px 14px;
+  }
+}
+
+/* =========================================================
+   CENTERED MODALS
+   ========================================================= */
+
+.nexus-modal .modal-dialog-centered {
+  min-height: calc(100% - 3.5rem);
+}
+
+.nexus-modal .modal-dialog-centered .modal-content {
+  width: 100%;
+}
+
+/* =========================================================
+   CENTERED MODAL DETAIL LIST
+   ========================================================= */
+
+.nexus-centered-detail-list {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--nexus-modal-border-light);
+}
+
+.nexus-centered-detail-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 40px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--nexus-modal-border-light);
+}
+
+.nexus-centered-detail-item:last-child {
+  border-bottom: 0;
+}
+
+.nexus-centered-detail-item > span:first-child {
+  font-size: 11px;
+  line-height: 17px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-centered-detail-item strong {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 17px;
+  color: var(--nexus-modal-text);
+  text-align: right;
+}
+
+/* =========================================================
+   CENTERED MODAL STATUS
+   ========================================================= */
+
+.nexus-centered-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border: 1px solid #b7dfc2;
+  border-radius: 999px;
+  background: #dafbe1;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 15px;
+  color: #1a7f37;
+}
+
+.nexus-centered-status::before {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #1a7f37;
+  content: "";
+}
+
+/* =========================================================
+   CENTERED MODAL RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 575.98px) {
+  .nexus-modal .modal-dialog-centered {
+    min-height: calc(100% - 1.5rem);
+  }
+
+  .nexus-centered-detail-item {
+    gap: 10px;
+  }
+}
+
+/* =========================================================
+   NEXUS SCROLLABLE MODALS
+   ========================================================= */
+
+/* =========================================================
+   PROFILE
+   ========================================================= */
+
+.nexus-scrollable-profile-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 4px;
+}
+
+.nexus-scrollable-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+
+  border-radius: 10px;
+
+  background: #ddf4ff;
+  color: #0969da;
+
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.nexus-scrollable-profile-header h6 {
+  margin: 0 0 2px;
+
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+
+  color: var(--nexus-modal-text);
+}
+
+.nexus-scrollable-profile-header p {
+  margin: 0 0 5px;
+
+  font-size: 11px;
+  line-height: 16px;
+
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-scrollable-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  font-size: 10px;
+  line-height: 16px;
+
+  color: #1a7f37;
+}
+
+.nexus-scrollable-status span {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: #1a7f37;
+}
+
+/* =========================================================
+   DIVIDER
+   ========================================================= */
+
+.nexus-scrollable-divider {
+  height: 1px;
+
+  margin: 18px 0;
+
+  background: var(--nexus-modal-border-light);
+}
+
+/* =========================================================
+   CONTENT SECTIONS
+   ========================================================= */
+
+.nexus-scrollable-section {
+  margin-bottom: 24px;
+}
+
+.nexus-scrollable-section:last-child {
+  margin-bottom: 0;
+}
+
+.nexus-scrollable-section > h6 {
+  margin: 0 0 12px;
+
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+
+  color: var(--nexus-modal-text);
+}
+
+.nexus-scrollable-text {
+  margin: 0 0 10px;
+
+  font-size: 12px;
+  line-height: 20px;
+
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-scrollable-text:last-child {
+  margin-bottom: 0;
+}
+
+/* =========================================================
+   DETAIL ITEMS
+   ========================================================= */
+
+.nexus-detail-item {
+  padding: 10px 12px;
+
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 7px;
+
+  background: var(--nexus-modal-surface-alt);
+}
+
+.nexus-detail-label {
+  display: block;
+
+  margin-bottom: 2px;
+
+  font-size: 10px;
+  line-height: 16px;
+
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-detail-item strong {
+  display: block;
+
+  overflow-wrap: anywhere;
+
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 17px;
+
+  color: var(--nexus-modal-text);
+}
+
+/* =========================================================
+   TAGS
+   ========================================================= */
+
+.nexus-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.nexus-tag-list span {
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 26px;
+  padding: 3px 9px;
+
+  border: 1px solid var(--nexus-modal-border);
+  border-radius: 6px;
+
+  background: var(--nexus-modal-surface-alt);
+
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 16px;
+
+  color: var(--nexus-modal-text);
+}
+
+/* =========================================================
+   NOTES
+   ========================================================= */
+
+.nexus-note-item {
+  padding: 10px 12px;
+
+  border-left: 2px solid var(--nexus-modal-border);
+
+  background: var(--nexus-modal-surface-alt);
+}
+
+.nexus-note-item + .nexus-note-item {
+  margin-top: 8px;
+}
+
+.nexus-note-date {
+  display: block;
+
+  margin-bottom: 3px;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  color: var(--nexus-modal-text);
+}
+
+.nexus-note-item p {
+  margin: 0;
+
+  font-size: 11px;
+  line-height: 18px;
+
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   ACTIVITY HISTORY
+   ========================================================= */
+
+.nexus-activity-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.nexus-activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  padding: 14px 0;
+
+  border-bottom: 1px solid var(--nexus-modal-border-light);
+}
+
+.nexus-activity-item:first-child {
+  padding-top: 0;
+}
+
+.nexus-activity-item:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.nexus-activity-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+
+  border-radius: 7px;
+
+  font-size: 13px;
+}
+
+.nexus-activity-success {
+  color: #1a7f37;
+  background: #dafbe1;
+}
+
+.nexus-activity-info {
+  color: #0969da;
+  background: #ddf4ff;
+}
+
+.nexus-activity-warning {
+  color: #9a6700;
+  background: #fff8c5;
+}
+
+.nexus-activity-danger {
+  color: #cf222e;
+  background: #ffebe9;
+}
+
+.nexus-activity-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.nexus-activity-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.nexus-activity-top strong {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 17px;
+
+  color: var(--nexus-modal-text);
+}
+
+.nexus-activity-top span {
+  flex-shrink: 0;
+
+  font-size: 10px;
+  line-height: 16px;
+
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-activity-content p {
+  margin: 3px 0;
+
+  font-size: 11px;
+  line-height: 18px;
+
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-activity-content small {
+  font-size: 10px;
+  line-height: 16px;
+
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   NOTIFICATIONS
+   ========================================================= */
+
+.nexus-notification-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.nexus-notification-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+
+  padding: 13px 10px;
+
+  border-bottom: 1px solid var(--nexus-modal-border-light);
+}
+
+.nexus-notification-item:first-child {
+  padding-top: 2px;
+}
+
+.nexus-notification-item:last-child {
+  border-bottom: 0;
+}
+
+.nexus-notification-item.unread {
+  background: #f6f8fa;
+
+  border-radius: 7px;
+}
+
+.nexus-notification-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+
+  border-radius: 7px;
+
+  color: #0969da;
+  background: #ddf4ff;
+
+  font-size: 13px;
+}
+
+.nexus-notification-item strong {
+  display: block;
+
+  margin-bottom: 2px;
+
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 17px;
+
+  color: var(--nexus-modal-text);
+}
+
+.nexus-notification-item p {
+  margin: 0 0 3px;
+
+  font-size: 11px;
+  line-height: 18px;
+
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-notification-item span {
+  font-size: 10px;
+  line-height: 15px;
+
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   POLICY
+   ========================================================= */
+
+.nexus-policy-intro {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+
+  margin-bottom: 22px;
+  padding: 12px;
+
+  border: 1px solid #ddf4ff;
+  border-radius: 8px;
+
+  background: #f6fbff;
+}
+
+.nexus-policy-intro > i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+
+  border-radius: 7px;
+
+  color: #0969da;
+  background: #ddf4ff;
+
+  font-size: 14px;
+}
+
+.nexus-policy-intro strong {
+  display: block;
+
+  margin-bottom: 2px;
+
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 17px;
+
+  color: var(--nexus-modal-text);
+}
+
+.nexus-policy-intro p {
+  margin: 0;
+
+  font-size: 11px;
+  line-height: 18px;
+
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-policy section {
+  margin-bottom: 22px;
+}
+
+.nexus-policy section:last-child {
+  margin-bottom: 0;
+}
+
+.nexus-policy h6 {
+  margin: 0 0 6px;
+
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+
+  color: var(--nexus-modal-text);
+}
+
+.nexus-policy p {
+  margin: 0;
+
+  font-size: 11px;
+  line-height: 19px;
+
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 767.98px) {
+  .nexus-activity-top {
+    display: block;
+  }
+
+  .nexus-activity-top span {
+    display: block;
+
+    margin-top: 2px;
+  }
+
+  .nexus-scrollable-profile-header {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .nexus-scrollable-avatar {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+
+    font-size: 13px;
+  }
+
+  .nexus-detail-item {
+    padding: 9px 10px;
+  }
+
+  .nexus-activity-item {
+    gap: 9px;
+  }
+
+  .nexus-activity-icon,
+  .nexus-notification-icon {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+
+    font-size: 12px;
+  }
+
+  .nexus-policy-intro {
+    padding: 10px;
+  }
+}
+
+/* =========================================================
+   ALERT MODALS
+   ========================================================= */
+
+.nexus-alert-modal .modal-dialog {
+  max-width: 500px;
+}
+
+.nexus-alert-modal .modal-content {
+  border-radius: 12px;
+}
+
+/* =========================================================
+   ALERT HEADING
+   ========================================================= */
+
+.nexus-alert-heading {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 10px;
+}
+
+.nexus-alert-heading > div:last-child {
+  min-width: 0;
+}
+
+/* =========================================================
+   ALERT ICON
+   ========================================================= */
+
+.nexus-alert-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 9px;
+  font-size: 17px;
+}
+
+.nexus-alert-info .nexus-alert-icon {
+  color: #0969da;
+  background: #ddf4ff;
+}
+
+.nexus-alert-success .nexus-alert-icon {
+  color: #1a7f37;
+  background: #dafbe1;
+}
+
+.nexus-alert-warning .nexus-alert-icon {
+  color: #9a6700;
+  background: #fff8c5;
+}
+
+.nexus-alert-danger .nexus-alert-icon {
+  color: #cf222e;
+  background: #ffebe9;
+}
+
+.nexus-alert-maintenance .nexus-alert-icon {
+  color: #8250df;
+  background: #fbefff;
+}
+
+/* =========================================================
+   ALERT VARIANT BORDERS
+   ========================================================= */
+
+.nexus-alert-info .modal-header {
+  border-left: 3px solid #0969da;
+}
+
+.nexus-alert-success .modal-header {
+  border-left: 3px solid #1a7f37;
+}
+
+.nexus-alert-warning .modal-header {
+  border-left: 3px solid #9a6700;
+}
+
+.nexus-alert-danger .modal-header {
+  border-left: 3px solid #cf222e;
+}
+
+.nexus-alert-maintenance .modal-header {
+  border-left: 3px solid #8250df;
+}
+
+/* =========================================================
+   ALERT SUMMARY
+   ========================================================= */
+
+.nexus-alert-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 18px;
+  overflow: hidden;
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 8px;
+  background: var(--nexus-modal-surface-alt);
+}
+
+.nexus-alert-summary > div {
+  padding: 10px 12px;
+}
+
+.nexus-alert-summary > div + div {
+  border-left: 1px solid var(--nexus-modal-border-light);
+}
+
+.nexus-alert-summary-label {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 10px;
+  line-height: 15px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-alert-summary strong {
+  display: block;
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 17px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--nexus-modal-text);
+}
+
+/* =========================================================
+   ALERT MESSAGE
+   ========================================================= */
+
+.nexus-alert-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 12px;
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 8px;
+  background: var(--nexus-modal-surface-alt);
+}
+
+.nexus-alert-message > i {
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-size: 16px;
+  color: var(--nexus-modal-warning);
+}
+
+.nexus-alert-message strong {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-alert-message p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 17px;
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   ERROR BOX
+   ========================================================= */
+
+.nexus-alert-error-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  border: 1px solid #ffebe9;
+  border-radius: 7px;
+  background: #fff8f7;
+}
+
+.nexus-alert-error-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--nexus-modal-danger);
+}
+
+.nexus-alert-error-box code {
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: #ffebe9;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 10px;
+  color: var(--nexus-modal-danger);
+}
+
+/* =========================================================
+   MAINTENANCE DETAILS
+   ========================================================= */
+
+.nexus-alert-maintenance-info {
+  margin-bottom: 18px;
+  overflow: hidden;
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 8px;
+  background: var(--nexus-modal-surface-alt);
+}
+
+.nexus-alert-maintenance-info > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 12px;
+}
+
+.nexus-alert-maintenance-info > div + div {
+  border-top: 1px solid var(--nexus-modal-border-light);
+}
+
+.nexus-alert-maintenance-info span {
+  font-size: 11px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-alert-maintenance-info strong {
+  font-size: 11px;
+  font-weight: 600;
+  text-align: right;
+  color: var(--nexus-modal-text);
+}
+
+/* =========================================================
+   SESSION TIMER
+   ========================================================= */
+
+.nexus-session-timer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 14px;
+  border: 1px solid #e5d9a3;
+  border-radius: 8px;
+  background: #fffdf0;
+}
+
+.nexus-session-timer-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 8px;
+  color: #9a6700;
+  background: #fff8c5;
+  font-size: 16px;
+}
+
+.nexus-session-timer span {
+  display: block;
+  margin-bottom: 1px;
+  font-size: 10px;
+  line-height: 15px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-session-timer strong {
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: -0.01em;
+  color: var(--nexus-modal-text);
+}
+
+/* =========================================================
+   UPDATE LIST
+   ========================================================= */
+
+.nexus-update-list {
+  margin: 18px 0 0;
+  padding: 0;
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 8px;
+  background: var(--nexus-modal-surface-alt);
+}
+
+.nexus-update-list > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 10px 12px;
+  font-size: 11px;
+  line-height: 17px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-update-list > div + div {
+  border-top: 1px solid var(--nexus-modal-border-light);
+}
+
+.nexus-update-list i {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--nexus-modal-success);
+  font-size: 13px;
+}
+
+/* =========================================================
+   ACCESS DETAILS
+   ========================================================= */
+
+.nexus-access-details {
+  margin: 18px 0;
+  overflow: hidden;
+  border: 1px solid #ffebe9;
+  border-radius: 8px;
+  background: #fff8f7;
+}
+
+.nexus-access-details > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 12px;
+}
+
+.nexus-access-details > div + div {
+  border-top: 1px solid #ffebe9;
+}
+
+.nexus-access-details span {
+  font-size: 11px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-access-details strong {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--nexus-modal-danger);
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 575.98px) {
+  .nexus-alert-modal .modal-dialog {
+    margin: 12px;
+  }
+
+  .nexus-alert-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .nexus-alert-summary > div + div {
+    border-top: 1px solid var(--nexus-modal-border-light);
+    border-left: 0;
+  }
+
+  .nexus-alert-maintenance-info > div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .nexus-alert-maintenance-info strong {
+    text-align: left;
+  }
+
+  .nexus-access-details > div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .nexus-alert-error-box {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+}
+
+/* =========================================================
+   ACTION MODALS
+   ========================================================= */
+
+.nexus-action-modal .modal-dialog {
+  max-width: 520px;
+}
+
+/* =========================================================
+   ACTION ICONS
+   ========================================================= */
+
+.nexus-action-icon-primary {
+  color: #0969da;
+  background: #ddf4ff;
+}
+
+.nexus-action-icon-info {
+  color: #0969da;
+  background: #ddf4ff;
+}
+
+.nexus-action-icon-success {
+  color: #1a7f37;
+  background: #dafbe1;
+}
+
+.nexus-action-icon-danger {
+  color: #cf222e;
+  background: #ffebe9;
+}
+
+/* =========================================================
+   ACTION RECORD
+   ========================================================= */
+
+.nexus-action-record {
+  padding: 12px 14px;
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 8px;
+  background: var(--nexus-modal-surface-alt);
+}
+
+.nexus-action-record > span {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 10px;
+  line-height: 15px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-action-record > strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 19px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-action-record > small {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  line-height: 16px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-action-record-danger {
+  border-color: #ffebe9;
+  background: #fff8f7;
+}
+
+.nexus-action-record-danger > strong {
+  color: var(--nexus-modal-danger);
+}
+
+/* =========================================================
+   ACTION DETAILS
+   ========================================================= */
+
+.nexus-action-details {
+  margin-top: 12px;
+  overflow: hidden;
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 8px;
+}
+
+.nexus-action-details > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 9px 12px;
+}
+
+.nexus-action-details > div + div {
+  border-top: 1px solid var(--nexus-modal-border-light);
+}
+
+.nexus-action-details span {
+  font-size: 10px;
+  line-height: 16px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-action-details strong {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 17px;
+  text-align: right;
+  color: var(--nexus-modal-text);
+}
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.nexus-action-status-current {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 12px;
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 8px;
+  background: var(--nexus-modal-surface-alt);
+}
+
+.nexus-action-status-current > span {
+  font-size: 10px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-action-status-current > div {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-action-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #bf8700;
+}
+
+/* =========================================================
+   ACTION OPTIONS
+   ========================================================= */
+
+.nexus-action-option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nexus-action-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--nexus-modal-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.nexus-action-option:hover {
+  border-color: #afb8c1;
+  background: var(--nexus-modal-surface-alt);
+}
+
+.nexus-action-option:has(input:checked) {
+  border-color: #0969da;
+  background: #f6faff;
+}
+
+.nexus-action-option input {
+  flex-shrink: 0;
+  margin: 0;
+  accent-color: #0969da;
+}
+
+.nexus-action-option-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  border-radius: 7px;
+  color: var(--nexus-modal-muted);
+  background: #ffffff;
+  font-size: 14px;
+}
+
+.nexus-action-option-content {
+  min-width: 0;
+}
+
+.nexus-action-option-content strong {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 17px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-action-option-content small {
+  display: block;
+  margin-top: 1px;
+  font-size: 10px;
+  line-height: 15px;
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   INPUT ICON
+   ========================================================= */
+
+.nexus-action-input-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  padding: 0;
+  border-color: var(--nexus-modal-border);
+  border-right: 0;
+  background: var(--nexus-modal-surface);
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-action-input-icon + .nexus-form-control {
+  border-left: 0;
+}
+
+.nexus-action-input-icon + .nexus-form-control:focus {
+  border-left: 1px solid #0969da;
+}
+
+/* =========================================================
+   DATE OPTIONS
+   ========================================================= */
+
+.nexus-action-date-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.nexus-action-date-options label {
+  position: relative;
+  margin: 0;
+  cursor: pointer;
+}
+
+.nexus-action-date-options input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.nexus-action-date-options span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 5px 10px;
+  border: 1px solid var(--nexus-modal-border);
+  border-radius: 6px;
+  background: #ffffff;
+  font-size: 11px;
+  line-height: 18px;
+  color: var(--nexus-modal-text);
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.nexus-action-date-options label:hover span {
+  background: var(--nexus-modal-surface-alt);
+  border-color: #afb8c1;
+}
+
+.nexus-action-date-options input:checked + span {
+  color: #0969da;
+  background: #f6faff;
+  border-color: #0969da;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 575.98px) {
+  .nexus-action-modal .modal-dialog {
+    margin: 12px;
+  }
+
+  .nexus-action-details > div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .nexus-action-details strong {
+    text-align: left;
+  }
+
+  .nexus-action-status-current {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .nexus-action-date-options {
+    flex-direction: column;
+  }
+
+  .nexus-action-date-options span {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   NEXUS FULLSCREEN MODALS
+   ========================================================= */
+
+.nexus-modal-fullscreen .modal-dialog {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  margin: 0;
+}
+
+.nexus-modal-fullscreen .modal-content {
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.nexus-modal-fullscreen .modal-header {
+  min-height: 64px;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--nexus-modal-border);
+}
+
+.nexus-modal-fullscreen .modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24px;
+  background: #f6f8fa;
+}
+
+.nexus-modal-fullscreen .modal-footer {
+  min-height: 60px;
+  padding: 12px 24px;
+  background: #ffffff;
+  border-top: 1px solid var(--nexus-modal-border);
+}
+
+/* =========================================================
+   FULLSCREEN CONTENT
+   ========================================================= */
+
+.nexus-fullscreen-content {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.nexus-fullscreen-welcome {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid var(--nexus-modal-border);
+  border-radius: 10px;
+}
+
+.nexus-fullscreen-welcome h3 {
+  margin: 0 0 4px;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-fullscreen-welcome p {
+  max-width: 760px;
+  margin: 0;
+  font-size: 12px;
+  line-height: 19px;
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   STAT CARDS
+   ========================================================= */
+
+.nexus-fullscreen-stat {
+  display: flex;
+  flex-direction: column;
+  min-height: 120px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid var(--nexus-modal-border);
+  border-radius: 9px;
+}
+
+.nexus-fullscreen-stat-label {
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-fullscreen-stat strong {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 30px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-fullscreen-stat small {
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   PANELS
+   ========================================================= */
+
+.nexus-fullscreen-panel {
+  background: #ffffff;
+  border: 1px solid var(--nexus-modal-border);
+  border-radius: 10px;
+}
+
+.nexus-fullscreen-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--nexus-modal-border-light);
+}
+
+.nexus-fullscreen-panel-header h4 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-fullscreen-panel-header p {
+  margin: 3px 0 0;
+  font-size: 11px;
+  line-height: 17px;
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   BADGES
+   ========================================================= */
+
+.nexus-fullscreen-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 16px;
+}
+
+.nexus-fullscreen-badge.success {
+  color: #1a7f37;
+  background: #dafbe1;
+}
+
+.nexus-fullscreen-badge.warning {
+  color: #9a6700;
+  background: #fff8c5;
+}
+
+.nexus-fullscreen-badge.danger {
+  color: #cf222e;
+  background: #ffebe9;
+}
+
+.nexus-fullscreen-badge.info {
+  color: #0969da;
+  background: #ddf4ff;
+}
+
+/* =========================================================
+   STATUS LIST
+   ========================================================= */
+
+.nexus-fullscreen-status-list {
+  padding: 4px 18px;
+}
+
+.nexus-fullscreen-status-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+  border-bottom: 1px solid var(--nexus-modal-border-light);
+}
+
+.nexus-fullscreen-status-row:last-child {
+  border-bottom: 0;
+}
+
+.nexus-fullscreen-status-row > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.nexus-fullscreen-status-row strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-fullscreen-status-row small {
+  display: block;
+  font-size: 10px;
+  line-height: 16px;
+  color: var(--nexus-modal-muted);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  min-width: 8px;
+  border-radius: 50%;
+}
+
+.status-dot.success {
+  background: #1a7f37;
+}
+
+.status-dot.warning {
+  background: #bf8700;
+}
+
+.status-dot.danger {
+  background: #cf222e;
+}
+
+.status-label {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.status-label.success {
+  color: #1a7f37;
+}
+
+.status-label.warning {
+  color: #9a6700;
+}
+
+.status-label.danger {
+  color: #cf222e;
+}
+
+/* =========================================================
+   APPLICATION WORKSPACE
+   ========================================================= */
+
+.nexus-fullscreen-app-header {
+  padding: 10px 20px !important;
+}
+
+.nexus-fullscreen-app-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nexus-fullscreen-app-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 8px;
+  color: #0969da;
+  background: #ddf4ff;
+}
+
+.nexus-fullscreen-app-brand .modal-title {
+  font-size: 14px;
+}
+
+.nexus-fullscreen-app-brand span {
+  display: block;
+  margin-top: 1px;
+  font-size: 10px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-fullscreen-app-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* =========================================================
+   WORKSPACE
+   ========================================================= */
+
+.nexus-fullscreen-workspace {
+  display: flex;
+  padding: 0 !important;
+}
+
+.nexus-fullscreen-sidebar {
+  width: 230px;
+  min-width: 230px;
+  padding: 18px 12px;
+  background: #ffffff;
+  border-right: 1px solid var(--nexus-modal-border);
+}
+
+.nexus-fullscreen-sidebar-title {
+  padding: 4px 10px 10px;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-fullscreen-nav-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 36px;
+  margin-bottom: 3px;
+  padding: 7px 10px;
+  gap: 9px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--nexus-modal-text);
+  font-size: 11px;
+  text-align: left;
+}
+
+.nexus-fullscreen-nav-item i {
+  width: 16px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-fullscreen-nav-item span {
+  margin-left: auto;
+  color: var(--nexus-modal-muted);
+  font-size: 10px;
+}
+
+.nexus-fullscreen-nav-item:hover,
+.nexus-fullscreen-nav-item.active {
+  background: #f6f8fa;
+}
+
+.nexus-fullscreen-nav-item.active {
+  font-weight: 600;
+}
+
+.nexus-fullscreen-workspace-main {
+  flex: 1;
+  min-width: 0;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.nexus-fullscreen-workspace-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 18px;
+}
+
+.nexus-fullscreen-workspace-toolbar h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.nexus-fullscreen-workspace-toolbar p {
+  margin: 3px 0 0;
+  font-size: 11px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-fullscreen-work-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 10px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid var(--nexus-modal-border);
+  border-radius: 9px;
+}
+
+.nexus-fullscreen-work-card h4 {
+  margin: 8px 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.nexus-fullscreen-work-card p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 18px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-fullscreen-work-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.nexus-fullscreen-work-meta span {
+  font-size: 10px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-fullscreen-work-meta i {
+  margin-right: 4px;
+}
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.nexus-fullscreen-table-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.nexus-fullscreen-search {
+  max-width: 420px;
+}
+
+.nexus-fullscreen-search .input-group-text {
+  background: #ffffff;
+  border-color: var(--nexus-modal-border);
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-fullscreen-filter {
+  max-width: 220px;
+}
+
+.nexus-fullscreen-table-wrapper {
+  background: #ffffff;
+  border: 1px solid var(--nexus-modal-border);
+  border-radius: 9px;
+}
+
+.nexus-fullscreen-table {
+  margin: 0;
+  font-size: 11px;
+}
+
+.nexus-fullscreen-table th {
+  padding: 11px 14px;
+  background: #f6f8fa;
+  border-bottom: 1px solid var(--nexus-modal-border);
+  color: var(--nexus-modal-muted);
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.nexus-fullscreen-table td {
+  padding: 12px 14px;
+  vertical-align: middle;
+  border-color: var(--nexus-modal-border-light);
+  color: var(--nexus-modal-text);
+}
+
+.nexus-fullscreen-table td strong {
+  font-weight: 600;
+}
+
+.nexus-fullscreen-record-count {
+  margin-right: auto;
+  font-size: 10px;
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   DETAIL VIEW
+   ========================================================= */
+
+.nexus-fullscreen-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.nexus-fullscreen-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  padding: 6px 18px;
+}
+
+.nexus-fullscreen-info-grid > div {
+  padding: 13px 10px;
+  border-bottom: 1px solid var(--nexus-modal-border-light);
+}
+
+.nexus-fullscreen-info-grid span,
+.nexus-fullscreen-meta-list span {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 10px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-fullscreen-info-grid strong,
+.nexus-fullscreen-meta-list strong {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-fullscreen-check-list {
+  padding: 8px 18px;
+}
+
+.nexus-fullscreen-check-list > div {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 42px;
+  border-bottom: 1px solid var(--nexus-modal-border-light);
+  font-size: 11px;
+}
+
+.nexus-fullscreen-check-list > div:last-child {
+  border-bottom: 0;
+}
+
+.nexus-fullscreen-check-list i {
+  color: #1a7f37;
+}
+
+.nexus-fullscreen-meta-list {
+  padding: 6px 18px;
+}
+
+.nexus-fullscreen-meta-list > div {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--nexus-modal-border-light);
+}
+
+.nexus-fullscreen-meta-list > div:last-child {
+  border-bottom: 0;
+}
+
+.nexus-fullscreen-remarks {
+  margin: 0;
+  padding: 16px 18px;
+  font-size: 11px;
+  line-height: 19px;
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   FULLSCREEN FORM
+   ========================================================= */
+
+.nexus-fullscreen-form-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 20px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.nexus-fullscreen-form-sidebar {
+  height: fit-content;
+  padding: 8px;
+  background: #ffffff;
+  border: 1px solid var(--nexus-modal-border);
+  border-radius: 9px;
+}
+
+.nexus-fullscreen-form-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 7px;
+}
+
+.nexus-fullscreen-form-step.active {
+  background: #f6f8fa;
+}
+
+.nexus-fullscreen-form-step > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border: 1px solid var(--nexus-modal-border);
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--nexus-modal-muted);
+  background: #ffffff;
+}
+
+.nexus-fullscreen-form-step.active > span {
+  color: #ffffff;
+  background: #0969da;
+  border-color: #0969da;
+}
+
+.nexus-fullscreen-form-step strong {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 17px;
+}
+
+.nexus-fullscreen-form-step small {
+  display: block;
+  margin-top: 1px;
+  font-size: 9px;
+  line-height: 14px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-fullscreen-form-content {
+  min-width: 0;
+}
+
+.nexus-fullscreen-procedure {
+  padding: 8px 18px;
+}
+
+.nexus-fullscreen-procedure-item {
+  display: flex;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--nexus-modal-border-light);
+}
+
+.nexus-fullscreen-procedure-item:last-child {
+  border-bottom: 0;
+}
+
+.nexus-fullscreen-procedure-item > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 6px;
+  background: #f6f8fa;
+  color: var(--nexus-modal-muted);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.nexus-fullscreen-procedure-item strong {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.nexus-fullscreen-procedure-item p {
+  margin: 0;
+  font-size: 10px;
+  line-height: 17px;
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 991.98px) {
+  .nexus-fullscreen-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nexus-fullscreen-form-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .nexus-fullscreen-form-sidebar {
+    display: flex;
+    overflow-x: auto;
+    gap: 4px;
+  }
+
+  .nexus-fullscreen-form-step {
+    min-width: 190px;
+  }
+
+  .nexus-fullscreen-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .nexus-fullscreen-work-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .nexus-fullscreen-work-meta {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .nexus-modal-fullscreen .modal-header {
+    padding: 12px 16px;
+  }
+
+  .nexus-modal-fullscreen .modal-body {
+    padding: 16px;
+  }
+
+  .nexus-modal-fullscreen .modal-footer {
+    padding: 10px 16px;
+  }
+
+  .nexus-fullscreen-sidebar {
+    display: none;
+  }
+
+  .nexus-fullscreen-workspace-main {
+    padding: 16px;
+  }
+
+  .nexus-fullscreen-workspace-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .nexus-fullscreen-table-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .nexus-fullscreen-search,
+  .nexus-fullscreen-filter {
+    max-width: none;
+  }
+
+  .nexus-fullscreen-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nexus-fullscreen-app-actions .btn {
+    display: none;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .nexus-modal-fullscreen .modal-header {
+    min-height: 58px;
+  }
+
+  .nexus-fullscreen-welcome {
+    padding: 16px;
+  }
+
+  .nexus-fullscreen-stat {
+    min-height: 100px;
+  }
+
+  .nexus-fullscreen-form-step {
+    min-width: 170px;
+  }
+
+  .nexus-fullscreen-record-count {
+    display: none;
+  }
+}
+
+/* =========================================================
+   MODAL STATES
+   ========================================================= */
+
+.nexus-state-modal .modal-body {
+  min-height: 120px;
+}
+
+/* =========================================================
+   STATE CONTENT
+   ========================================================= */
+
+.nexus-state-content {
+  width: 100%;
+}
+
+.nexus-state-content > p {
+  margin-bottom: 16px;
+}
+
+/* =========================================================
+   STATE SUMMARY
+   ========================================================= */
+
+.nexus-state-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 8px;
+  background: var(--nexus-modal-surface-alt);
+}
+
+.nexus-state-summary > div {
+  min-width: 0;
+}
+
+.nexus-state-summary span {
+  display: block;
+  margin-bottom: 2px;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 10px;
+  line-height: 15px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-state-summary strong {
+  display: block;
+  overflow: hidden;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 17px;
+  color: var(--nexus-modal-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   ERROR DETAILS
+   ========================================================= */
+
+.nexus-state-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 12px;
+  border: 1px solid #ffebe9;
+  border-radius: 8px;
+  background: #fff8f7;
+}
+
+.nexus-state-error-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border-radius: 50%;
+  color: #cf222e;
+  background: #ffebe9;
+  font-size: 12px;
+}
+
+.nexus-state-error strong {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 17px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-state-error span {
+  display: block;
+  font-size: 10px;
+  line-height: 16px;
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   WARNING CHECKLIST
+   ========================================================= */
+
+.nexus-state-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 8px;
+  background: var(--nexus-modal-surface-alt);
+}
+
+.nexus-state-checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 22px;
+  font-size: 11px;
+  line-height: 17px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-state-checklist-item i {
+  font-size: 13px;
+}
+
+.nexus-state-checklist-item.is-complete {
+  color: var(--nexus-modal-text);
+}
+
+.nexus-state-checklist-item.is-complete i {
+  color: #1a7f37;
+}
+
+.nexus-state-checklist-item.is-pending {
+  color: #9a6700;
+}
+
+.nexus-state-checklist-item.is-pending i {
+  color: #bf8700;
+}
+
+/* =========================================================
+   MUTED / UNAVAILABLE ICON
+   ========================================================= */
+
+.nexus-modal-icon-muted {
+  color: #656d76;
+  background: #eaeef2;
+}
+
+/* =========================================================
+   STATE NOTICE
+   ========================================================= */
+
+.nexus-state-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 11px 12px;
+  border: 1px solid #d8e6f5;
+  border-radius: 8px;
+  background: #f1f8ff;
+  color: #0969da;
+}
+
+.nexus-state-notice i {
+  flex-shrink: 0;
+  margin-top: 1px;
+  font-size: 13px;
+}
+
+.nexus-state-notice span {
+  font-size: 10px;
+  line-height: 16px;
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   SESSION INFORMATION
+   ========================================================= */
+
+.nexus-session-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 8px;
+  background: var(--nexus-modal-surface-alt);
+}
+
+.nexus-session-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 10px;
+  line-height: 16px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-session-info-item i {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--nexus-modal-primary);
+  font-size: 12px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 575.98px) {
+  .nexus-state-summary {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+
+  .nexus-state-summary > div {
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--nexus-modal-border-light);
+  }
+
+  .nexus-state-summary > div:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .nexus-state-modal .modal-body {
+    min-height: 0;
+  }
+}
+
+/* =========================================================
+   ADVANCED MODALS
+   ERP / Enterprise Workflow Components
+   ========================================================= */
+
+.nexus-modal-advanced .modal-dialog {
+  width: auto;
+}
+
+.nexus-modal-eyebrow {
+  margin-bottom: 3px;
+  font-family:
+    "Mona Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 14px;
+  letter-spacing: 0.08em;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-advanced-muted {
+  font-size: 11px;
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   STATUS BAR
+   ========================================================= */
+
+.nexus-advanced-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 36px;
+  margin-bottom: 18px;
+  padding: 8px 10px;
+  background: var(--nexus-modal-surface-alt);
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 7px;
+  font-size: 11px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-advanced-status-bar > div {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 500;
+}
+
+.nexus-status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.nexus-status-warning {
+  background: #bf8700;
+}
+
+.nexus-status-success {
+  background: #1a7f37;
+}
+
+.nexus-status-danger {
+  background: #cf222e;
+}
+
+.nexus-status-info {
+  background: #0969da;
+}
+
+/* =========================================================
+   DETAIL GRID
+   ========================================================= */
+
+.nexus-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  margin-bottom: 18px;
+  background: var(--nexus-modal-border-light);
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 8px;
+}
+
+.nexus-detail-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding: 11px 12px;
+  background: var(--nexus-modal-surface);
+}
+
+.nexus-detail-label {
+  font-size: 10px;
+  line-height: 15px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-detail-grid strong {
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--nexus-modal-text);
+}
+
+/* =========================================================
+   ADVANCED BLOCK
+   ========================================================= */
+
+.nexus-advanced-block {
+  margin-top: 16px;
+  overflow: hidden;
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 8px;
+}
+
+.nexus-advanced-block-header {
+  padding: 9px 12px;
+  background: var(--nexus-modal-surface-alt);
+  border-bottom: 1px solid var(--nexus-modal-border-light);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 17px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-advanced-text {
+  padding: 12px;
+  font-size: 12px;
+  line-height: 19px;
+  color: var(--nexus-modal-text);
+}
+
+/* =========================================================
+   ADVANCED TABLE
+   ========================================================= */
+
+.nexus-advanced-table {
+  width: 100%;
+}
+
+.nexus-advanced-table-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) 60px 100px 100px;
+  align-items: center;
+  min-height: 40px;
+  border-bottom: 1px solid var(--nexus-modal-border-light);
+  font-size: 11px;
+  line-height: 17px;
+}
+
+.nexus-advanced-table-row:last-child {
+  border-bottom: 0;
+}
+
+.nexus-advanced-table-row > span,
+.nexus-advanced-table-row > strong {
+  min-width: 0;
+  padding: 7px 10px;
+}
+
+.nexus-advanced-table-head {
+  min-height: 34px;
+  background: var(--nexus-modal-surface-alt);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-advanced-table-row strong {
+  font-weight: 600;
+  color: var(--nexus-modal-text);
+}
+
+/* =========================================================
+   TOTAL
+   ========================================================= */
+
+.nexus-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 18px;
+  padding: 14px 2px 2px;
+  font-size: 12px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-total-row strong {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--nexus-modal-text);
+}
+
+/* =========================================================
+   WORKFLOW
+   ========================================================= */
+
+.nexus-workflow {
+  position: relative;
+}
+
+.nexus-workflow-item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  min-height: 66px;
+  gap: 12px;
+}
+
+.nexus-workflow-item:not(:last-child)::before {
+  position: absolute;
+  top: 30px;
+  bottom: 0;
+  left: 13px;
+  width: 1px;
+  content: "";
+  background: var(--nexus-modal-border);
+}
+
+.nexus-workflow-marker {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 27px;
+  min-width: 27px;
+  border: 1px solid var(--nexus-modal-border);
+  border-radius: 50%;
+  background: var(--nexus-modal-surface);
+  font-size: 11px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-workflow-item.completed .nexus-workflow-marker {
+  border-color: #1a7f37;
+  color: #1a7f37;
+  background: #dafbe1;
+}
+
+.nexus-workflow-item.active .nexus-workflow-marker {
+  border-color: #0969da;
+  color: #0969da;
+  background: #ddf4ff;
+}
+
+.nexus-workflow-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 3px;
+}
+
+.nexus-workflow-content strong {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-workflow-content span {
+  font-size: 10px;
+  line-height: 16px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-workflow-badge {
+  margin-left: auto;
+  padding: 3px 7px;
+  border: 1px solid #b6e3ff;
+  border-radius: 20px;
+  background: #ddf4ff;
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 13px;
+  letter-spacing: 0.04em;
+  color: #0969da;
+}
+
+/* =========================================================
+   ADVANCED NOTE
+   ========================================================= */
+
+.nexus-advanced-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 18px;
+  padding: 10px 11px;
+  border: 1px solid #b6e3ff;
+  border-radius: 7px;
+  background: #f0f9ff;
+  font-size: 10px;
+  line-height: 16px;
+  color: #0969da;
+}
+
+.nexus-advanced-note i {
+  margin-top: 1px;
+  font-size: 12px;
+}
+
+.nexus-advanced-note-warning {
+  border-color: #f0d58c;
+  background: #fff8c5;
+  color: #7a5a00;
+}
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.nexus-advanced-search {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.nexus-advanced-search > i {
+  position: absolute;
+  top: 50%;
+  left: 11px;
+  z-index: 2;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-advanced-search .form-control {
+  padding-left: 32px;
+}
+
+/* =========================================================
+   EMPLOYEE LIST
+   ========================================================= */
+
+.nexus-employee-list {
+  overflow: hidden;
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 8px;
+}
+
+.nexus-employee-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 58px;
+  padding: 9px 11px;
+  gap: 10px;
+  border: 0;
+  border-bottom: 1px solid var(--nexus-modal-border-light);
+  background: var(--nexus-modal-surface);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.nexus-employee-row:last-child {
+  border-bottom: 0;
+}
+
+.nexus-employee-row:hover {
+  background: var(--nexus-modal-surface-alt);
+}
+
+.nexus-employee-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 7px;
+  background: #ddf4ff;
+  color: #0969da;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.nexus-employee-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 1px;
+}
+
+.nexus-employee-info strong {
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 17px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-employee-info span {
+  overflow: hidden;
+  font-size: 10px;
+  line-height: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-employee-row > i {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   RECORD STATUS
+   ========================================================= */
+
+.nexus-record-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 18px;
+  font-size: 11px;
+}
+
+.nexus-record-status > span:last-child {
+  margin-left: 8px;
+  padding-left: 8px;
+  border-left: 1px solid var(--nexus-modal-border);
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-record-status strong {
+  font-weight: 600;
+  color: var(--nexus-modal-text);
+}
+
+/* =========================================================
+   ACTION ROW
+   ========================================================= */
+
+.nexus-action-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+}
+
+.nexus-action-row > i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 7px;
+  background: #ddf4ff;
+  color: #0969da;
+  font-size: 13px;
+}
+
+.nexus-action-row > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nexus-action-row strong {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 17px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-action-row span {
+  font-size: 10px;
+  line-height: 15px;
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   AUDIT TIMELINE
+   ========================================================= */
+
+.nexus-audit-timeline {
+  position: relative;
+}
+
+.nexus-audit-item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding-bottom: 20px;
+}
+
+.nexus-audit-item:last-child {
+  padding-bottom: 0;
+}
+
+.nexus-audit-item:not(:last-child)::before {
+  position: absolute;
+  top: 29px;
+  bottom: 0;
+  left: 13px;
+  width: 1px;
+  content: "";
+  background: var(--nexus-modal-border-light);
+}
+
+.nexus-audit-marker {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 27px;
+  min-width: 27px;
+  border: 1px solid var(--nexus-modal-border-light);
+  border-radius: 50%;
+  background: var(--nexus-modal-surface-alt);
+  color: var(--nexus-modal-muted);
+  font-size: 11px;
+}
+
+.nexus-audit-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+
+.nexus-audit-content strong {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 17px;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-audit-content > span {
+  font-size: 10px;
+  line-height: 15px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-audit-content p {
+  margin: 4px 0 0;
+  font-size: 10px;
+  line-height: 16px;
+  color: var(--nexus-modal-text);
+}
+
+/* =========================================================
+   DANGER SUMMARY
+   ========================================================= */
+
+.nexus-danger-summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 12px;
+  border: 1px solid #ffcecb;
+  border-radius: 8px;
+  background: #fff5f5;
+}
+
+.nexus-danger-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 7px;
+  background: #ffebe9;
+  color: #cf222e;
+  font-size: 14px;
+}
+
+.nexus-danger-summary > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nexus-danger-summary strong {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 17px;
+  color: #cf222e;
+}
+
+.nexus-danger-summary span {
+  font-size: 10px;
+  line-height: 16px;
+  color: var(--nexus-modal-text);
+}
+
+/* =========================================================
+   SELECTED RECORDS
+   ========================================================= */
+
+.nexus-selected-record {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 36px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--nexus-modal-border-light);
+  font-size: 10px;
+}
+
+.nexus-selected-record:last-of-type {
+  border-bottom: 0;
+}
+
+.nexus-selected-record span:first-child {
+  font-weight: 600;
+  color: var(--nexus-modal-text);
+}
+
+.nexus-selected-record span:last-child {
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-more-records {
+  padding: 8px 10px;
+  background: var(--nexus-modal-surface-alt);
+  font-size: 10px;
+  color: var(--nexus-modal-muted);
+}
+
+/* =========================================================
+   MASTER DATA
+   ========================================================= */
+
+.nexus-change-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding: 9px 11px;
+  border: 1px solid #b6e3ff;
+  border-radius: 7px;
+  background: #f0f9ff;
+  font-size: 10px;
+  line-height: 16px;
+  color: #0969da;
+}
+
+.nexus-change-indicator i {
+  font-size: 12px;
+}
+
+.nexus-current-value {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid var(--nexus-modal-border-light);
+  font-size: 10px;
+  color: var(--nexus-modal-muted);
+}
+
+.nexus-current-value strong {
+  font-weight: 500;
+  color: var(--nexus-modal-text);
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 767.98px) {
+  .nexus-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nexus-advanced-table-row {
+    grid-template-columns:
+      minmax(0, 1fr)
+      45px
+      85px
+      85px;
+    font-size: 10px;
+  }
+
+  .nexus-total-row {
+    justify-content: space-between;
+  }
+
+  .nexus-workflow-badge {
+    display: none;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .nexus-modal-advanced .modal-dialog {
+    margin: 12px;
+  }
+
+  .nexus-advanced-status-bar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .nexus-advanced-table {
+    overflow-x: auto;
+  }
+
+  .nexus-advanced-table-row {
+    min-width: 480px;
+  }
+
+  .nexus-current-value {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .nexus-selected-record {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+}
