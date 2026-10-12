@@ -21,7 +21,7 @@ if (!empty($_SESSION['user_id'])) {
 
         $stmtActive = sqlsrv_query(
             $conn_sen,
-            "UPDATE [sen_template_db].[dbo].[accounts]
+            "UPDATE [factory_supplies_db].[dbo].[accounts]
              SET [last_active] = ?, [ip_address] = ?
              WHERE [id] = ?",
             [$manilaNow, $_SERVER['REMOTE_ADDR'] ?? '', $_SESSION['user_id']]
@@ -475,8 +475,66 @@ if (!function_exists('isActive')) {
     }
 }
 
+/* ==================== NAV BY ROLE ==================== */
+
+$role   = strtolower(trim($_SESSION['role'] ?? ''));
+$isUser = ($role === 'user');
+
+$navItems = $isUser
+    ? [
+        ['href' => 'index.php', 'icon' => 'bi-bag-plus',     'label' => 'Request Items'],
+        ['href' => 'withdraw.php',      'icon' => 'bi-box-arrow-up', 'label' => 'Withdraw'],
+    ]
+    : [
+        ['href' => 'index.php',     'icon' => 'bi-speedometer2', 'label' => 'Dashboard'],
+        ['href' => 'account.php',   'icon' => 'bi-people',       'label' => 'Account Management'],
+        ['href' => 'journal.php',   'icon' => 'bi-journal-text', 'label' => 'Journal'],
+        ['href' => 'purchases.php', 'icon' => 'bi-cart3',        'label' => 'Purchases'],
+    ];
+/* ==================== USER SECTION (m_employees) ==================== */
+
+// Cached in the session, so m_employees is queried once per login, not on every page
+if (!isset($_SESSION['section']) && !empty($_SESSION['id_no'])) {
+
+    $emsFile = __DIR__ . '/../api/connection/ems_conn.php'; // adjust to your real path
+    if (is_file($emsFile)) {
+        require_once $emsFile;
+    }
+
+    // Prefer $conn_ems, otherwise use any SQL Server connection except $conn_sen
+    $connEms = $GLOBALS['conn_ems'] ?? null;
+    if (!$connEms) {
+        foreach ($GLOBALS as $name => $value) {
+            if ($name !== 'conn_sen' && is_resource($value) && get_resource_type($value) === 'SQL Server Connection') {
+                $connEms = $value;
+                break;
+            }
+        }
+    }
+
+    if ($connEms) {
+        $stmtSec = sqlsrv_query(
+            $connEms,
+            "SELECT TOP 1 [section] FROM [emp_mgt_db].[dbo].[m_employees] WHERE [emp_no] = ?",
+            [$_SESSION['id_no']]
+        );
+        if ($stmtSec) {
+            $secRow = sqlsrv_fetch_array($stmtSec, SQLSRV_FETCH_ASSOC);
+            sqlsrv_free_stmt($stmtSec);
+            // Only cache on a successful query, so a failure retries on the next page
+            $_SESSION['section'] = trim($secRow['section'] ?? '');
+        }
+    }
+}
+
+// Shown under the name: the section, falling back to the role if there is none
+$userSection = trim($_SESSION['section'] ?? '');
+$userLabel   = $userSection !== '' ? $userSection : (!empty($_SESSION['role']) ? $_SESSION['role'] : 'Employee');
+// Brand logo goes to the first page the role can actually open
+$homeHref = $navItems[0]['href'];
+
 // If $system isn't set, fall back to a relative path (a bare "/dist/..." breaks the logo in subfolders)
-$logo_url = htmlspecialchars((isset($system) && $system !== '' ? rtrim($system, '/') . '/' : '') . 'dist/img/logo.png');
+$logo_url = htmlspecialchars((isset($system) && $system !== '' ? rtrim($system, '/') . '/' : '') . 'dist/img/logo2.png');
 
 // Signed-in employee's photo (falls back to the initial if there is no photo)
 $photo_url = '';
@@ -496,30 +554,27 @@ if (!empty($_SESSION['id_no'])) {
     <div class="topbar-inner">
 
         <!-- Brand -->
-        <a href="index.php" class="topbar-brand">
+        <a href="<?= htmlspecialchars($homeHref) ?>" class="topbar-brand">
             <div class="brand-mark">
                 <img src="<?= $logo_url ?>" alt="Template">
             </div>
 
             <div class="brand-text">
-                <span class="brand-name">Template</span>
+                <span class="brand-name">Factory Supplies System</span>
                 <span class="brand-version">Internal Web System</span>
             </div>
         </a>
 
         <!-- Desktop navigation -->
         <nav class="topbar-nav" aria-label="Primary navigation">
-
-            <a href="index.php" class="top-nav-item <?= isActive('index.php') ?>">
-                <i class="bi bi-speedometer2"></i>
-                <span>Dashboard</span>
-            </a>
-
-            <a href="account.php" class="top-nav-item <?= isActive('account.php') ?>">
-                <i class="bi bi-people"></i>
-                <span>Account Management</span>
-            </a>
-
+            <?php foreach ($navItems as $item): ?>
+                <a href="<?= htmlspecialchars($item['href']) ?>"
+                   class="top-nav-item <?= isActive($item['href']) ?>"
+                   <?= isActive($item['href']) ? 'aria-current="page"' : '' ?>>
+                    <i class="bi <?= htmlspecialchars($item['icon']) ?>"></i>
+                    <span><?= htmlspecialchars($item['label']) ?></span>
+                </a>
+            <?php endforeach; ?>
         </nav>
 
         <!-- Actions -->
@@ -545,13 +600,7 @@ if (!empty($_SESSION['id_no'])) {
                                 echo 'newt_';
                             }
                             ?></span>
-                        <span class="user-role"><?php
-                            if (!empty($_SESSION['role'])) {
-                                echo htmlspecialchars($_SESSION['role']);
-                            } else {
-                                echo 'Employee';
-                            }
-                            ?></span>
+<span class="user-role"><?= htmlspecialchars($userLabel) ?></span>
                     </span>
 
                     <i class="bi bi-chevron-down user-chevron"></i>
@@ -560,6 +609,7 @@ if (!empty($_SESSION['id_no'])) {
 
                 <ul class="dropdown-menu dropdown-menu-end template-user-dropdown">
 
+                    <?php if (!$isUser): ?>
                     <li>
                         <a class="dropdown-item" href="account.php">
                             <i class="bi bi-people"></i>
@@ -570,6 +620,7 @@ if (!empty($_SESSION['id_no'])) {
                     <li>
                         <hr class="dropdown-divider">
                     </li>
+                    <?php endif; ?>
 
                     <li>
                         <a class="dropdown-item text-danger" href="<?php echo htmlspecialchars($system ?? ''); ?>/logout.php">
@@ -600,15 +651,14 @@ if (!empty($_SESSION['id_no'])) {
 
         <div class="mobile-nav-inner">
 
-            <a href="index.php" class="mobile-nav-item <?= isActive('index.php') ?>">
-                <i class="bi bi-speedometer2"></i>
-                <span>Dashboard</span>
-            </a>
-
-            <a href="account.php" class="mobile-nav-item <?= isActive('account.php') ?>">
-                <i class="bi bi-people"></i>
-                <span>Account Management</span>
-            </a>
+            <?php foreach ($navItems as $item): ?>
+                <a href="<?= htmlspecialchars($item['href']) ?>"
+                   class="mobile-nav-item <?= isActive($item['href']) ?>"
+                   <?= isActive($item['href']) ? 'aria-current="page"' : '' ?>>
+                    <i class="bi <?= htmlspecialchars($item['icon']) ?>"></i>
+                    <span><?= htmlspecialchars($item['label']) ?></span>
+                </a>
+            <?php endforeach; ?>
 
             <div class="mobile-account-card">
 
@@ -624,12 +674,7 @@ if (!empty($_SESSION['id_no'])) {
                             echo 'newt_';
                         }
                         ?></span>
-                    <span class="user-role"><?php
-                        if (!empty($_SESSION['role'])) {
-                            echo htmlspecialchars($_SESSION['role']);
-                        } else {
-                            echo 'Employee';
-                        }
+<span class="user-role"><?= htmlspecialchars($userLabel) ?></span>
                         ?></span>
                 </div>
 

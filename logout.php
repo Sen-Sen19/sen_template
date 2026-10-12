@@ -7,6 +7,6 @@ $_SESSION = array();
 session_destroy();
 
 // Redirect to login page
-header('Location: /sen_template/index.php');
+header('Location: /factory_supplies/index.php');
 exit;
 ?>

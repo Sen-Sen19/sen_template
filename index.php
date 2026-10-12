@@ -69,7 +69,6 @@ html[data-theme="dark"] {
   position: fixed;
   inset: 0;
   display: flex;
-  overflow: hidden;
   width: 100%;
   height: 100dvh;
   overflow: hidden;
@@ -88,6 +87,21 @@ body {
   margin: 0;
   padding: 0;
   background: var(--login-bg);
+}
+
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--login-bg);
+  overflow-x: clip; /* safety net so nothing can widen the page */
 }
 
 /* ==================== THEME TOGGLE ==================== */
@@ -614,35 +628,50 @@ html[data-theme="dark"] .login-input:-webkit-autofill:focus {
 .loading-overlay.active {
   display: flex;
 }
-
 /* ==================== RESPONSIVE ==================== */
 
-/* Tablet: stack panels */
+/* Let flex/grid children shrink instead of overflowing */
+.system-panel,
+.login-panel,
+.login-content,
+.system-identity,
+.brand > div {
+  min-width: 0;
+}
+
+/* Tablet and below: stack panels in normal document flow */
 @media (max-width: 991.98px) {
   .login-page {
+    position: static;
     flex-direction: column;
-    overflow-y: auto;
+    width: 100%;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: visible;
   }
 
   .system-panel {
     width: 100%;
     height: auto;
-    flex-shrink: 0;
+    flex: none;
     padding: 28px 32px;
     border-right: 0;
     border-bottom: 1px solid var(--login-border-soft);
-    overflow: visible; /* lets the Work Instructions dropdown escape the panel */
   }
 
-  .system-content {
-    max-width: 720px;
+  .system-identity {
+    flex: none;
+    justify-content: flex-start;
+    margin-top: 40px;
+    padding-bottom: 0;
   }
 
   .login-panel {
     width: 100%;
     height: auto;
-    flex: 1;
-    padding: 30px 32px;
+    flex: 1 0 auto;
+    padding: 32px;
     overflow: visible;
   }
 
@@ -653,24 +682,12 @@ html[data-theme="dark"] .login-input:-webkit-autofill:focus {
 
 /* Small tablet */
 @media (max-width: 767.98px) {
-  .system-panel {
-    padding: 24px;
-  }
-
-  .system-content {
-    max-width: 100%;
-  }
-
-  .brand {
-    margin-bottom: 56px;
-  }
-
-  .login-panel {
-    padding: 26px 24px;
-  }
+  .system-panel { padding: 24px; }
+  .system-identity { margin-top: 32px; }
+  .login-panel { padding: 28px 24px; }
 }
 
-/* Mobile: system panel hidden, login only */
+/* Mobile: compact branded header + form */
 @media (max-width: 575.98px) {
   .theme-toggle {
     top: 14px;
@@ -680,58 +697,84 @@ html[data-theme="dark"] .login-input:-webkit-autofill:focus {
   }
 
   .system-panel {
-    display: none;
+    padding: 20px 16px 24px;
   }
 
-  .login-panel {
-    min-height: 100dvh;
-    padding: 20px 16px;
+  .brand-icon {
+    width: 40px;
+    height: 40px;
   }
 
-  .login-content {
-    max-width: 400px;
-  }
+  .brand-name { font-size: 12px; }
 
-  .login-input {
-    height: 42px;
-    min-height: 42px;
-    line-height: 40px;
-  }
+  .system-identity { margin-top: 24px; }
 
-  .login-button {
-    min-height: 42px;
-  }
-}
-
-/* Short desktop screens */
-@media (max-height: 650px) and (min-width: 576px) {
-  .system-panel {
-    padding-block: 24px;
-  }
-
-  .login-panel {
-    padding-block: 20px;
-  }
-
-  .login-header {
+  .system-icon {
+    width: 48px;
+    height: 48px;
     margin-bottom: 12px;
   }
 
-  .login-form-group {
-    margin-bottom: 13px;
+  .system-title {
+    font-size: 28px;
+    letter-spacing: -1.2px;
+    margin-bottom: 10px;
   }
 
-  .login-form-group.password-group {
-    margin-bottom: 15px;
+  .system-departments { margin-bottom: 0; }
+
+  .system-description { display: none; }
+
+  .system-actions {
+    width: 100%;
+    margin-top: 18px;
   }
 
-  .login-divider {
-    margin: 15px 0 11px;
+  .nexus-dropdown {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
   }
 
-  .register-box {
-    margin-top: 9px;
+  .system-action {
+    min-height: 44px;
+    padding: 0 10px;
+    border: 1px solid var(--panel-border);
   }
+
+  .login-panel {
+    align-items: flex-start;
+    padding: 24px 16px 32px;
+  }
+
+  .login-content { max-width: 100%; }
+
+  .login-label { font-size: 13px; }
+
+  .login-input {
+    height: 44px;
+    min-height: 44px;
+    line-height: 42px;
+    font-size: 16px;
+  }
+
+  .login-button { min-height: 44px; }
+
+  .login-divider { font-size: 10px; }
+
+  .support-box,
+  .register-box { font-size: 12px; }
+}
+
+/* Short desktop screens */
+@media (max-height: 650px) and (min-width: 992px) {
+  .system-panel { padding-block: 24px; }
+  .login-panel { padding-block: 20px; }
+  .login-header { margin-bottom: 12px; }
+  .login-form-group { margin-bottom: 13px; }
+  .login-form-group.password-group { margin-bottom: 15px; }
+  .login-divider { margin: 15px 0 11px; }
+  .register-box { margin-top: 9px; }
 }
 
 /* Reduced motion */
@@ -743,21 +786,9 @@ html[data-theme="dark"] .login-input:-webkit-autofill:focus {
     animation: none !important;
   }
 }
-
-.system-action,
-.system-action.primary {
-  background: transparent;
-}
-
-.system-action:hover,
-.system-action.primary:hover {
-  background: transparent;
-  opacity: 0.75;
-  transform: translateY(-1px);
-}
 </style>
 <title>Template</title>
-<link rel="icon" type="image/png" href="<?php echo htmlspecialchars($base . '/dist/img/logo.png'); ?>">
+<link rel="icon" type="image/png" href="<?php echo htmlspecialchars($base . '/dist/img/logo2.png'); ?>">
 <main class="login-page">
     <section class="system-panel">
         <div class="system-content">
@@ -782,15 +813,15 @@ html[data-theme="dark"] .login-input:-webkit-autofill:focus {
         <div class="system-identity">
             <div class="system-icon">
                 <img
-                    src="<?php echo htmlspecialchars($base . '/dist/img/logo.png'); ?>" alt="System Logo" aria-hidden="true">
+                    src="<?php echo htmlspecialchars($base . '/dist/img/logo2.png'); ?>" alt="System Logo" aria-hidden="true">
             </div>
-            <h1 class="system-title">Nexus Template</h1>
+            <h1 class="system-title">Factory Supplies System</h1>
             <div
                 class="system-departments"
                 aria-label="Departments using this system">
                 <div class="system-department">
                     <span>
-                        System Engineering
+                        All Department
                     </span>
                 </div>
             </div>
@@ -894,6 +925,7 @@ async function login_authenticate(form, event) {
 
     const username = form.querySelector('#login_form_username');
     const password = form.querySelector('#login_form_password');
+    const submitBtn = form.querySelector('[type="submit"]');
     const loader = form.closest('.login-card').querySelector('.loading-overlay');
     const loginError = document.getElementById('loginError');
     const loginErrorText = document.getElementById('loginErrorText');
@@ -902,59 +934,68 @@ async function login_authenticate(form, event) {
     if (!username.value.trim()) { username.focus(); return; }
     if (!password.value) { password.focus(); return; }
 
-    $.ajax({
-        url: SYSTEM_URL + '/api/login.php',
-        type: 'POST',
-        data: new FormData(form),
-        processData: false,
-        contentType: false,
-        cache: false,
-        dataType: 'json',
-        beforeSend: function () {
-            loader.classList.add('active');
-            loginError.classList.add('d-none');
-        },
-        success: function (response) {
-            if (response.status === true) {
-                window.location = response.redirect || (SYSTEM_URL + '/pages/process_design');
-            } else {
-                // Wrong Emp No and/or password
-                loginErrorText.textContent = 'Invalid Emp No or password.';
-                loginError.classList.remove('d-none');
-                password.value = '';
-                password.focus();
-            }
-        },
-        error: function () {
-            loginErrorText.textContent = 'Something went wrong. Please try again.';
-            loginError.classList.remove('d-none');
-        },
-        complete: function () {
-            loader.classList.remove('active');
+    const showError = (message) => {
+        loginErrorText.textContent = message;
+        loginError.classList.remove('d-none');
+    };
+
+    // Equivalent of beforeSend
+    loader.classList.add('active');
+    loginError.classList.add('d-none');
+    submitBtn.disabled = true;
+
+    try {
+        const res = await fetch(`${SYSTEM_URL}/api/login.php`, {
+            method: 'POST',
+            body: new FormData(form), // browser sets the multipart boundary itself
+            cache: 'no-store',
+            credentials: 'same-origin' // make sure the session cookie is sent/stored
+        });
+
+        // fetch only rejects on network failure, not on 4xx/5xx
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const response = await res.json();
+
+        if (response.status === true) {
+            window.location.href = response.redirect || `${SYSTEM_URL}/pages/process_design`;
+            return; // keep the loader up while the browser navigates
         }
-    });
+
+        // Wrong Emp No and/or password
+        showError('Invalid Emp No or password.');
+        password.value = '';
+        password.focus();
+    } catch (err) {
+        console.error('Login failed:', err);
+        showError('Something went wrong. Please try again.');
+    }
+
+    // Equivalent of complete (only reached on failure, see the return above)
+    loader.classList.remove('active');
+    submitBtn.disabled = false;
 }
 
 /* ==================== EVENTS ==================== */
 
 // Viewer Page button: go to process_design as a viewer (no login required)
-document.getElementById('viewer_btn').addEventListener('click', function () {
-    window.location = SYSTEM_URL + '/pages/process_design?mode=viewer';
+document.getElementById('viewer_btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = `${SYSTEM_URL}/pages/process_design?mode=viewer`;
 });
 
 /* ==================== INIT ==================== */
 
 // Handle forms with data-submit-callback attribute
-document.addEventListener('DOMContentLoaded', function () {
-    const forms = document.querySelectorAll('form[data-submit-callback]');
-    forms.forEach(form => {
-        const callbackName = form.getAttribute('data-submit-callback');
-        if (window[callbackName] && typeof window[callbackName] === 'function') {
-            form.addEventListener('submit', function (e) {
-                e.preventDefault();
-                window[callbackName](this, e);
-            });
-        }
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('form[data-submit-callback]').forEach((form) => {
+        const callback = window[form.dataset.submitCallback];
+        if (typeof callback !== 'function') return;
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            callback(form, e);
+        });
     });
 });
-</script>
+</script> 

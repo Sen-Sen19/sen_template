@@ -650,8 +650,15 @@ a { text-decoration: none; }
 }
 
 .user-name { font-size: 12px; font-weight: 600; }
-
-.user-role { color: var(--muted); font-size: 11px; }
+.user-role {
+  max-width: 90px;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--template-topbar-text-muted);
+  font-size: 9px;
+}
 
 .sidebar-user .user-name,
 .sidebar-user .user-role { overflow: hidden; text-overflow: ellipsis; }
@@ -1924,3 +1931,4 @@ textarea.form-control.nexus-form-control { height: auto; min-height: 84px; paddi
 
   .nexus-modal .modal-footer { flex-wrap: wrap; padding: 10px 16px; }
 }
+

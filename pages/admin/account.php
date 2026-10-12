@@ -5,7 +5,7 @@
  * | Account Management
  * |--------------------------------------------------------------------------
  * | Account table with search by ID / role, add, edit, and delete.
- * | Accounts come from sen_template_db.dbo.accounts and are joined with
+ * | Accounts come from factory_supplies_db.dbo.accounts and are joined with
  * | emp_mgt_db.dbo.m_employees (emp_no = id_no) by ../../api/admin/accounts.php.
  * |--------------------------------------------------------------------------
  */

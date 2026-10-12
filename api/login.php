@@ -22,7 +22,7 @@ if (empty($username) || empty($password)) {
 
 // Prepare and execute query
 $sql = "SELECT TOP (1) [id], [id_no], [full_name], [password], [role], [last_active], [ip_address]
-        FROM [sen_template_db].[dbo].[accounts]
+        FROM [factory_supplies_db].[dbo].[accounts]
         WHERE [id_no] = ?";
 
 $params = array($username);
@@ -50,9 +50,9 @@ if ($user) {
 
         // Determine redirect URL based on role
         if (strtolower($user['role']) === 'admin') {
-            $redirect_url = '/sen_template/pages/admin/index.php';
+            $redirect_url = '/factory_supplies/pages/admin/index.php';
         } else {
-            $redirect_url = '/sen_template/pages/user/index.php';
+            $redirect_url = '/factory_supplies/pages/user/index.php';
         }
 
         $response = [

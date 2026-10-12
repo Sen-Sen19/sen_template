@@ -3,13 +3,13 @@ header('Content-Type: application/json');
 
 session_start();
 
-// Connections: $conn_sen (sen_template_db) and $conn_ems (emp_mgt_db)
+// Connections: $conn_sen (factory_supplies_db) and $conn_ems (emp_mgt_db)
 require_once __DIR__ . '/../connection/template_conn.php';
 require_once __DIR__ . '/../connection/ems_conn.php';
 
 /* ==================== CONFIG ==================== */
 
-const ACCOUNTS_TABLE  = '[sen_template_db].[dbo].[accounts]';
+const ACCOUNTS_TABLE  = '[factory_supplies_db].[dbo].[accounts]';
 const EMPLOYEES_TABLE = '[emp_mgt_db].[dbo].[m_employees]';
 const ALLOWED_ROLES   = ['Admin', 'User'];
 

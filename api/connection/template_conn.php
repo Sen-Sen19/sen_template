@@ -2,7 +2,7 @@
 $serverName = "172.25.116.188";
 
 $connectionOptions = [
-    "Database" => "sen_template_db",
+    "Database" => "factory_supplies_db",
     "Uid" => "sa",
     "PWD" => "SystemGroup@2022"
 ];
