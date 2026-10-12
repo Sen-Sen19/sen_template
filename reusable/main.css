@@ -676,7 +676,6 @@ a { text-decoration: none; }
   height: 30px;
   flex: 0 0 30px;
   padding: 0;
-
   border: 0;
   border-radius: var(--radius-sm);
   background: transparent;
@@ -685,7 +684,7 @@ a { text-decoration: none; }
 
   transition: var(--transition-colors);
 }
-
+#acctNameWrap[hidden] { display: none !important; }
 .sidebar-user-menu:hover { background: var(--hover-bg-strong); color: #24292f; }
 
 .sidebar-user-menu:focus { outline: none; box-shadow: 0 0 0 2px rgba(9, 105, 218, 0.15); }

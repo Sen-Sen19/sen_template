@@ -12,6 +12,38 @@ require_once __DIR__ . '/../connection/ems_conn.php';
 const ACCOUNTS_TABLE  = '[factory_supplies_db].[dbo].[accounts]';
 const EMPLOYEES_TABLE = '[emp_mgt_db].[dbo].[m_employees]';
 const ALLOWED_ROLES   = ['Admin', 'User'];
+const ALLOWED_ACCOUNT_NAMES = [
+    'Accounting',
+    'Equipment Engineering',
+    'Equipment Management',
+    'Facilities, Repair and Maintenance',
+    'Factory IE - NF Kaizen',
+    'Finished Goods',
+    'Heath and Safety',
+    'Hodec Department',
+    'Human Resource & General Affairs',
+    'Information Technology',
+    'Initial Process',
+    'Kaizen',
+    'Material Management',
+    'NPI-MPPD',
+    'Procurement',
+    'Production Control',
+    'Production Design ID',
+    'Production Engineering Final',
+    'Production Engineering Initial',
+    'Quality Assurance',
+    'Quality Control',
+    'Quality Management',
+    'Quality Preparation',
+    'Recruitment & Training',
+    'Safety and Health Department',
+    'Set-UP & Fabrication Engineering',
+    'Spare Parts & Asset Management',
+    'Technical Document Creation ID',
+    'WH Common ID',
+    'Wire Production ID',
+];
 
 /* ==================== UTILS ==================== */
 
@@ -49,6 +81,18 @@ function emsConn()
 function validEmpNo(string $value): bool
 {
     return (bool)preg_match('/^[A-Za-z0-9_-]{1,30}$/', $value);
+}
+
+// Admin => NULL (nothing stored). User => must be one of the allowed names.
+function resolveAccountName(string $role, string $accountName): ?string
+{
+    if ($role !== 'User') {
+        return null;
+    }
+    if (!in_array($accountName, ALLOWED_ACCOUNT_NAMES, true)) {
+        respond(['status' => false, 'message' => 'Account Name is required for User role.'], 422);
+    }
+    return $accountName;
 }
 
 /* ==================== AUTH ==================== */
@@ -151,7 +195,7 @@ function listAccounts($conn): void
     sqlsrv_free_stmt($stmt);
 
     // One batch (the password is never sent to the browser)
-    $sql = 'SELECT [id], [id_no], [full_name], [role], [last_active]
+    $sql = 'SELECT [id], [id_no], [full_name], [role], [account_name], [last_active]
             FROM ' . ACCOUNTS_TABLE . "
             $whereSql
             ORDER BY [last_active] DESC, [id] DESC
@@ -173,16 +217,17 @@ function listAccounts($conn): void
         }
 
         $data[] = [
-            'id'          => $row['id'],
-            'id_no'       => trim($row['id_no']),
-            'full_name'   => $row['full_name'],
-            'role'        => $row['role'],
-            'last_active' => $row['last_active'] instanceof DateTime ? $row['last_active']->format('Y-m-d H:i') : null,
+            'id'              => $row['id'],
+            'id_no'           => trim($row['id_no']),
+            'full_name'       => $row['full_name'],
+            'role'            => $row['role'],
+            'account_name'    => $row['account_name'],
+            'last_active'     => $row['last_active'] instanceof DateTime ? $row['last_active']->format('Y-m-d H:i') : null,
             'last_active_ago' => $ago, // seconds
-            'dept'        => null,
-            'section'     => null,
-            'position'    => null,
-            'provider'    => null,
+            'dept'            => null,
+            'section'         => null,
+            'position'        => null,
+            'provider'        => null,
         ];
     }
     sqlsrv_free_stmt($stmt);
@@ -208,9 +253,10 @@ function listAccounts($conn): void
 
 function createAccount($conn): void
 {
-    $idNo     = trim($_POST['id_no'] ?? '');
-    $password = $_POST['password'] ?? '';
-    $role     = trim($_POST['role'] ?? '');
+    $idNo        = trim($_POST['id_no'] ?? '');
+    $password    = $_POST['password'] ?? '';
+    $role        = trim($_POST['role'] ?? '');
+    $accountName = trim($_POST['account_name'] ?? '');
 
     if ($idNo === '' || $password === '') {
         respond(['status' => false, 'message' => 'ID No. and Password are required.'], 422);
@@ -221,6 +267,7 @@ function createAccount($conn): void
     if (!in_array($role, ALLOWED_ROLES, true)) {
         respond(['status' => false, 'message' => 'Invalid role.'], 422);
     }
+    $accountName = resolveAccountName($role, $accountName);
 
     // The employee must exist in m_employees; the name comes from there
     $map = fetchEmployees([$idNo]);
@@ -243,8 +290,8 @@ function createAccount($conn): void
     // Plain text to match how login.php compares passwords today
     $stmt = sqlsrv_query(
         $conn,
-        'INSERT INTO ' . ACCOUNTS_TABLE . ' ([id_no], [full_name], [password], [role]) VALUES (?, ?, ?, ?)',
-        [$emp['emp_no'], $emp['full_name'], $password, $role]
+        'INSERT INTO ' . ACCOUNTS_TABLE . ' ([id_no], [full_name], [password], [role], [account_name]) VALUES (?, ?, ?, ?, ?)',
+        [$emp['emp_no'], $emp['full_name'], $password, $role, $accountName]
     );
     if ($stmt === false) dbFail();
     sqlsrv_free_stmt($stmt);
@@ -256,9 +303,10 @@ function createAccount($conn): void
 
 function updateAccount($conn): void
 {
-    $idNo     = trim($_POST['id_no'] ?? '');
-    $password = $_POST['password'] ?? '';
-    $role     = trim($_POST['role'] ?? '');
+    $idNo        = trim($_POST['id_no'] ?? '');
+    $password    = $_POST['password'] ?? '';
+    $role        = trim($_POST['role'] ?? '');
+    $accountName = trim($_POST['account_name'] ?? '');
 
     if ($idNo === '') {
         respond(['status' => false, 'message' => 'ID No. is required.'], 422);
@@ -266,10 +314,11 @@ function updateAccount($conn): void
     if (!in_array($role, ALLOWED_ROLES, true)) {
         respond(['status' => false, 'message' => 'Invalid role.'], 422);
     }
+    $accountName = resolveAccountName($role, $accountName);
 
-    // Edit only changes the role (and the password when one is given)
-    $set    = '[role] = ?';
-    $params = [$role];
+    // Edit changes the role, the account name, and the password when one is given
+    $set    = '[role] = ?, [account_name] = ?';
+    $params = [$role, $accountName];
 
     // Blank password = keep the current one
     if ($password !== '') {

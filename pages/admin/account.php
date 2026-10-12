@@ -62,8 +62,9 @@ include('../../reusable/topbar.php');
                         <th>Section</th>
                         <th>Position</th>
                         <th>Password</th>
-                        <th>Role</th>
-                        <th>Last Active</th>
+                      <th>Role</th>
+<th>Account Name</th>
+<th>Last Active</th>
                     </tr>
                 </thead>
                 <tbody id="acctBody"></tbody>
@@ -174,6 +175,43 @@ include('../../reusable/topbar.php');
                         <option value="User">User</option>
                     </select>
                 </div>
+
+                <div class="mt-3" id="acctNameWrap" hidden>
+    <label for="fAccountName" class="form-label">Account Name</label>
+    <select class="form-select nexus-form-control" id="fAccountName">
+        <option value="">Select account name</option>
+        <option value="Accounting">Accounting</option>
+        <option value="Equipment Engineering">Equipment Engineering</option>
+        <option value="Equipment Management">Equipment Management</option>
+        <option value="Facilities, Repair and Maintenance">Facilities, Repair and Maintenance</option>
+        <option value="Factory IE - NF Kaizen">Factory IE - NF Kaizen</option>
+        <option value="Finished Goods">Finished Goods</option>
+        <option value="Heath and Safety">Heath and Safety</option>
+        <option value="Hodec Department">Hodec Department</option>
+        <option value="Human Resource & General Affairs">Human Resource &amp; General Affairs</option>
+        <option value="Information Technology">Information Technology</option>
+        <option value="Initial Process">Initial Process</option>
+        <option value="Kaizen">Kaizen</option>
+        <option value="Material Management">Material Management</option>
+        <option value="NPI-MPPD">NPI-MPPD</option>
+        <option value="Procurement">Procurement</option>
+        <option value="Production Control">Production Control</option>
+        <option value="Production Design ID">Production Design ID</option>
+        <option value="Production Engineering Final">Production Engineering Final</option>
+        <option value="Production Engineering Initial">Production Engineering Initial</option>
+        <option value="Quality Assurance">Quality Assurance</option>
+        <option value="Quality Control">Quality Control</option>
+        <option value="Quality Management">Quality Management</option>
+        <option value="Quality Preparation">Quality Preparation</option>
+        <option value="Recruitment & Training">Recruitment &amp; Training</option>
+        <option value="Safety and Health Department">Safety and Health Department</option>
+        <option value="Set-UP & Fabrication Engineering">Set-UP &amp; Fabrication Engineering</option>
+        <option value="Spare Parts & Asset Management">Spare Parts &amp; Asset Management</option>
+        <option value="Technical Document Creation ID">Technical Document Creation ID</option>
+        <option value="WH Common ID">WH Common ID</option>
+        <option value="Wire Production ID">Wire Production ID</option>
+    </select>
+</div>
 
                 <div class="nexus-form-error" id="fError"></div>
 
@@ -365,7 +403,10 @@ include('../../reusable/topbar.php');
         dDept: document.getElementById('dDept'),
         dSection: document.getElementById('dSection'),
         dPosition: document.getElementById('dPosition'),
-        dProvider: document.getElementById('dProvider')
+        dProvider: document.getElementById('dProvider'),
+        fAccountName: document.getElementById('fAccountName'),
+acctNameWrap: document.getElementById('acctNameWrap')
+
     };
 
     let modal = null;
@@ -428,8 +469,9 @@ include('../../reusable/topbar.php');
             <td>${esc(a.section || '—')}</td>
             <td>${esc(a.position || '—')}</td>
             <td class="cell-mono">••••••••</td>
-            <td><span class="nexus-badge ${ROLE_COLOR[a.role] || 'gray'}">${esc(a.role)}</span></td>
-            <td title="${esc(a.last_active || '')}">${fmtAgo(a.last_active_ago)}</td>
+         <td><span class="nexus-badge ${ROLE_COLOR[a.role] || 'gray'}">${esc(a.role)}</span></td>
+<td>${esc(a.account_name || '—')}</td>
+<td title="${esc(a.last_active || '')}">${fmtAgo(a.last_active_ago)}</td>
         </tr>`;
     }
 
@@ -585,7 +627,7 @@ include('../../reusable/topbar.php');
             const nearBottom = els.scroll.scrollTop + els.scroll.clientHeight >= els.scroll.scrollHeight - 100;
             if (nearBottom) loadNextBatch();
         });
-
+els.fRole.addEventListener('change', toggleAccountName);
         let timer;
         els.searchId.addEventListener('input', () => {
             clearTimeout(timer);
@@ -620,7 +662,11 @@ include('../../reusable/topbar.php');
     }
 
     /* ==================== EDIT / UPDATE ==================== */
-
+function toggleAccountName() {
+    const isUser = els.fRole.value === 'User';
+    els.acctNameWrap.hidden = !isUser;
+    if (!isUser) els.fAccountName.value = '';
+}
     function openModal(id) {
         editingId = id;
         els.fError.textContent = '';
@@ -632,6 +678,8 @@ include('../../reusable/topbar.php');
             els.fId.value = '';
             els.fId.readOnly = false;
             els.fRole.value = 'User';
+            els.fAccountName.value = '';
+            toggleAccountName();
             els.fPasswordHint.textContent = '';
             els.btnDelete.classList.add('invisible');
             resetProfile(ADD_HINT);
@@ -639,11 +687,13 @@ include('../../reusable/topbar.php');
             const a = rows.find((x) => x.id_no === id);
             if (!a) return;
             els.title.textContent = 'Edit Account';
-            els.subtitle.textContent = 'You can change the password and role.';
+            els.subtitle.textContent = 'You can change the password, role, and account name.';
             els.fId.value = a.id_no;
             els.fId.readOnly = true;
             els.fRole.value = a.role;
             if (els.fRole.value !== a.role) els.fRole.value = 'User'; // old role not in the list
+            toggleAccountName();
+            els.fAccountName.value = a.account_name || '';
             els.fPasswordHint.textContent = 'Leave blank to keep the current password.';
             els.btnDelete.classList.remove('invisible');
             resetProfile('');
@@ -658,9 +708,11 @@ include('../../reusable/topbar.php');
         const id = adding ? els.fId.value.trim() : editingId;
         const pass = els.fPassword.value;
         const role = els.fRole.value;
+        const accountName = role === 'User' ? els.fAccountName.value : '';
 
         if (!id) return (els.fError.textContent = 'ID No. is required.');
         if (adding && !pass) return (els.fError.textContent = 'Password is required for new accounts.');
+        if (role === 'User' && !accountName) return (els.fError.textContent = 'Account Name is required for User role.');
 
         els.fError.textContent = '';
         els.btnSave.disabled = true;
@@ -683,7 +735,8 @@ include('../../reusable/topbar.php');
         const res = await postApi(adding ? 'create' : 'update', {
             id_no: id,
             password: pass,
-            role: role
+            role: role,
+            account_name: accountName
         });
         els.btnSave.disabled = false;
 

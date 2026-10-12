@@ -482,7 +482,7 @@ $isUser = ($role === 'user');
 
 $navItems = $isUser
     ? [
-        ['href' => 'index.php', 'icon' => 'bi-bag-plus',     'label' => 'Request Items'],
+        ['href' => 'index.php', 'icon' => 'bi-bag-plus',     'label' => 'Requested Items'],
         ['href' => 'withdraw.php',      'icon' => 'bi-box-arrow-up', 'label' => 'Withdraw'],
     ]
     : [
@@ -526,7 +526,32 @@ if (!isset($_SESSION['section']) && !empty($_SESSION['id_no'])) {
         }
     }
 }
+/* ==================== ACCOUNT NAME (accounts) ==================== */
 
+// Cached in the session, used by api/user/fetch_wf.php to match C_BUMONNM
+if (!isset($_SESSION['account_name']) && !empty($_SESSION['id_no'])) {
+
+    if (!isset($conn_sen)) {
+        $connFile = __DIR__ . '/../api/connection/template_conn.php'; // same path as at the top
+        if (is_file($connFile)) {
+            require_once $connFile;
+        }
+    }
+
+    if (isset($conn_sen) && $conn_sen) {
+        $stmtAcc = sqlsrv_query(
+            $conn_sen,
+            "SELECT TOP 1 [account_name] FROM [factory_supplies_db].[dbo].[accounts] WHERE [id_no] = ?",
+            [$_SESSION['id_no']]
+        );
+        if ($stmtAcc) {
+            $accRow = sqlsrv_fetch_array($stmtAcc, SQLSRV_FETCH_ASSOC);
+            sqlsrv_free_stmt($stmtAcc);
+            // Only cache on a successful query, so a failure retries on the next page
+            $_SESSION['account_name'] = trim($accRow['account_name'] ?? '');
+        }
+    }
+}
 // Shown under the name: the section, falling back to the role if there is none
 $userSection = trim($_SESSION['section'] ?? '');
 $userLabel   = $userSection !== '' ? $userSection : (!empty($_SESSION['role']) ? $_SESSION['role'] : 'Employee');
@@ -675,7 +700,7 @@ if (!empty($_SESSION['id_no'])) {
                         }
                         ?></span>
 <span class="user-role"><?= htmlspecialchars($userLabel) ?></span>
-                        ?></span>
+                   </span>
                 </div>
 
                 <a href="<?php echo htmlspecialchars($system ?? ''); ?>/logout.php" class="text-danger" aria-label="Sign out">
