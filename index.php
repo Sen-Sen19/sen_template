@@ -827,7 +827,7 @@ html[data-theme="dark"] .login-input:-webkit-autofill:focus {
             </div>
 
             <p class="system-description">
-                <?php echo $system_description ?? 'System description goes here.'; ?>
+                <?php echo $system_description ?? 'A web-based system for managing factory supplies, purchase orders, and journal entries efficiently.'; ?>
             </p>
 
             <div class="system-actions">

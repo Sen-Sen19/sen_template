@@ -12,11 +12,11 @@ $system = $system ?? '/' . explode('/', trim($_SERVER['SCRIPT_NAME'], '/'))[0];
     <meta name="description" content="Sub PC Checksheet Record" />
     <meta name="keywords" content="Sub PC Checksheet Record" />
 
-    <title>FALP NEXUS</title>
+    <title>Factory Supplies System</title>
 
 
     <title><?php echo htmlspecialchars($page_title ?? 'Template'); ?></title>
-    <link rel="icon" type="image/png" href="../../dist/img/logo.png">
+    <link rel="icon" type="image/png" href="../../dist/img/logo2.png">
     <link rel="stylesheet" href="<?php echo htmlspecialchars($page_css ?? ''); ?>">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>

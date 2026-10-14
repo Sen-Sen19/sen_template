@@ -1930,3 +1930,5 @@ textarea.form-control.nexus-form-control { height: auto; min-height: 84px; paddi
   .nexus-modal .modal-footer { flex-wrap: wrap; padding: 10px 16px; }
 }
 
+.nexus-table tr.wd-variance td { background: rgba(220, 53, 69, .08); }
+.nexus-table tr.wd-unmatched td { background: rgba(255, 193, 7, .10); }

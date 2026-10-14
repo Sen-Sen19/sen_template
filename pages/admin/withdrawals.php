@@ -28,33 +28,33 @@ include('../../reusable/topbar.php');
             <input type="date" id="dateTo" class="form-control nexus-form-control">
         </div>
 
-<select id="searchAccount" class="form-select nexus-form-control wd-account">
-    <option value="">All accounts</option>
-</select>
+        <select id="searchAccount" class="form-select nexus-form-control wd-account">
+            <option value="">All accounts</option>
+        </select>
 
         <button type="button" id="btnSearch" class="btn nexus-btn-primary">
             <i class="bi bi-search"></i>
             Search
         </button>
 
-    <button type="button" id="btnClear" class="btn nexus-btn-secondary">
-    <i class="bi bi-x-lg"></i>
-    Clear
-</button>
+        <button type="button" id="btnClear" class="btn nexus-btn-secondary">
+            <i class="bi bi-x-lg"></i>
+            Clear
+        </button>
 
-<button type="button" id="btnExport" class="btn nexus-btn-secondary">
-    <i class="bi bi-download"></i>
-    Export
-</button>
+        <button type="button" id="btnExport" class="btn nexus-btn-secondary">
+            <i class="bi bi-download"></i>
+            Export
+        </button>
 
-<span class="nexus-toolbar-count" id="wdCount"></span>
+        <span class="nexus-toolbar-count" id="wdCount"></span>
     </div>
 
     <!-- Table -->
     <div class="nexus-card">
         <div class="nexus-table-scroll">
             <table class="nexus-table">
-           <thead id="wdHead"></thead>
+                <thead id="wdHead"></thead>
                 <tbody id="wdBody"></tbody>
             </table>
             <div class="nexus-state" id="wdState">Choose a date range and press Search.</div>
@@ -64,18 +64,40 @@ include('../../reusable/topbar.php');
 </main>
 
 <style>
-.wd-field { display: flex; align-items: center; gap: 8px; }
-.wd-field-label { margin: 0; color: var(--muted); font-size: 12px; }
-.wd-field .form-control { width: 150px; }
+    .wd-field {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-/* wider than the default 170px so long account names fit */
-.nexus-toolbar .form-select.nexus-form-control.wd-account { flex: 0 0 280px; }
+    .wd-field-label {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+    }
 
-@media (max-width: 768px) {
-    .nexus-toolbar .form-select.nexus-form-control.wd-account { flex: 1 1 100%; }
-    .wd-field { flex: 1 1 100%; }
-    .wd-field .form-control { width: 100%; }
-}
+    .wd-field .form-control {
+        width: 150px;
+    }
+
+    /* wider than the default 170px so long account names fit */
+    .nexus-toolbar .form-select.nexus-form-control.wd-account {
+        flex: 0 0 280px;
+    }
+
+    @media (max-width: 768px) {
+        .nexus-toolbar .form-select.nexus-form-control.wd-account {
+            flex: 1 1 100%;
+        }
+
+        .wd-field {
+            flex: 1 1 100%;
+        }
+
+        .wd-field .form-control {
+            width: 100%;
+        }
+    }
 </style>
 
 <script>
@@ -117,32 +139,136 @@ include('../../reusable/topbar.php');
     ];
 
     // key: null = left blank on purpose. num: right-aligned.
-    const COLUMNS = [
-        { label: 'Requested Section Code', key: 'requested_section_code' },
-        { label: 'Requested Section',      key: 'requested_section_name' },
-        { label: 'End Use Section Code',   key: 'end_use_section_code' },
-        { label: 'End Use Section',        key: 'end_use_section' },
-        { label: 'Item Code',              key: 'item_code' },
-        { label: 'Item Name',              key: 'item_name' },
-        { label: 'Unit',                   key: 'unit_code' },
-        { label: 'Supplier Code',          key: 'supplier_code' },
-        { label: 'Supplier Name',          key: 'supplier_name' },
-        { label: 'Invoice No.',            key: 'invoice_no' },
-        { label: 'Unit Cost JPY',          key: 'unit_cost_jpy', num: true },
-        { label: 'Unit Cost PHP',          key: 'unit_cost_php', num: true },
-        { label: 'FSIB Qty',               key: 'fsib_quantity', num: true },
-      { label: 'Beginning Amount JPY', calc: (r) => mult(r.unit_cost_jpy, r.fsib_quantity), num: true },
-{ label: 'Beginning Amount PHP', calc: (r) => mult(r.unit_cost_php, r.fsib_quantity), num: true },
-        { label: 'Store In Qty',           key: null, num: true },
-        { label: 'Store In Amount JPY',    key: null, num: true },
-        { label: 'Store In Amount PHP',    key: null, num: true },
-        { label: 'Store Out Qty',          key: null, num: true },
-        { label: 'Store Out Amount JPY',   key: null, num: true },
-        { label: 'Store Out Amount PHP',   key: null, num: true },
-        { label: 'Actual Qty',             key: 'actual_quantity', num: true },
-       { label: 'Ending Amount JPY', calc: (r) => mult(r.unit_cost_jpy, r.actual_quantity), num: true },
-{ label: 'Ending Amount PHP', calc: (r) => mult(r.unit_cost_php, r.actual_quantity), num: true },
-        { label: 'Remarks',                key: null }
+    const COLUMNS = [{
+            label: 'Requested Section Code',
+            key: 'requested_section_code'
+        },
+        {
+            label: 'Requested Section',
+            key: 'requested_section_name'
+        },
+        {
+            label: 'End Use Section Code',
+            key: 'end_use_section_code'
+        },
+        {
+            label: 'End Use Section',
+            key: 'end_use_section'
+        },
+        {
+            label: 'Item Code',
+            key: 'item_code'
+        },
+        {
+            label: 'Item Name',
+            key: 'item_name'
+        },
+        {
+            label: 'Unit',
+            key: 'unit_code'
+        },
+        {
+            label: 'Supplier Code',
+            key: 'supplier_code'
+        },
+        {
+            label: 'Supplier Name',
+            key: 'supplier_name'
+        },
+        {
+            label: 'Invoice No.',
+            key: 'invoice_no'
+        },
+        {
+            label: 'Unit Cost JPY',
+            key: 'unit_cost_jpy',
+            num: true
+        },
+        {
+            label: 'Unit Cost PHP',
+            key: 'unit_cost_php',
+            num: true
+        },
+        {
+            label: 'Beginning Qty',
+            key: 'fsib_quantity',
+            num: true
+        },
+        {
+            label: 'Beginning Amount JPY',
+            calc: (r) => mult(r.unit_cost_jpy, r.fsib_quantity),
+            num: true
+        },
+        {
+            label: 'Beginning Amount PHP',
+            calc: (r) => mult(r.unit_cost_php, r.fsib_quantity),
+            num: true
+        },
+
+        {
+            label: 'Store In Qty',
+            key: null,
+            num: true
+        },
+        {
+            label: 'Store In Amount JPY',
+            key: null,
+            num: true
+        },
+        {
+            label: 'Store In Amount PHP',
+            key: null,
+            num: true
+        },
+        {
+            label: 'Store Out Qty',
+            key: null,
+            num: true
+        },
+        {
+            label: 'Store Out Amount JPY',
+            key: null,
+            num: true
+        },
+        {
+            label: 'Store Out Amount PHP',
+            key: null,
+            num: true
+        },
+        {
+            label: 'Ending Qty',
+            key: 'actual_quantity',
+            num: true
+        },
+        {
+            label: 'Ending Amount JPY',
+            calc: (r) => mult(r.unit_cost_jpy, r.actual_quantity),
+            num: true
+        },
+        {
+            label: 'Ending Amount PHP',
+            calc: (r) => mult(r.unit_cost_php, r.actual_quantity),
+            num: true
+        },
+        {
+            label: 'Remarks',
+            key: null
+        },
+        {
+            label: 'Variance Qty',
+            calc: (r) => diff(r.actual_quantity, r.fsib_quantity),
+            num: true
+        },
+        {
+            label: 'Variance JPY',
+            calc: (r) => diff(mult(r.unit_cost_jpy, r.actual_quantity), mult(r.unit_cost_jpy, r.fsib_quantity)),
+            num: true
+        },
+        {
+            label: 'Variance PHP',
+            calc: (r) => diff(mult(r.unit_cost_php, r.actual_quantity), mult(r.unit_cost_php, r.fsib_quantity)),
+            num: true
+        },
     ];
 
     const els = {
@@ -158,8 +284,8 @@ include('../../reusable/topbar.php');
         count: document.getElementById('wdCount')
     };
 
-    let rows = [];      // every column of every fetched row (the table shows only some)
-    let loadToken = 0;  // ignores late responses
+    let rows = []; // every column of every fetched row (the table shows only some)
+    let loadToken = 0; // ignores late responses
 
     /* ==================== UTILS ==================== */
 
@@ -168,40 +294,64 @@ include('../../reusable/topbar.php');
     }
 
     function esc(v) {
-        return String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        return String(v ?? '').replace(/[&<>"']/g, (c) => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        } [c]));
     }
 
     function num(v) {
         if (v === null || v === undefined || v === '') return '—';
-        return Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        return Number(v).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
     }
     // Product of two values, rounded to 2 decimals. null if either is missing.
-function mult(a, b) {
-    if (a === null || a === undefined || a === '' || b === null || b === undefined || b === '') return null;
-    return Math.round(Number(a) * Number(b) * 100) / 100;
-}
+    function mult(a, b) {
+        if (a === null || a === undefined || a === '' || b === null || b === undefined || b === '') return null;
+        return Math.round(Number(a) * Number(b) * 100) / 100;
+    }
+    // Ending minus Beginning, rounded to 2 decimals. null if either side is missing.
+    function diff(end, begin) {
+        if (end === null || end === undefined || begin === null || begin === undefined) return null;
+        return Math.round((end - begin) * 100) / 100;
+    }
 
-// The value a column shows: calculated, taken from the row, or nothing (blank column)
-function colValue(c, r) {
-    if (c.calc) return c.calc(r);
-    return c.key ? r[c.key] : null;
-}
+    // The value a column shows: calculated, taken from the row, or nothing (blank column)
+    function colValue(c, r) {
+        if (c.calc) return c.calc(r);
+        return c.key ? r[c.key] : null;
+    }
 
     function toast(msg, icon) {
         if (window.Swal) {
-            Swal.fire({ toast: true, position: 'top-end', icon: icon || 'info', title: msg, showConfirmButton: false, timer: 1800 });
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: icon || 'info',
+                title: msg,
+                showConfirmButton: false,
+                timer: 1800
+            });
         }
     }
 
     /* ==================== RENDER ==================== */
 
     function cellHtml(c, r) {
-    if (!c.key && !c.calc) return `<td${c.num ? ' class="text-end"' : ''}></td>`;
-    if (c.num)             return `<td class="text-end">${num(colValue(c, r))}</td>`;
-    return `<td>${esc(colValue(c, r)) || '—'}</td>`;
-}
+        if (!c.key && !c.calc) return `<td${c.num ? ' class="text-end"' : ''}></td>`;
+        if (c.num) return `<td class="text-end">${num(colValue(c, r))}</td>`;
+        return `<td>${esc(colValue(c, r)) || '—'}</td>`;
+    }
+
     function rowHtml(r) {
-        return '<tr>' + COLUMNS.map((c) => cellHtml(c, r)).join('') + '</tr>';
+        const v = diff(r.actual_quantity, r.fsib_quantity);
+        const cls = v === null ? ' class="wd-unmatched"' : (v !== 0 ? ' class="wd-variance"' : '');
+        return `<tr${cls}>` + COLUMNS.map((c) => cellHtml(c, r)).join('') + '</tr>';
     }
 
     function render() {
@@ -239,11 +389,19 @@ function colValue(c, r) {
 
         let res;
         try {
-            const params = new URLSearchParams({ action: 'list', from: from, to: to, account: els.account.value });
+            const params = new URLSearchParams({
+                action: 'list',
+                from: from,
+                to: to,
+                account: els.account.value
+            });
             const r = await fetch(API_URL + '?' + params.toString());
             res = await r.json();
         } catch (e) {
-            res = { status: false, message: 'Could not load withdrawals.' };
+            res = {
+                status: false,
+                message: 'Could not load withdrawals.'
+            };
         }
         if (token !== loadToken) return;
 
@@ -283,7 +441,9 @@ function colValue(c, r) {
         const lines = [COLUMNS.map((c) => q(c.label)).join(',')]
             .concat(rows.map((r) => COLUMNS.map((c) => q(colValue(c, r))).join(',')));
 
-        const blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+        const blob = new Blob(['\ufeff' + lines.join('\r\n')], {
+            type: 'text/csv;charset=utf-8;'
+        });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = `withdrawals_${els.from.value}_to_${els.to.value}.csv`;
@@ -295,7 +455,7 @@ function colValue(c, r) {
 
     /* ==================== INIT ==================== */
 
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         els.account.insertAdjacentHTML('beforeend', ACCOUNTS.map((a) => `<option value="${esc(a)}">${esc(a)}</option>`).join(''));
 
         els.head.innerHTML = '<tr>' + COLUMNS.map((c) =>
