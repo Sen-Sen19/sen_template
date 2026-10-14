@@ -22,9 +22,7 @@ include('../../reusable/topbar.php');
 
 /* ==================== TOOLBAR ==================== */
 
-.user-dash .nexus-date { flex: 0 0 150px; }
-
-.user-dash .toolbar-sep { color: var(--muted-light); font-size: 12px; }
+.user-dash .nexus-search { flex: 1 1 320px; max-width: 420px; }
 
 .user-dash .btn-search { white-space: nowrap; }
 
@@ -48,8 +46,7 @@ include('../../reusable/topbar.php');
 /* ==================== RESPONSIVE ==================== */
 
 @media (max-width: 768px) {
-  .user-dash .nexus-date { flex: 1 1 calc(50% - 14px); }
-  .user-dash .toolbar-sep { display: none; }
+  .user-dash .nexus-search { max-width: none; }
   .user-dash .btn-search { flex: 1 1 100%; }
 }
 
@@ -63,19 +60,16 @@ include('../../reusable/topbar.php');
 
     <div class="page-head">
         <h1 class="page-title">Requested Item</h1>
+        <p class="page-subtitle">Items requested for <?php echo htmlspecialchars($_SESSION['account_name'] ?? 'your section'); ?>. Search by invoice no. or WF KEY.</p>
     </div>
 
     <!-- Toolbar -->
     <form class="nexus-toolbar" id="searchForm" role="search" autocomplete="off">
         <div class="nexus-search">
             <i class="bi bi-search" aria-hidden="true"></i>
-            <input type="search" id="invoiceInput" class="form-control nexus-form-control"
-                   placeholder="Search invoice no." aria-label="Search invoice number" autocomplete="off">
+            <input type="search" id="searchInput" class="form-control nexus-form-control"
+                   placeholder="Search invoice no. or WF KEY" aria-label="Search invoice number or WF KEY" autocomplete="off" autofocus>
         </div>
-
-        <input type="date" id="dateFrom" class="form-control nexus-form-control nexus-date" aria-label="Date from">
-        <span class="toolbar-sep" aria-hidden="true">to</span>
-        <input type="date" id="dateTo" class="form-control nexus-form-control nexus-date" aria-label="Date to">
 
         <button type="submit" class="btn btn-primary btn-search" id="searchBtn">
             <i class="bi bi-search" aria-hidden="true"></i> Search
@@ -129,6 +123,12 @@ include('../../reusable/topbar.php');
 
             <div class="modal-body">
 
+                <!-- Withdrawal status (hidden until something was withdrawn) -->
+                <div class="d-flex align-items-center flex-wrap gap-2 mb-3" id="mStatus" role="status" aria-live="polite" hidden>
+                    <span class="nexus-badge" id="mStatusBadge"></span>
+                    <span class="form-text m-0" id="mStatusText"></span>
+                </div>
+
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label class="form-label" for="mWfKey">WF KEY</label>
@@ -150,6 +150,7 @@ include('../../reusable/topbar.php');
                         <label class="form-label" for="mActualQty">Actual Quantity</label>
                         <input type="number" class="form-control nexus-form-control" id="mActualQty"
                                min="0" step="any" inputmode="decimal" placeholder="Enter actual quantity">
+                        <div class="form-text" id="mActualHint" hidden></div>
                     </div>
                     <div class="col-12">
                         <label class="form-label" for="mRequester">Requested User Name</label>
@@ -191,13 +192,14 @@ include('../../reusable/topbar.php');
 
 const API_URL      = '../../api/user/fetch_wf.php';
 const WITHDRAW_URL = '../../api/user/withdraw_wf.php';
+const STATUS_URL   = '../../api/user/withdraw_status.php';
 const BATCH_SIZE = 15;
-const DEFAULT_RANGE_DAYS = 30;
 
 // Leave empty to show every column of V_WFSEARCH, or list the ones you want, in order
-const VISIBLE_COLUMNS = ['C_WFKEY', 'C_BUMONNM', 'C_HINBANNM', 'C_TANICD', 'L_SURYO', 'L_TANKA', 'JPY_PRICE', 'C_SINSEISHANM'];
+const VISIBLE_COLUMNS = ['C_WFKEY', 'C_SEIKYUNO', 'C_BUMONNM', 'C_HINBANNM', 'C_TANICD', 'L_SURYO', 'L_TANKA', 'JPY_PRICE', 'C_SINSEISHANM'];
 const COLUMN_LABELS = {
   C_WFKEY:       'WF KEY',
+  C_SEIKYUNO:    'Invoice No.',
   C_BUMONNM:     'Requested Section name',
   C_HINBANNM:    'Item Name',
   C_TANICD:      'Unit code',
@@ -213,9 +215,7 @@ const tableBody    = document.getElementById('tableBody');
 const tableState   = document.getElementById('tableState');
 const rowCount     = document.getElementById('rowCount');
 const searchForm   = document.getElementById('searchForm');
-const invoiceInput = document.getElementById('invoiceInput');
-const dateFrom     = document.getElementById('dateFrom');
-const dateTo       = document.getElementById('dateTo');
+const searchInput  = document.getElementById('searchInput');
 
 const itemModalEl  = document.getElementById('itemModal');
 const mWfKey       = document.getElementById('mWfKey');
@@ -225,15 +225,22 @@ const mQuantity    = document.getElementById('mQuantity');
 const mActualQty = document.getElementById('mActualQty');
 const mRequester   = document.getElementById('mRequester');
 const mError       = document.getElementById('mError');
+const mStatus      = document.getElementById('mStatus');
+const mStatusBadge = document.getElementById('mStatusBadge');
+const mStatusText  = document.getElementById('mStatusText');
+const mActualHint  = document.getElementById('mActualHint');
 const btnWithdraw  = document.getElementById('btnWithdraw');
 
-let currentRow = null; // row shown in the modal
+let currentRow = null;      // row shown in the modal
+let currentRemaining = 0;   // quantity still available to withdraw for that row
+let statusToken = 0;        // ignores late status responses
 let columns   = [];
 let rowsData  = [];   // every loaded row, so a click can open its full details
 let total     = 0;
 let loaded    = 0;
 let isLoading = false;
 let requestId = 0;
+let lastTerm  = '';
 let controller = null;
 
 /* ==================== FETCH / API ==================== */
@@ -256,9 +263,7 @@ async function fetchBatch(reset) {
   setState('<span class="spinner-border" role="status" aria-hidden="true"></span>Loading…');
 
   const params = new URLSearchParams({
-    date_from: dateFrom.value,
-    date_to: dateTo.value,
-    c_seikyuno: invoiceInput.value.trim(),
+    q: lastTerm,            // invoice no. OR WF KEY
     offset: loaded,
     limit: BATCH_SIZE
   });
@@ -316,7 +321,7 @@ function updateCount() {
 
 function updateState() {
   if (!total) {
-    setState('No requests found for this date range.');
+    setState(`No items found for “${escapeHtml(lastTerm)}”.`);
   } else if (loaded >= total) {
     setState('You have reached the end of the list.');
   } else {
@@ -332,6 +337,8 @@ function setState(html, isError = false) {
 
 /* ==================== MODAL ==================== */
 
+const round3 = n => Math.round(n * 1000) / 1000;
+
 function openItemModal(index) {
   const r = rowsData[index];
   if (!r) return;
@@ -342,23 +349,86 @@ function openItemModal(index) {
   mItemName.value    = r.C_HINBANNM ?? '';
   mQuantity.value    = r.L_SURYO ?? '';
   mRequester.value   = r.C_SINSEISHANM ?? '';
-  mActualQty.value = '';
   mError.textContent = '';
 
-  // Actual Quantity can never be higher than Quantity
-  const qty = parseFloat(String(r.L_SURYO ?? '').replace(/,/g, ''));
-  if (Number.isFinite(qty)) {
-    mActualQty.max = qty;
-    mActualQty.placeholder = `Max ${qty}`;
-  } else {
-    mActualQty.removeAttribute('max');
-    mActualQty.placeholder = 'Enter actual quantity';
-  }
+  // Locked until we know how much was already withdrawn
+  mActualQty.value = '';
+  mActualQty.readOnly = true;
+  mActualQty.removeAttribute('max');
+  mActualQty.placeholder = 'Checking…';
+  mActualHint.hidden = true;
+  mStatus.hidden = true;
+  btnWithdraw.disabled = true;
+  currentRemaining = 0;
 
   bootstrap.Modal.getOrCreateInstance(itemModalEl).show();
+  loadWithdrawStatus(r);
 }
 
-itemModalEl.addEventListener('shown.bs.modal', () => mActualQty.focus());
+async function loadWithdrawStatus(r) {
+  const token = ++statusToken;
+  const qty = parseFloat(String(r.L_SURYO ?? '').replace(/,/g, ''));
+
+  try {
+    const res  = await fetch(`${STATUS_URL}?${new URLSearchParams({ wfkey: r.C_WFKEY ?? '' })}`, { headers: { Accept: 'application/json' } });
+    const json = await res.json();
+    if (token !== statusToken) return; // another row was opened meanwhile
+
+    if (!json.success) throw new Error(json.message);
+    applyWithdrawState(qty, Number(json.withdrawn) || 0);
+  } catch (err) {
+    if (token !== statusToken) return;
+    mActualQty.placeholder = '';
+    showModalError('Could not check previous withdrawals. Close and try again.');
+  }
+}
+
+function applyWithdrawState(qty, withdrawn) {
+  if (!Number.isFinite(qty)) {
+    mActualQty.placeholder = '';
+    return showModalError('This item has no valid quantity.');
+  }
+
+  const remaining = Math.max(round3(qty - withdrawn), 0);
+  currentRemaining = remaining;
+
+  if (remaining <= 0) {
+    // Everything was withdrawn: show the total, lock the field
+    mStatusBadge.className = 'nexus-badge green';
+    mStatusBadge.innerHTML = '<i class="bi bi-check-circle-fill me-1" aria-hidden="true"></i>Fully withdrawn';
+    mStatusText.textContent = `${round3(withdrawn)} of ${qty} withdrawn`;
+    mStatus.hidden = false;
+
+    mActualQty.value = qty;
+    mActualQty.readOnly = true;
+    mActualQty.removeAttribute('max');
+    mActualHint.hidden = true;
+    btnWithdraw.disabled = true;
+    return;
+  }
+
+  if (withdrawn > 0) {
+    // Partly withdrawn: field stays open, limited to what is left
+    mStatusBadge.className = 'nexus-badge yellow';
+    mStatusBadge.textContent = 'Partially withdrawn';
+    mStatusText.textContent = `${round3(withdrawn)} of ${qty} already withdrawn`;
+    mStatus.hidden = false;
+
+    mActualHint.textContent = `${remaining} remaining`;
+    mActualHint.hidden = false;
+  }
+
+  mActualQty.readOnly = false;
+  mActualQty.max = remaining;
+  mActualQty.placeholder = `Max ${remaining}`;
+  btnWithdraw.disabled = false;
+
+  if (itemModalEl.classList.contains('show')) mActualQty.focus();
+}
+
+itemModalEl.addEventListener('shown.bs.modal', () => {
+  if (!mActualQty.readOnly) mActualQty.focus();
+});
 
 // Block characters that make no sense for a quantity (negative sign, exponent)
 mActualQty.addEventListener('keydown', e => {
@@ -377,15 +447,16 @@ mActualQty.addEventListener('input', () => {
 btnWithdraw.addEventListener('click', async () => {
   if (!currentRow) return;
 
-  const qty    = parseFloat(String(currentRow.L_SURYO ?? '').replace(/,/g, ''));
+  if (currentRemaining <= 0) return;
   const actual = parseFloat(mActualQty.value);
 
   if (Number.isNaN(actual))  return showModalError('Enter the actual quantity.');
   if (actual <= 0)           return showModalError('Actual quantity must be greater than 0.');
-  if (Number.isFinite(qty) && actual > qty) return showModalError('Actual quantity cannot exceed the requested quantity.');
+  if (actual > currentRemaining) return showModalError(`Only ${currentRemaining} left to withdraw.`);
 
   const fd = new FormData();
   fd.append('wfkey', currentRow.C_WFKEY ?? '');
+  fd.append('invoice_no', currentRow.C_SEIKYUNO ?? '');
   fd.append('requested_section_name', currentRow.C_BUMONNM ?? '');
   fd.append('item_name', currentRow.C_HINBANNM ?? '');
   fd.append('unit_code', currentRow.C_TANICD ?? '');
@@ -402,14 +473,21 @@ btnWithdraw.addEventListener('click', async () => {
     const res  = await fetch(WITHDRAW_URL, { method: 'POST', body: fd, headers: { Accept: 'application/json' } });
     const json = await res.json();
 
-    if (!json.success) return showModalError(json.message || 'Could not save the withdrawal.');
+    if (!json.success) {
+      // Someone else may have withdrawn in the meantime: refresh the limits
+      if (typeof json.withdrawn === 'number') {
+        applyWithdrawState(parseFloat(String(currentRow.L_SURYO).replace(/,/g, '')), json.withdrawn);
+      }
+      return showModalError(json.message || 'Could not save the withdrawal.');
+    }
 
     bootstrap.Modal.getOrCreateInstance(itemModalEl).hide();
     toast(json.message || 'Withdrawal saved.');
   } catch (err) {
     showModalError('Request failed. Please try again.');
   } finally {
-    btnWithdraw.disabled = false;
+    // Stay locked if nothing is left; applyWithdrawState decides on the next open
+    btnWithdraw.disabled = currentRemaining <= 0;
   }
 });
 
@@ -453,17 +531,30 @@ searchForm.addEventListener('submit', e => {
 /* ==================== SEARCH / FILTER ==================== */
 
 function applyFilters() {
-  if (!dateFrom.value || !dateTo.value || dateFrom.value > dateTo.value) {
-    if (controller) controller.abort();
-    requestId++;
-    isLoading = false;
-    rowsData = [];
-    tableBody.innerHTML = '';
-    rowCount.textContent = '';
-    setState('Select a valid date range.', true);
+  const term = searchInput.value.trim();
+
+  if (!term) {
+    resetTable();
+    setState('Enter an invoice no. or WF KEY, then press Search.');
+    searchInput.focus();
     return;
   }
+
+  lastTerm = term;
   fetchBatch(true);
+}
+
+// Back to the empty "nothing searched yet" table
+function resetTable() {
+  if (controller) controller.abort();
+  requestId++;
+  isLoading = false;
+  loaded = 0;
+  total = 0;
+  rowsData = [];
+  tableHead.innerHTML = '';
+  tableBody.innerHTML = '';
+  rowCount.textContent = '';
 }
 
 // On tall screens the first batch may not overflow, so scrolling would never fire
@@ -480,12 +571,6 @@ function pickColumns(all) {
   return VISIBLE_COLUMNS.filter(c => all.includes(c));
 }
 
-function toInputDate(d) {
-  // Local date parts, so the value does not shift a day because of the timezone
-  const pad = n => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
-
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
@@ -493,14 +578,8 @@ function escapeHtml(value) {
 /* ==================== INIT ==================== */
 
 document.addEventListener('DOMContentLoaded', () => {
-  const today = new Date();
-  const from  = new Date();
-  from.setDate(today.getDate() - DEFAULT_RANGE_DAYS);
-
-  dateFrom.value = toInputDate(from);
-  dateTo.value   = toInputDate(today);
-
-  applyFilters();
+  // Nothing is loaded until the user searches
+  setState('Enter an invoice no. or WF KEY, then press Search.');
 });
 </script>
 

@@ -2,6 +2,22 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+// ==================== AUTH GUARD ====================
+if (empty($_SESSION['logged_in']) || empty($_SESSION['user_id'])) {
+    if (!headers_sent()) {
+        header('Location: /factory_supplies/index.php');
+    } else {
+        // Fallback if the page already started output
+        echo '<script>location.replace("/factory_supplies/index.php");</script>';
+    }
+    exit;
+}
+
+if (!headers_sent()) {
+    header('Cache-Control: no-store, no-cache, must-revalidate');
+    header('Pragma: no-cache');
+}
 ?>
 <?php
 /* ==================== UPDATE LAST ACTIVE / IP ==================== */
@@ -482,14 +498,16 @@ $isUser = ($role === 'user');
 
 $navItems = $isUser
     ? [
-        ['href' => 'index.php', 'icon' => 'bi-bag-plus',     'label' => 'Requested Items'],
-        ['href' => 'withdraw.php',      'icon' => 'bi-box-arrow-up', 'label' => 'Withdraw'],
+        ['href' => 'index.php',    'icon' => 'bi-bag-plus',     'label' => 'Requested Items'],
+        ['href' => 'withdraw.php', 'icon' => 'bi-box-arrow-up', 'label' => 'Withdraw'],
     ]
     : [
-        ['href' => 'index.php',     'icon' => 'bi-speedometer2', 'label' => 'Dashboard'],
-        ['href' => 'account.php',   'icon' => 'bi-people',       'label' => 'Account Management'],
-        ['href' => 'journal.php',   'icon' => 'bi-journal-text', 'label' => 'Journal'],
-        ['href' => 'purchases.php', 'icon' => 'bi-cart3',        'label' => 'Purchases'],
+        ['href' => 'index.php',       'icon' => 'bi-speedometer2', 'label' => 'Dashboard'],
+        ['href' => 'account.php',     'icon' => 'bi-people',       'label' => 'Account Management'],
+        ['href' => 'journal.php',     'icon' => 'bi-journal-text', 'label' => 'Journal'],
+        ['href' => 'purchases.php',   'icon' => 'bi-cart3',        'label' => 'Purchases'],
+        ['href' => 'item_master.php', 'icon' => 'bi-box-seam',     'label' => 'Item Masterlist'],
+      ['href' => 'withdrawals.php', 'icon' => 'bi-box-arrow-up', 'label' => 'Withdrawals'],
     ];
 /* ==================== USER SECTION (m_employees) ==================== */
 

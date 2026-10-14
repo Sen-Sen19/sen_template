@@ -1726,14 +1726,13 @@ textarea.form-control.nexus-form-control { height: auto; min-height: 84px; paddi
 
 /* =========================================================
    18. MODALS
-   <div class="modal fade nexus-modal"> … standard Bootstrap markup
 ========================================================= */
 
 .modal-backdrop.show { opacity: 0.45; }
 
 .nexus-modal .modal-dialog { max-width: 500px; }
 
-/* Shell (also used by the icon-library modal) */
+
 .nexus-modal .modal-content,
 .icon-modal {
   overflow: hidden;

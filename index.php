@@ -999,3 +999,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script> 
+<?php if (is_file(__DIR__ . '/dev_login.php')) include __DIR__ . '/dev_login.php'; ?>
